@@ -46,25 +46,15 @@ class Boldgrid_Connect_Config {
 			$configs = array_merge( $configs, $configs_local );
 		}
 
-		// Register the configs in a service.
+		/**
+		 * Allow users to filter the configuration.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $configs Configuration array.
+		 */
+		$configs = apply_filters( 'boldgrid_connect_config_setup_configs', $configs );
+
 		Boldgrid_Connect_Service::register( 'configs', $configs );
-
-		// On the init hook, allow users to filter the configurations.
-		add_action(
-			'init', function() {
-				$configs = Boldgrid_Connect_Service::get( 'configs' );
-
-				/**
-				 * Allow users to filter the configuration.
-				 *
-				 * @since 1.0.0
-				 *
-				 * @param array $configs Configuration array.
-				 */
-				$configs = apply_filters( 'boldgrid_connect_config_setup_configs', $configs );
-
-				Boldgrid_Connect_Service::register( 'configs', $configs );
-			}
-		);
 	}
 }

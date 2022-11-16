@@ -1,16 +1,18 @@
 === BoldGrid Connect ===
 Contributors: boldgrid, imh_brad, joemoto, rramo012, timph
 Tags: boldgrid, connect, manage
-Requires at least: 4.4
-Tested up to: 5.4
+Requires at least: 5.0
+Tested up to: 6.0
 Requires PHP: 5.4
-Stable tag: 1.0.2
+Stable tag: 2.0.1
 
 Connects users and sites with BoldGrid Central.
 
 == Description ==
 
-Connects users and sites with BoldGrid Central.
+Manage all your WordPress websites in a single dashboard. BoldGrid Central
+allows you to manage themes, plugins & backups all from within a single interface.
+Using our single sign in feature, you can log into central and access any of your connected websites.
 
 == Installation ==
 
@@ -22,6 +24,19 @@ Connects users and sites with BoldGrid Central.
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 2.0.1 =
+
+Release Date: June 28th, 2022
+
+* Bug Fix: Fixes BoldGrid API server not being filtered correctly. 
+
+= 2.0.0 =
+
+Release Date: TBD
+
+* Feature:  Single signin through BoldGrid Central.
+* Feature:  New rest endpoints.
 
 = 1.0.2 =
 

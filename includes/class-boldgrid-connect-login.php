@@ -31,7 +31,6 @@ class Boldgrid_Connect_Login {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @see \Boldgrid\Library\Library\Configs::get()
 	 * @see Boldgrid_Connect_Login::authenticate()
 	 *
 	 * @global $pagenow The current page/script filename, according to WordPress.
@@ -43,7 +42,7 @@ class Boldgrid_Connect_Login {
 			'init', function () use ( $login ) {
 				global $pagenow;
 
-				if ( 'wp-login.php' === $pagenow && \Boldgrid\Library\Library\Configs::get( 'key' ) ) {
+				if ( 'wp-login.php' === $pagenow && get_option( 'boldgrid_api_key' ) ) {
 					$login->authenticate();
 				}
 			}, 20
@@ -60,7 +59,7 @@ class Boldgrid_Connect_Login {
 	 *
 	 * @return WP_User|false
 	 */
-	protected function get_user() {
+	public function get_user() {
 		$args = array(
 			'role'   => 'administrator',
 			'order'  => 'DESC',
@@ -87,9 +86,8 @@ class Boldgrid_Connect_Login {
 	 */
 	public function authenticate() {
 		// Authentication parameters.
-		$token        = ! empty( $_POST['token'] ) ? sanitize_text_field( $_POST['token'] ) : null; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-		$redirect_url = ! empty( $_POST['redirect_url'] ) ? // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-			esc_url_raw( $_POST['redirect_url'] ) : user_admin_url();
+		$token        = ! empty( $_REQUEST['token'] ) ? sanitize_text_field( $_REQUEST['token'] ) : null; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		$redirect_url = ! empty( $_REQUEST['redirect_url'] ) ? $_REQUEST['redirect_url'] : user_admin_url(); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 
 		if ( is_user_logged_in() && $token ) {
 			wp_safe_redirect( $redirect_url );
@@ -100,9 +98,24 @@ class Boldgrid_Connect_Login {
 
 		if ( $token ) {
 			$user = $this->get_user();
+			if ( ! empty( $_REQUEST['environment_id'] ) ) {
+				$environment_id = sanitize_text_field( $_REQUEST['environment_id'] );
+				$tokenValidator = new \BoldGrid\Connect\Authentication\Token();
+				if ( ! empty( $_REQUEST['has_access_token'] ) ) {
+					$user = $tokenValidator->getValidUser( $token );
+					$valid = $user && ! empty( $user->ID );
 
-			$valid = $user && $this->remote_validate( $token );
+				// Validate an environment auth code remotely.
+				} else {
+					$valid = $user && $tokenValidator->remoteValidate( $token, $environment_id );
+				}
 
+			// Verify the site token.
+			} else {
+				$valid = $user && $this->remote_validate( $token );
+			}
+
+			// Log the user in.
 			if ( $valid ) {
 				$this->login( $user, $redirect_url );
 			}
@@ -141,7 +154,6 @@ class Boldgrid_Connect_Login {
 	 * @since 1.0.0
 	 *
 	 * @see Boldgrid_Connect_Service::get()
-	 * @see \Boldgrid\Library\Library\Configs::get()
 	 * @see wp_remote_post()
 	 * @see wp_remote_retrieve_response_code()
 	 * @see wp_remote_retrieve_body()
@@ -149,17 +161,20 @@ class Boldgrid_Connect_Login {
 	 * @param  string $token Login token.
 	 * @return bool
 	 */
-	protected function remote_validate( $token ) {
+	public function remote_validate( $token ) {
+		do_action('bgc_remote_validate');
+
 		$configs   = Boldgrid_Connect_Service::get( 'configs' );
 		$url       = $configs['asset_server'] . $configs['ajax_calls']['verify_site_token'];
 		$args      = array(
 			'method'  => 'POST',
 			'body'    => array(
-				'key'   => \Boldgrid\Library\Library\Configs::get( 'key' ),
+				'key'   => get_option( 'boldgrid_api_key' ),
 				'token' => $token,
 			),
 			'timeout' => 10,
 		);
+
 		$response  = wp_remote_post( $url, $args );
 		$http_code = wp_remote_retrieve_response_code( $response );
 		$body      = json_decode( wp_remote_retrieve_body( $response ), true );
