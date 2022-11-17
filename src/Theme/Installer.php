@@ -10,7 +10,7 @@
 * @link       https://boldgrid.com
 */
 
-namespace BoldGrid\Connect\Theme;
+namespace Central\Connect\Theme;
 
 /**
 * Class: Installer
@@ -86,12 +86,12 @@ class Installer {
 	public function delete( $stylesheets ) {
 		include_once ABSPATH . 'wp-admin/includes/misc.php';
 		include_once ABSPATH . 'wp-admin/includes/theme.php';
-		include_once BOLDGRID_CONNECT_PATH . 'includes/class-boldgrid-connect-upgrader.php';
+		include_once CENTRAL_CONNECT_PATH . 'includes/class-central-connect-upgrader.php';
 
 		$results = false;
 		foreach( $stylesheets as $stylesheet ) {
 			$directory = get_theme_root( $stylesheet ) . trailingslashit( "/$stylesheet" );
-			$upgrader = new \Theme_Upgrader( new \Boldgrid_Connect_Upgrader_Skin() );
+			$upgrader = new \Theme_Upgrader( new \Central_Connect_Upgrader_Skin() );
 			$upgrader->init();
 			$results[] = $upgrader->clear_destination( $directory );
 		}
@@ -107,7 +107,7 @@ class Installer {
 	public function install( $themeZip ) {
 		include_once ABSPATH . 'wp-admin/includes/misc.php';
 		include_once ABSPATH . 'wp-admin/includes/theme.php';
-		include_once BOLDGRID_CONNECT_PATH . 'includes/class-boldgrid-connect-upgrader.php';
+		include_once CENTRAL_CONNECT_PATH . 'includes/class-central-connect-upgrader.php';
 
 		add_filter( 'upgrader_package_options', function ( $options ) {
 			$options['clear_destination'] = true;
@@ -118,7 +118,7 @@ class Installer {
 
 		wp_cache_flush();
 
-		$upgrader = new \Theme_Upgrader( new \Boldgrid_Connect_Upgrader_Skin() );
+		$upgrader = new \Theme_Upgrader( new \Central_Connect_Upgrader_Skin() );
 		$upgrader->install( $themeZip );
 
 		return $upgrader->theme_info();

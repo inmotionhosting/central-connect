@@ -10,7 +10,7 @@
 * @link       https://boldgrid.com
 */
 
-namespace BoldGrid\Connect\Theme;
+namespace Central\Connect\Theme;
 
 /**
 * Class: Router

@@ -17,7 +17,7 @@
  *
  * @since 2.0.0
  */
-class Boldgrid_Connect_Upgrade {
+class Central_Connect_Upgrade {
 
 	/**
 	 * Prefix string used in plugin.
@@ -38,7 +38,7 @@ class Boldgrid_Connect_Upgrade {
 	 * @since 2.0.0
 	 */
 	public function __construct() {
-		$this->prefix = 'boldgrid_connect';
+		$this->prefix = 'central_connect';
 	}
 
 	/**
@@ -66,7 +66,7 @@ class Boldgrid_Connect_Upgrade {
         }
 
 		// Get current version from constant set in plugin.
-		$version = BOLDGRID_CONNECT_VERSION;
+		$version = CENTRAL_CONNECT_VERSION;
 
 		// If the db version doesn't match the config version then run upgrade methods.
 		if ( $this->get_option() !== $version ) {
@@ -93,7 +93,7 @@ class Boldgrid_Connect_Upgrade {
 			}
 
 			// Once done with method calls, update the version number from constant.
-			$this->set_option( BOLDGRID_CONNECT_VERSION );
+			$this->set_option( CENTRAL_CONNECT_VERSION );
 		}
 	}
 

@@ -10,9 +10,9 @@
 * @link       https://boldgrid.com
 */
 
-namespace BoldGrid\Connect\Plugin;
+namespace Central\Connect\Plugin;
 
-use BoldGrid\Connect\FileSystem;
+use Central\Connect\FileSystem;
 
 /**
 * Class: Router

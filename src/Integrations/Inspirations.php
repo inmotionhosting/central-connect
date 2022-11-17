@@ -10,10 +10,10 @@
 * @link       https://boldgrid.com
 */
 
-namespace BoldGrid\Connect\Integrations;
+namespace Central\Connect\Integrations;
 
-use BoldGrid\Connect\Option;
-use BoldGrid\Connect\View\Central;
+use Central\Connect\Option;
+use Central\Connect\View\Central;
 
 /**
 * Class: Installed
@@ -48,7 +48,7 @@ class Inspirations {
 			return;
 		}
 
-		$configs = get_option( 'bg_connect_configs', \Boldgrid_Connect_Service::get( 'configs' ) );
+		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 		$provider = get_option( 'boldgrid_connect_provider', 'BoldGrid' );
 
 		add_meta_box(

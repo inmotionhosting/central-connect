@@ -10,9 +10,9 @@
 * @link       https://boldgrid.com
 */
 
-namespace BoldGrid\Connect\Authentication;
+namespace Central\Connect\Authentication;
 
-use BoldGrid\Connect\Option;
+use Central\Connect\Option;
 
 /**
 * Class: Router
@@ -141,7 +141,7 @@ class Router {
 		}
 		
 		if ( empty( $user ) ) {
-			$login = new \Boldgrid_Connect_Login();
+			$login = new \Central_Connect_Login();
 			$user = $login->get_user();
 		}
 

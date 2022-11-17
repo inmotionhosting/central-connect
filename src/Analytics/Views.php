@@ -10,9 +10,9 @@
  * @link       https://boldgrid.com
  */
 
-namespace BoldGrid\Connect\Analytics;
+namespace Central\Connect\Analytics;
 
-use BoldGrid\Connect\Analytics\Option;
+use Central\Connect\Analytics\Option;
 
 /**
  * Class: Views

@@ -74,7 +74,7 @@ class Installer {
 	public function install( $plugin_zip ) {
 		include_once ABSPATH . 'wp-admin/includes/misc.php';
 		include_once ABSPATH . 'wp-admin/includes/plugin.php';
-		include_once BOLDGRID_CONNECT_PATH . 'includes/class-boldgrid-connect-upgrader.php';
+		include_once CENTRAL_CONNECT_PATH . 'includes/class-central-connect-upgrader.php';
 
 		add_filter( 'upgrader_package_options', function ( $options ) {
 			$options['clear_destination'] = true;
@@ -85,7 +85,7 @@ class Installer {
 
 		wp_cache_flush();
 
-		$upgrader = new \Plugin_Upgrader( new \Boldgrid_Connect_Upgrader_Skin() );
+		$upgrader = new \Plugin_Upgrader( new \Central_Connect_Upgrader_Skin() );
 		$upgrader->install( $plugin_zip );
 
 		return $upgrader->plugin_info();

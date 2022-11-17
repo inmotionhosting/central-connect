@@ -10,7 +10,7 @@
  * @link       https://boldgrid.com
  */
 
-namespace BoldGrid\Connect\Option;
+namespace Central\Connect\Option;
 
 /**
  * Class: Connect
@@ -20,5 +20,5 @@ namespace BoldGrid\Connect\Option;
  * @since      2.0.0
  */
 class Connect extends Group {
-	const OPTION_NAMESPACE = 'boldgrid_connect';
+	const OPTION_NAMESPACE = 'central_connect';
 }

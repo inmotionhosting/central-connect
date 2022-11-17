@@ -10,9 +10,9 @@
 * @link       https://boldgrid.com
 */
 
-namespace BoldGrid\Connect\Rest;
+namespace Central\Connect\Rest;
 
-use BoldGrid\Connect;
+use Central\Connect;
 
 /**
 * Class: Server

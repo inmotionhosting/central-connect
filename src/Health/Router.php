@@ -10,7 +10,7 @@
 * @link       https://boldgrid.com
 */
 
-namespace BoldGrid\Connect\Health;
+namespace Central\Connect\Health;
 
 /**
 * Class: Router

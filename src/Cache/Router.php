@@ -10,7 +10,7 @@
 * @link       https://boldgrid.com
 */
 
-namespace BoldGrid\Connect\Cache;
+namespace Central\Connect\Cache;
 
 /**
 * Class: Router

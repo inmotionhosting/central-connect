@@ -8,9 +8,9 @@
  * @link       https://boldgrid.com
  */
 
-namespace BoldGrid\Connect\Analytics;
+namespace Central\Connect\Analytics;
 
-use BoldGrid\Connect\Health;
+use Central\Connect\Health;
 
 /**
  * Class: Stats

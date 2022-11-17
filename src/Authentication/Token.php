@@ -10,7 +10,7 @@
 * @link       https://boldgrid.com
 */
 
-namespace BoldGrid\Connect\Authentication;
+namespace Central\Connect\Authentication;
 
 /**
 * Class: Central
@@ -84,7 +84,7 @@ class Token {
 	public function remoteValidate( $token, $environmentId ) {
 		do_action('bgc_remote_validate');
 
-		$configs = \Boldgrid_Connect_Service::get( 'configs' );
+		$configs = \Central_Connect_Service::get( 'configs' );
 		$url     = $configs['asset_server'] . $configs['ajax_calls']['verify_env_token'];
 		$args    = array(
 			'body'    => array(

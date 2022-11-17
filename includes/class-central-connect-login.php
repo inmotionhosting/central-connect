@@ -25,7 +25,7 @@
  *
  * phpcs:disable WordPress.VIP
  */
-class Boldgrid_Connect_Login {
+class Central_Connect_Login {
 	/**
 	 * Run hooks for login support.
 	 *

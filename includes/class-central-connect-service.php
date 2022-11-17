@@ -21,7 +21,7 @@
  *
  * @since      1.0.0
  */
-abstract class Boldgrid_Connect_Service {
+abstract class Central_Connect_Service {
 	/**
 	 * Array of service objects.
 	 *

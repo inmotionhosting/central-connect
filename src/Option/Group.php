@@ -21,7 +21,7 @@ namespace BoldGrid\Connect\Option;
  */
 abstract class Group {
 
-	const OPTION_NAMESPACE = 'boldgrid_plugin';
+	const OPTION_NAMESPACE = 'central_connect';
 
 	/**
 	 * Retrieve an option from the stored list of editor options.

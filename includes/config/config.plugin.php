@@ -32,7 +32,7 @@ return array(
 	'central_url'           => 'https://www.boldgrid.com/central',
 	'plugin_name'           => 'boldgrid-connect',
 	'plugin_key_code'       => 'connect',
-	'main_file_path'        => BOLDGRID_CONNECT_PATH . 'boldgrid-connect.php',
+	'main_file_path'        => CENTRAL_CONNECT_PATH . 'boldgrid-connect.php',
 	'plugin_transient_name' => 'boldgrid_connect_version_data',
 
 	'branding' => [

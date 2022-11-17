@@ -10,9 +10,9 @@
 * @link       https://boldgrid.com
 */
 
-namespace BoldGrid\Connect\View\Central;
+namespace Central\Connect\View\Central;
 
-use BoldGrid\Connect\Option;
+use Central\Connect\Option;
 
 /**
 * Class: Router
@@ -90,9 +90,9 @@ class ConnectNotice {
 	 * @since 2.0.0
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_style( 'bgc-connect-styles', plugins_url( './assets/style/admin.css', BOLDGRID_CONNECT_FILE ), array(), BOLDGRID_CONNECT_VERSION );
+		wp_enqueue_style( 'bgc-connect-styles', plugins_url( './assets/style/admin.css', CENTRAL_CONNECT_FILE ), array(), CENTRAL_CONNECT_VERSION );
 
-		$configs = get_option( 'bg_connect_configs', \Boldgrid_Connect_Service::get( 'configs' ) );
+		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 		$provider = get_option( 'boldgrid_connect_provider', '' );
 
 		global $_wp_admin_css_colors;
@@ -108,7 +108,7 @@ class ConnectNotice {
 
 		wp_add_inline_style( 'bgc-connect-styles', $custom_css );
 
-		wp_enqueue_script( 'bgc-connect-script', plugins_url( './assets/js/admin.js', BOLDGRID_CONNECT_FILE ), array( 'jquery' ), BOLDGRID_CONNECT_VERSION, true );
+		wp_enqueue_script( 'bgc-connect-script', plugins_url( './assets/js/admin.js', CENTRAL_CONNECT_FILE ), array( 'jquery' ), CENTRAL_CONNECT_VERSION, true );
 	}
 
 	/**
@@ -125,7 +125,7 @@ class ConnectNotice {
 			'activate_plugins',
 			'boldgrid-connect-central',
 			function () {
-				$configs = get_option( 'bg_connect_configs', \Boldgrid_Connect_Service::get( 'configs' ) );
+				$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 				$centralUrl = $configs['central_url'] . '/projects?environment_id=' . Option\Connect::get( 'environment_id' );
 
 				?>
@@ -179,7 +179,7 @@ class ConnectNotice {
 	* @echo string
 	*/
 	public static function termsOfService() {
-		$configs = get_option( 'bg_connect_configs', \Boldgrid_Connect_Service::get( 'configs' ) );
+		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 		$provider = get_option( 'boldgrid_connect_provider', 'BoldGrid' );
 
 		printf(
@@ -209,7 +209,7 @@ class ConnectNotice {
 	 * @return string
 	 */
 	public static function getConnectUrl( $token ) {
-		$configs = get_option( 'bg_connect_configs', \Boldgrid_Connect_Service::get( 'configs' ) );
+		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 		$provider = get_option( 'boldgrid_connect_provider', 'BoldGrid' );
 
 		$query = http_build_query( [
@@ -222,20 +222,20 @@ class ConnectNotice {
 	}
 
 	public static function getBrandLogo() {
-		$configs = \Boldgrid_Connect_Service::get( 'configs' );
+		$configs = \Central_Connect_Service::get( 'configs' );
 		$provider = get_option( 'boldgrid_connect_provider', 'BoldGrid' );
 		$url = $configs['branding'][ $provider ]['logo'];
 
 		// Allows brands to provide external URL via config or load from local file.
 		if ( substr( $configs['branding'][ $provider ]['logo'], 0, 4 ) !== 'http' ) {
-			$url = plugins_url( $url, BOLDGRID_CONNECT_FILE );
+			$url = plugins_url( $url, CENTRAL_CONNECT_FILE );
 		}
 
 		return $url;
 	}
 
 	public static function getNoticeBody() {
-		$configs = get_option( 'bg_connect_configs', \Boldgrid_Connect_Service::get( 'configs' ) );
+		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 		$provider = get_option( 'boldgrid_connect_provider', '' );
 		$productName = '';
 

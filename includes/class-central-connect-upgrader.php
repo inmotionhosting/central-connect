@@ -19,7 +19,7 @@ include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 *
 * @since 2.0.0
 */
-class Boldgrid_Connect_Upgrader_Skin extends \WP_Upgrader_Skin {
+class Central_Connect_Upgrader_Skin extends \WP_Upgrader_Skin {
 
 
 	/**

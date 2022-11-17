@@ -3,7 +3,7 @@
  * WordPress and PHP Version checking.
  */
 
-if ( ! class_exists( 'Boldgrid_Connect_Version_Check' ) ) {
+if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 
 	/**
 	 * Boldgrid_Connect_Version_Check Class.
@@ -11,7 +11,7 @@ if ( ! class_exists( 'Boldgrid_Connect_Version_Check' ) ) {
 	 * This class is used to determine if a supported PHP version and
 	 * WP version are in use before initializing plugin code.
 	 */
-	class Boldgrid_Connect_Version_Check {
+	class Central_Connect_Version_Check {
 
 		/**
 		 * @var string $plugin Main plugin file.

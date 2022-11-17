@@ -5,14 +5,14 @@
  * Connect accessors within a namespace.
  *
  * @since      2.0.0
- * @package    BoldGrid\Connect
+ * @package    Central\Connect
  * @author     BoldGrid <support@boldgrid.com>
  * @link       https://boldgrid.com
  */
 
-namespace BoldGrid\Connect\Analytics;
+namespace Central\Connect\Analytics;
 
-use BoldGrid\Connect\Option\Group;
+use Central\Connect\Option\Group;
 
 /**
  * Class: Connect
@@ -22,5 +22,5 @@ use BoldGrid\Connect\Option\Group;
  * @since      2.0.0
  */
 class Option extends Group {
-	const OPTION_NAMESPACE = 'boldgrid_connect_analytics';
+	const OPTION_NAMESPACE = 'central_connect_analytics';
 }

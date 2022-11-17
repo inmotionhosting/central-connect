@@ -19,7 +19,7 @@
  *
  * @since 1.0.0
  */
-class Boldgrid_Connect_Config {
+class Central_Connect_Config {
 	/**
 	 * Setup the configuration.
 	 *
@@ -35,10 +35,10 @@ class Boldgrid_Connect_Config {
 		global $wp_filesystem;
 
 		// Set the initial configs for those who can't wait.
-		$configs = include BOLDGRID_CONNECT_PATH . '/includes/config/config.plugin.php';
+		$configs = include CENTRAL_CONNECT_PATH . '/includes/config/config.plugin.php';
 
 		// If there are local config overrides, then merge them in.
-		$local_config_path = BOLDGRID_CONNECT_PATH . '/includes/config/config.local.php';
+		$local_config_path = CENTRAL_CONNECT_PATH . '/includes/config/config.local.php';
 
 		if ( $wp_filesystem->exists( $local_config_path ) ) {
 			$configs_local = include $local_config_path;

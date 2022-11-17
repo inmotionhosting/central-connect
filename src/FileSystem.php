@@ -10,7 +10,7 @@
  * @link       https://boldgrid.com
  */
 
-namespace BoldGrid\Connect;
+namespace Central\Connect;
 
 /**
  * Class: FileSystem

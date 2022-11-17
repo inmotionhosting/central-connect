@@ -10,9 +10,9 @@
 * @link       https://boldgrid.com
 */
 
-namespace BoldGrid\Connect\Analytics;
+namespace Central\Connect\Analytics;
 
-use BoldGrid\Connect\Rest\Controller;
+use Central\Connect\Rest\Controller;
 
 /**
 * Class: Router

@@ -10,7 +10,7 @@
 * @link       https://boldgrid.com
 */
 
-namespace BoldGrid\Connect\Authentication;
+namespace Central\Connect\Authentication;
 
 /**
 * Class: Central

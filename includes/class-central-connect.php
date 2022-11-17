@@ -12,7 +12,7 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
- use BoldGrid\Connect;
+ use Central\Connect;
 
 /**
  * Class: Boldgrid_Connect
@@ -22,14 +22,14 @@
  * @subpackage Boldgrid_Connect/includes
  * @author     BoldGrid <support@boldgrid.com>
  */
-class Boldgrid_Connect {
+class Central_Connect {
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
 	 * the plugin.
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      Boldgrid_Connect_Loader    $loader    Maintains and registers all hooks for the plugin.
+	 * @var      Central_Connect_Loader    $loader    Maintains and registers all hooks for the plugin.
 	 */
 	protected $loader;
 
@@ -69,32 +69,32 @@ class Boldgrid_Connect {
 	 * @see Boldgrid_Connect_Loader()
 	 */
 	private function load_dependencies() {
-		require_once BOLDGRID_CONNECT_PATH . '/autoload.php';
+		require_once CENTRAL_CONNECT_PATH . '/autoload.php';
 
 		/**
 		 * The class responsible for orchestrating the actions and filters of the core plugin.
 		 */
-		require_once BOLDGRID_CONNECT_PATH . '/includes/class-boldgrid-connect-loader.php';
+		require_once CENTRAL_CONNECT_PATH . '/includes/class-boldgrid-connect-loader.php';
 
 		/**
 		 * The class responsible for handling service objects.
 		 */
-		require_once BOLDGRID_CONNECT_PATH . '/includes/class-boldgrid-connect-service.php';
+		require_once CENTRAL_CONNECT_PATH . '/includes/class-boldgrid-connect-service.php';
 
 		/**
 		 * The class responsible for loading the configuration array as a service object.
 		 */
-		require_once BOLDGRID_CONNECT_PATH . '/includes/class-boldgrid-connect-config.php';
+		require_once CENTRAL_CONNECT_PATH . '/includes/class-boldgrid-connect-config.php';
 
 		/**
 		 * The class responsible for login via secure token.
 		 */
-		require_once BOLDGRID_CONNECT_PATH . '/includes/class-boldgrid-connect-login.php';
+		require_once CENTRAL_CONNECT_PATH . '/includes/class-boldgrid-connect-login.php';
 
 		/**
 		 * The class responsible for login via secure token.
 		 */
-		require_once BOLDGRID_CONNECT_PATH . '/includes/class-boldgrid-connect-upgrade.php';
+		require_once CENTRAL_CONNECT_PATH . '/includes/class-boldgrid-connect-upgrade.php';
 
 		$this->loader = new Boldgrid_Connect_Loader();
 	}

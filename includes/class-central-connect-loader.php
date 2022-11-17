@@ -28,7 +28,7 @@
  * @subpackage Boldgrid_Connect/includes
  * @author     BoldGrid <support@boldgrid.com>
  */
-class Boldgrid_Connect_Loader {
+class Central_Connect_Loader {
 	/**
 	 * The array of actions registered with WordPress.
 	 *
