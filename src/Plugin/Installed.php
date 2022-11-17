@@ -41,7 +41,7 @@ class Installed {
 	 */
 	public function pluginRow() {
 		add_filter( 'plugin_row_meta', function ( $meta, $slug ) {
-			$pluginName = 'boldgrid-connect.php';
+			$pluginName = 'central-connect.php';
 			$length = strlen( $pluginName );
 			$hasPluginFilename = substr( $slug, -$length ) === $pluginName;
 			if ( $hasPluginFilename ) {
