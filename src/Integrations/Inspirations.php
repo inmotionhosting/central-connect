@@ -53,7 +53,7 @@ class Inspirations {
 
 		add_meta_box(
 			'publish_website',
-			esc_html__( 'Publish Website', 'boldgrid-inspirations' ),
+			esc_html__( 'Publish Website', 'central-connect' ),
 			function () use ( $configs, $provider ) {
 				$productName = $configs['branding'][ $provider ]['productName'];
 				$centralUrl = $configs['branding'][ $provider ]['central_url'];
@@ -63,8 +63,8 @@ class Inspirations {
 						'" class="button button-primary">%2$s</a>',
 					esc_html__( 'You\'ve deployed this site on a development environment. To make this website public, ' .
 					'you\'ll need to transfer to a production environment. Head back over to ' . $productName .
-					' when you\'re done making changes to deploy your website.' ),
-					esc_html__( 'Publish Site' )
+					' when you\'re done making changes to deploy your website.', 'central-connect' ),
+					esc_html__( 'Publish Site', 'central-connect' )
 				);
 			},
 			'admin_page_my-inspiration',

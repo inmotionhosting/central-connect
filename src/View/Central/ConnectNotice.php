@@ -120,8 +120,8 @@ class ConnectNotice {
 	 */
 	public function add_submenu() {
 		add_options_page(
-			__( 'Central Connection', 'boldgrid-connect' ),
-			__( 'Central Connection', 'boldgrid-connect' ),
+			__( 'Central Connection', 'central-connect' ),
+			__( 'Central Connection', 'central-connect' ),
 			'activate_plugins',
 			'boldgrid-connect-central',
 			function () {
@@ -132,15 +132,15 @@ class ConnectNotice {
 				<div class="bg-container"> <?php
 					if ( self::isConnected() ) { ?>
 						<div class="bgc-connect-active">
-							<h2 class="bgc-connect-active__heading"><?php print esc_html__( 'Site Connected', 'boldgrid-connect' ) ?></h2>
+							<h2 class="bgc-connect-active__heading"><?php print esc_html__( 'Site Connected', 'central-connect' ) ?></h2>
 							<p class="bgc-connect-active__sub-heading">
 								<span class="dashicons dashicons-yes-alt"></span>
-								<?php print esc_html__( 'This site\'s connection is working properly.', 'boldgrid-connect' ) ?></p>
+								<?php print esc_html__( 'This site\'s connection is working properly.', 'central-connect' ) ?></p>
 							<p>
-								<?php print esc_html__( 'Log into Central and access this site\'s controls. Manage your backups, SEO, page speed and more!', 'boldgrid-connect' ) ?>
+								<?php print esc_html__( 'Log into Central and access this site\'s controls. Manage your backups, SEO, page speed and more!', 'central-connect' ) ?>
 							</p>
 							<a target="_blank" class="button button-primary"
-								href="<?php print $centralUrl; ?>"><?php print esc_html__( 'Manage In Central', 'boldgrid-connect' ) ?></a>
+								href="<?php print $centralUrl; ?>"><?php print esc_html__( 'Manage In Central', 'central-connect' ) ?></a>
 						</div>
 					<?php } else {
 						$this->render();
@@ -185,7 +185,7 @@ class ConnectNotice {
 		printf(
 			wp_kses(
 				/* Translators: placeholders are links. */
-				__( 'By clicking the <strong>Connect to %3$s</strong> button, you agree to our <a href="%1$s" target="_blank">Terms of Service</a> and our <a href="%2$s" target="_blank">privacy policy</a>.', 'boldgrid-connect' ),
+				__( 'By clicking the <strong>Connect to %3$s</strong> button, you agree to our <a href="%1$s" target="_blank">Terms of Service</a> and our <a href="%2$s" target="_blank">privacy policy</a>.', 'central-connect' ),
 				array(
 					'a' => array(
 						'href'   => array(),
@@ -248,16 +248,16 @@ class ConnectNotice {
 		if ( ! empty( $provider ) ) : ?>
 			<div class="bgc-connect-prompt__logo">
 			<a href="<?php echo $configs['branding'][ $provider ]['providerUrl']; ?>">
-				<img src="<?php echo self::getBrandLogo(); ?>" alt="<?php esc_attr_e( 'Connect your site', 'boldgrid-connect' ); ?>" target="_blank" />
+				<img src="<?php echo self::getBrandLogo(); ?>" alt="<?php esc_attr_e( 'Connect your site', 'central-connect' ); ?>" target="_blank" />
 			</a>
 			</div>
 			<div class="bgc-connect-prompt__description">
-				<h2><?php esc_html_e( "Optimize your Workflow and Connect to $productName" ); ?></h2>
-				<p><?php esc_html_e( 'Connect your site to Central for remote access to this install and any other WordPress installs you connect. Central makes it easy to set up your site if you\'re a beginner and fast if you\'re an expert. Our one-of-a-kind tools and services help you bring everything together.' ); ?></p>
-				<p><?php esc_html_e( 'Connecting to Central is completely free and includes a free WordPress environment that you can use for testing or staging changes.'); ?></p>
+				<h2><?php esc_html_e( "Optimize your Workflow and Connect to $productName", 'central-connect' ); ?></h2>
+				<p><?php esc_html_e( 'Connect your site to Central for remote access to this install and any other WordPress installs you connect. Central makes it easy to set up your site if you\'re a beginner and fast if you\'re an expert. Our one-of-a-kind tools and services help you bring everything together.', 'central-connect' ); ?></p>
+				<p><?php esc_html_e( 'Connecting to Central is completely free and includes a free WordPress environment that you can use for testing or staging changes.','central-connect' ); ?></p>
 				<div class="bgc-connect-prompt__description__action">
 					<a class="button-primary" target="_blank" href="<?php echo $connectUrl ?>"><?php
-						esc_html_e( "Connect to $productName" ); ?></a> <?php echo self::termsOfService() ?>
+						esc_html_e( "Connect to $productName", 'central-connect' ); ?></a> <?php echo self::termsOfService() ?>
 				</div>
 			</div>
 		<?php else :
@@ -265,9 +265,9 @@ class ConnectNotice {
 			$redirect = urlencode( $_SERVER['REQUEST_URI'] );
 			?>
 			<div class="bgc-connect-prompt__description">
-				<h2><?php esc_html_e( 'Get Started by Choosing your Central Provider' ); ?></h2>
-				<p><?php esc_html_e( 'Connect your site to a Central provider for remote access to this install and any other WordPress installs you connect.  Central makes it easy to set up your site if you\'re a beginner and fast if you\'re an expert.  Our one-of-a-kind tools and services help you bring everything together.' ); ?></p>
-				<p><?php esc_html_e( 'Connecting to Central is completely free and includes a free WordPress environment that you can use for testing or staging changes.'); ?></p>
+				<h2><?php esc_html_e( 'Get Started by Choosing your Central Provider', 'central-connect' ); ?></h2>
+				<p><?php esc_html_e( 'Connect your site to a Central provider for remote access to this install and any other WordPress installs you connect.  Central makes it easy to set up your site if you\'re a beginner and fast if you\'re an expert.  Our one-of-a-kind tools and services help you bring everything together.', 'central-connect' ); ?></p>
+				<p><?php esc_html_e( 'Connecting to Central is completely free and includes a free WordPress environment that you can use for testing or staging changes.','central-connect' ); ?></p>
 				<form action="<?php echo admin_url( 'admin-post.php' ); ?>" method="post">
 					<input type="hidden" name="action" value="boldgrid_connect_provider">
 					<?php wp_nonce_field( 'boldgrid_connect_provider', 'boldgrid_connect_provider_nonce', FALSE ); ?>
@@ -316,7 +316,7 @@ class ConnectNotice {
 			<div class="bgc-connect-prompt__attn">
 				<span class="dashicons dashicons-info"></span>
 				<?php esc_html_e( 'Finish setup by connecting to Central to unlock multiple WordPress environments,
-					performance optimization, site protection and more!' ); ?>
+					performance optimization, site protection and more!', 'central-connect' ); ?>
 				<!--- <span class="notice-dismiss" title="Dismiss this notice"></span> -->
 			</div>
 			<div class="bgc-connect-prompt__body">
