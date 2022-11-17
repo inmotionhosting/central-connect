@@ -10,7 +10,7 @@
 * @link       https://boldgrid.com
 */
 
-namespace BoldGrid\Connect\Plugin;
+namespace Central\Connect\Plugin;
 
 /**
 * Class: Installer

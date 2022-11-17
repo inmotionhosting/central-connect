@@ -10,7 +10,7 @@
  * @link       https://boldgrid.com
  */
 
-namespace BoldGrid\Connect\Option;
+namespace Central\Connect\Option;
 
 /**
  * Class: Option

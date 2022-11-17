@@ -4,7 +4,7 @@
 	margin: 0 auto;
 }
 
-.bgc-panel {
+.central-panel {
 	margin: 16px 0;
 	border: 1px solid #ccd0d4;
 	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
@@ -13,79 +13,79 @@
 	line-height: 1.7;
 }
 
-.bgc-connect-prompt__attn {
+.central-connect-prompt__attn {
 	position: relative;
 	color: #fff;
 	padding: 1.5em;
 }
 
-.bgc-connect-prompt__attn .dashicons {
+.central-connect-prompt__attn .dashicons {
 	margin-right: 1em;
 }
 
-.bgc-connect-prompt__attn .notice-dismiss::before {
+.central-connect-prompt__attn .notice-dismiss::before {
 	color: #fff;
 }
 
-.bgc-connect-prompt__attn .notice-dismiss:hover::before {
+.central-connect-prompt__attn .notice-dismiss:hover::before {
 	color: red;
 }
 
-.bgc-connect-prompt__body {
+.central-connect-prompt__body {
 	display: flex;
 }
 
-.bgc-connect-prompt__description {
+.central-connect-prompt__description {
 	padding: 2em 3em 5em 3em;
 	width: 1250px;
 }
 
-.bgc-connect-prompt__logo {
+.central-connect-prompt__logo {
 	width: 300px;
 }
 
-.bgc-connect-prompt__logo a {
+.central-connect-prompt__logo a {
 	display: flex;
 	height: 100%;
 	justify-content: center;
 }
 
-.bgc-connect-prompt__logo img {
+.central-connect-prompt__logo img {
 	display: flex;
 	align-self: center;
 	width: 180px;
 	padding: 3em;
 }
 
-.bgc-connect-prompt__description__action {
+.central-connect-prompt__description__action {
 	margin-top: 3em;
 }
 
-.bgc-connect-prompt__description__action .button-primary {
+.central-connect-prompt__description__action .button-primary {
 	margin-right: 1.5em;
 }
 
-.bgc-connect-active {
+.central-connect-active {
 	background: #fff;
 	max-width: 500px;
 	margin: 0 auto;
 	padding: 5em;
 }
 
-.bgc-connect-active__heading {
+.central-connect-active__heading {
 	font-size: 2em;
 	margin-top: 0;
 	font-weight: lighter;
 }
 
-.bgc-connect-active__sub-heading {
+.central-connect-active__sub-heading {
 	font-weight: bold;
 }
 
-.bgc-connect-active .button {
+.central-connect-active .button {
 	margin-top: 2em;
 }
 
-.bgc-connect-prompt__description label {
+.central-connect-prompt__description label {
 	vertical-align: baseline;
 }

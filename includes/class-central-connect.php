@@ -1,6 +1,6 @@
 <?php
 /**
- * File: class-boldgrid-connect.php
+ * File: class-central-connect.php
  *
  * @link       https://www.boldgrid.com
  * @since      1.0.0
@@ -69,34 +69,34 @@ class Central_Connect {
 	 * @see Boldgrid_Connect_Loader()
 	 */
 	private function load_dependencies() {
-		require_once CENTRAL_CONNECT_PATH . '/autoload.php';
+		require_once CENTRAL_CONNECT_PATH . 'autoload.php';
 
 		/**
 		 * The class responsible for orchestrating the actions and filters of the core plugin.
 		 */
-		require_once CENTRAL_CONNECT_PATH . '/includes/class-boldgrid-connect-loader.php';
+		require_once CENTRAL_CONNECT_PATH . 'includes/class-central-connect-loader.php';
 
 		/**
 		 * The class responsible for handling service objects.
 		 */
-		require_once CENTRAL_CONNECT_PATH . '/includes/class-boldgrid-connect-service.php';
+		require_once CENTRAL_CONNECT_PATH . 'includes/class-central-connect-service.php';
 
 		/**
 		 * The class responsible for loading the configuration array as a service object.
 		 */
-		require_once CENTRAL_CONNECT_PATH . '/includes/class-boldgrid-connect-config.php';
+		require_once CENTRAL_CONNECT_PATH . 'includes/class-central-connect-config.php';
 
 		/**
 		 * The class responsible for login via secure token.
 		 */
-		require_once CENTRAL_CONNECT_PATH . '/includes/class-boldgrid-connect-login.php';
+		require_once CENTRAL_CONNECT_PATH . 'includes/class-central-connect-login.php';
 
 		/**
 		 * The class responsible for login via secure token.
 		 */
-		require_once CENTRAL_CONNECT_PATH . '/includes/class-boldgrid-connect-upgrade.php';
+		require_once CENTRAL_CONNECT_PATH . 'includes/class-central-connect-upgrade.php';
 
-		$this->loader = new Boldgrid_Connect_Loader();
+		$this->loader = new Central_Connect_Loader();
 	}
 
 	/**
@@ -127,7 +127,7 @@ class Central_Connect {
 	 * @return void
 	 */
 	public function upgrade() {
-		$upgrade = new Boldgrid_Connect_Upgrade();
+		$upgrade = new Central_Connect_Upgrade();
 		$this->loader->add_action( 'plugins_loaded', $upgrade, 'upgrade_db_check' );
 	}
 
@@ -141,10 +141,10 @@ class Central_Connect {
 	private function define_admin_hooks() {
 		$this->overrideConfigs();
 
-		$config = new Boldgrid_Connect_Config();
+		$config = new Central_Connect_Config();
 		$this->loader->add_action( 'init', $config, 'setup_configs' );
 
-		$login = new Boldgrid_Connect_Login();
+		$login = new Central_Connect_Login();
 		$login->setup();
 
 		$connectNotice = new Connect\View\Central\ConnectNotice();
@@ -205,7 +205,7 @@ class Central_Connect {
 		 */
 		add_filter( 'option_bg_connect_configs', function( $value, $option ) {
 			$value = is_array( $value ) ? $value : [];
-			$conf = \Boldgrid_Connect_Service::get( 'configs' );
+			$conf = \Central_Connect_Service::get( 'configs' );
 
 			$confs = ! empty( $conf ) ? array_merge( $conf, $value ) : $value;
 

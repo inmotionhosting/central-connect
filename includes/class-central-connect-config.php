@@ -25,7 +25,7 @@ class Central_Connect_Config {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @see Boldgrid_Connect_Service::register()
+	 * @see Central_Connect_Service::register()
 	 *
 	 * @global $wp_filesystem.
 	 */
@@ -55,6 +55,6 @@ class Central_Connect_Config {
 		 */
 		$configs = apply_filters( 'boldgrid_connect_config_setup_configs', $configs );
 
-		Boldgrid_Connect_Service::register( 'configs', $configs );
+		Central_Connect_Service::register( 'configs', $configs );
 	}
 }

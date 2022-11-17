@@ -1,9 +1,9 @@
 /* global jQuery */
 console.log( 'fdfd' );
 ( function( $ ) {
-	var	notice = $( '.bgc-connect-prompt' ),
+	var	notice = $( '.central-connect-prompt' ),
 	wpWelcomeNotice = $( '#welcome-panel, .wp-header-end' ),
-	dismiss = $( '.bgc-connect-prompt .notice-dismiss' );
+	dismiss = $( '.central-connect-prompt .notice-dismiss' );
 
 	// Move the banner below the WP Welcome notice on the dashboard
 	$( window ).on( 'load', function() {
