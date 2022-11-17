@@ -30,7 +30,7 @@ class ConnectNotice {
 	 */
 	public function initialize() {
 		$page = isset( $_REQUEST['page'] ) ? sanitize_text_field( $_REQUEST['page'] ) : null;
-		if ( $page === 'boldgrid-connect-central' ) {
+		if ( $page === 'central-connect' ) {
 			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		}
 
@@ -123,7 +123,7 @@ class ConnectNotice {
 			__( 'Central Connection', 'central-connect' ),
 			__( 'Central Connection', 'central-connect' ),
 			'activate_plugins',
-			'boldgrid-connect-central',
+			'central-connect',
 			function () {
 				$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 				$centralUrl = $configs['central_url'] . '/projects?environment_id=' . Option\Connect::get( 'environment_id' );
@@ -161,7 +161,7 @@ class ConnectNotice {
 		$isRedirect = isset( $_GET['token_redirect'] ) ? $_GET['token_redirect'] : false;
 		$page = isset( $_GET['page'] ) ? $_GET['page'] : false;
 
-		if ( 'boldgrid-connect-central' === $page && $isRedirect ) {
+		if ( 'central-connect' === $page && $isRedirect ) {
 			$authentication = new \Central\Connect\Authentication\Token();
 			$token = $authentication->create( wp_get_current_user(), '+5 minutes' );
 
@@ -243,7 +243,7 @@ class ConnectNotice {
 			$productName = $configs['branding'][ $provider ]['productName'];
 		}
 
-		$connectUrl = get_admin_url( null, 'options-general.php?page=boldgrid-connect-central&token_redirect=1' );
+		$connectUrl = get_admin_url( null, 'options-general.php?page=central-connect&token_redirect=1' );
 
 		if ( ! empty( $provider ) ) : ?>
 			<div class="central-connect-prompt__logo">
