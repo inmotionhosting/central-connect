@@ -162,7 +162,7 @@ class ConnectNotice {
 		$page = isset( $_GET['page'] ) ? $_GET['page'] : false;
 
 		if ( 'boldgrid-connect-central' === $page && $isRedirect ) {
-			$authentication = new \BoldGrid\Connect\Authentication\Token();
+			$authentication = new \Central\Connect\Authentication\Token();
 			$token = $authentication->create( wp_get_current_user(), '+5 minutes' );
 
 			$url = self::getConnectUrl( $token['access_token'] );
