@@ -1,14 +1,14 @@
 <?php
 /**
-* File: Installed.php
-*
-* Modifications to the installed plugin listing page.
-*
-* @since      2.0.0
-* @package    BoldGrid\Connect\Integrations
-* @author     BoldGrid <support@boldgrid.com>
-* @link       https://boldgrid.com
-*/
+ * File: Installed.php
+ *
+ * Modifications to the installed plugin listing page.
+ *
+ * @since      2.0.0
+ * @package    BoldGrid\Connect\Integrations
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
+ * @link       https://boldgrid.com
+ */
 
 namespace Central\Connect\Integrations;
 
@@ -16,12 +16,12 @@ use Central\Connect\Option;
 use Central\Connect\View\Central;
 
 /**
-* Class: Installed
-*
-* Modifications to the installed plugin listing page.
-*
-* @since 2.0.0
-*/
+ * Class: Installed
+ *
+ * Modifications to the installed plugin listing page.
+ *
+ * @since 2.0.0
+ */
 class Inspirations {
 
 	/**
@@ -61,9 +61,12 @@ class Inspirations {
 				printf(
 					'<p>%1$s</p><a target="_blank" href="' . $centralUrl . '/projects?environment_id=' . Option\Connect::get( 'environment_id' ) .
 						'" class="button button-primary">%2$s</a>',
-					esc_html__( 'You\'ve deployed this site on a development environment. To make this website public, ' .
-					'you\'ll need to transfer to a production environment. Head back over to ' . $productName .
-					' when you\'re done making changes to deploy your website.', 'central-connect' ),
+					esc_html__(
+						'You\'ve deployed this site on a development environment. To make this website public, ' .
+						'you\'ll need to transfer to a production environment. Head back over to ' . $productName .
+						' when you\'re done making changes to deploy your website.',
+						'central-connect'
+					),
 					esc_html__( 'Publish Site', 'central-connect' )
 				);
 			},

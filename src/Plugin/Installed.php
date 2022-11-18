@@ -1,24 +1,24 @@
 <?php
 /**
-* File: Installed.php
-*
-* Modifications to the installed plugin listing page.
-*
-* @since      2.0.0
-* @package    BoldGrid\Connect\Plugin
-* @author     BoldGrid <support@boldgrid.com>
-* @link       https://boldgrid.com
-*/
+ * File: Installed.php
+ *
+ * Modifications to the installed plugin listing page.
+ *
+ * @since      2.0.0
+ * @package    BoldGrid\Connect\Plugin
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
+ * @link       https://boldgrid.com
+ */
 
 namespace Central\Connect\Plugin;
 
 /**
-* Class: Installed
-*
-* Modifications to the installed plugin listing page.
-*
-* @since 2.0.0
-*/
+ * Class: Installed
+ *
+ * Modifications to the installed plugin listing page.
+ *
+ * @since 2.0.0
+ */
 class Installed {
 
 	/**
@@ -40,15 +40,20 @@ class Installed {
 	 * @return void
 	 */
 	public function pluginRow() {
-		add_filter( 'plugin_row_meta', function ( $meta, $slug ) {
-			$pluginName = 'central-connect.php';
-			$length = strlen( $pluginName );
-			$hasPluginFilename = substr( $slug, -$length ) === $pluginName;
-			if ( $hasPluginFilename ) {
-				$meta[] = '<a href="' . admin_url( 'options-general.php?page=central-connect' ) . '">' . __( 'My Connection', 'central-connect' ) . '</a>';
-			}
+		add_filter(
+			'plugin_row_meta',
+			function ( $meta, $slug ) {
+				$pluginName = 'central-connect.php';
+				$length = strlen( $pluginName );
+				$hasPluginFilename = substr( $slug, -$length ) === $pluginName;
+				if ( $hasPluginFilename ) {
+					$meta[] = '<a href="' . admin_url( 'options-general.php?page=central-connect' ) . '">' . __( 'My Connection', 'central-connect' ) . '</a>';
+				}
 
-			return $meta;
-		}, 10, 2 );
+				return $meta;
+			},
+			10,
+			2
+		);
 	}
 }

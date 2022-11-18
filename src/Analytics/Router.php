@@ -1,26 +1,26 @@
 <?php
 /**
-* File: Router.php
-*
-* Setup the Router.
-*
-* @since      2.0.0
-* @package    BoldGrid\Connect\Analytics
-* @author     BoldGrid <support@boldgrid.com>
-* @link       https://boldgrid.com
-*/
+ * File: Router.php
+ *
+ * Setup the Router.
+ *
+ * @since      2.0.0
+ * @package    BoldGrid\Connect\Analytics
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
+ * @link       https://boldgrid.com
+ */
 
 namespace Central\Connect\Analytics;
 
 use Central\Connect\Rest\Controller;
 
 /**
-* Class: Router
-*
-* Setup the Router.
-*
-* @since 2.0.0
-*/
+ * Class: Router
+ *
+ * Setup the Router.
+ *
+ * @since 2.0.0
+ */
 class Router extends Controller {
 
 	/**
@@ -31,9 +31,12 @@ class Router extends Controller {
 	 * @return void
 	 */
 	public function register_routes() {
-		add_action( 'rest_api_init', function () {
-			$this->registerFetchStats();
-		} );
+		add_action(
+			'rest_api_init',
+			function () {
+				$this->registerFetchStats();
+			}
+		);
 	}
 
 	/**
@@ -44,14 +47,18 @@ class Router extends Controller {
 	 * @return void
 	 */
 	private function registerFetchStats() {
-		register_rest_route( $this->namespace, '/stats', array(
-			'methods' => 'GET',
-			'callback' => function () {
-				$stats = new Stats();
+		register_rest_route(
+			$this->namespace,
+			'/stats',
+			array(
+				'methods' => 'GET',
+				'callback' => function () {
+					$stats = new Stats();
 
-				return $stats->getData();
-			},
-			'permission_callback' => [ $this, 'permissionCheck' ]
-		) );
+					return $stats->getData();
+				},
+				'permission_callback' => array( $this, 'permissionCheck' ),
+			)
+		);
 	}
 }

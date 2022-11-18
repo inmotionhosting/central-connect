@@ -1,24 +1,24 @@
 <?php
 /**
-* File: Router.php
-*
-* Setup the Router.
-*
-* @since      2.0.0
-* @package    BoldGrid\Connect\Rest
-* @author     BoldGrid <support@boldgrid.com>
-* @link       https://boldgrid.com
-*/
+ * File: Router.php
+ *
+ * Setup the Router.
+ *
+ * @since      2.0.0
+ * @package    BoldGrid\Connect\Rest
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
+ * @link       https://boldgrid.com
+ */
 
 namespace Central\Connect\Theme;
 
 /**
-* Class: Router
-*
-* Setup the Router.
-*
-* @since 2.0.0
-*/
+ * Class: Router
+ *
+ * Setup the Router.
+ *
+ * @since 2.0.0
+ */
 class Router {
 
 	/**
@@ -40,12 +40,15 @@ class Router {
 	public function register() {
 		$this->themeInstaller = new Installer();
 
-		add_action( 'rest_api_init', function () {
-			$this->registerSwitchTheme();
-			$this->registerInstall();
-			$this->registerRemove();
-			$this->registerList();
-		} );
+		add_action(
+			'rest_api_init',
+			function () {
+				$this->registerSwitchTheme();
+				$this->registerInstall();
+				$this->registerRemove();
+				$this->registerList();
+			}
+		);
 	}
 
 	/**
@@ -56,36 +59,40 @@ class Router {
 	 * @return void
 	 */
 	public function registerSwitchTheme() {
-		register_rest_route( 'bgc/v1', '/themes/', array(
-			'methods' => 'PATCH',
-			'callback' => function ( $request ) {
-				$response = [ 'error' => 'Unable to switch theme' ];
-				$status = 400;
-				$stylesheet = $request->get_param( 'stylesheet' ) ?: '';
-				switch_theme( $stylesheet );
+		register_rest_route(
+			'bgc/v1',
+			'/themes/',
+			array(
+				'methods' => 'PATCH',
+				'callback' => function ( $request ) {
+					$response = array( 'error' => 'Unable to switch theme' );
+					$status = 400;
+					$stylesheet = $request->get_param( 'stylesheet' ) ?: '';
+					switch_theme( $stylesheet );
 
-				$currentTheme = wp_get_theme();
-				if ( $stylesheet === get_stylesheet() ) {
-					$response = $this->themeInstaller->formatThemeResource( $currentTheme );
-					$status = 200;
-				}
+					$currentTheme = wp_get_theme();
+					if ( $stylesheet === get_stylesheet() ) {
+						$response = $this->themeInstaller->formatThemeResource( $currentTheme );
+						$status = 200;
+					}
 
-				$response = new \WP_REST_Response( $response );
-				$response->set_status( $status );
+					$response = new \WP_REST_Response( $response );
+					$response->set_status( $status );
 
-				return $response;
-			},
-			'permission_callback' => [ $this, 'permissionCheck' ],
-			'args' => [
-				'stylesheet' => array(
-					'required' => true,
-					'description' => 'Theme stylesheet name',
-					'type' => 'string',
-					'validate_callback' => [ $this, 'validateThemeExists' ],
-					'sanitize_callback' => 'sanitize_title'
+					return $response;
+				},
+				'permission_callback' => array( $this, 'permissionCheck' ),
+				'args' => array(
+					'stylesheet' => array(
+						'required' => true,
+						'description' => 'Theme stylesheet name',
+						'type' => 'string',
+						'validate_callback' => array( $this, 'validateThemeExists' ),
+						'sanitize_callback' => 'sanitize_title',
+					),
 				),
-			]
-		) );
+			)
+		);
 	}
 
 	/**
@@ -96,56 +103,60 @@ class Router {
 	 * @return void
 	 */
 	private function registerInstall() {
-		register_rest_route( 'bgc/v1', '/themes/', array(
-			'methods' => 'POST',
-			'callback' => function ( $request ) {
-				$themes = $request->get_param( 'themes' );
-				$activeStylesheet = $request->get_param( 'active_stylesheet' );
+		register_rest_route(
+			'bgc/v1',
+			'/themes/',
+			array(
+				'methods' => 'POST',
+				'callback' => function ( $request ) {
+					$themes = $request->get_param( 'themes' );
+					$activeStylesheet = $request->get_param( 'active_stylesheet' );
 
-				foreach ( $themes as $theme ) {
-					$this->themeInstaller->install( $theme );
-				}
-
-				if ( $activeStylesheet ) {
-					switch_theme( $activeStylesheet );
-				}
-
-				$response = $this->themeInstaller->getCollection();
-				$response = new \WP_REST_Response( $response );
-				$response->set_status( 201 );
-
-				return $response;
-			},
-			'permission_callback' => [ $this, 'permissionCheck' ],
-			'args' => [
-				'active_stylesheet' => array(
-					'type' => 'string',
-					'description' => 'Name of a stylesheet to activate after install.',
-					'sanitize_callback' => 'sanitize_title'
-				),
-				'themes' => array(
-					'required' => true,
-					'type' => 'array',
-					'description' => 'List of theeme zips and stylesheets to install.',
-					'items' => [
-						'type' => 'string',
-					],
-					'sanitize_callback' => function ( $assets ) {
-						$cleanAssets = [];
-						foreach ( $assets as $asset ) {
-							$wpOrgUrl = 'https://downloads.wordpress.org/theme/' . $asset . '.latest-stable.zip';
-							if ( wp_http_validate_url( $asset ) ) {
-								$cleanAssets[] = $asset;
-							} else if ( wp_http_validate_url( $wpOrgUrl ) ) {
-								$cleanAssets[] = $wpOrgUrl;
-							}
-						}
-
-						return $cleanAssets;
+					foreach ( $themes as $theme ) {
+						$this->themeInstaller->install( $theme );
 					}
+
+					if ( $activeStylesheet ) {
+						switch_theme( $activeStylesheet );
+					}
+
+					$response = $this->themeInstaller->getCollection();
+					$response = new \WP_REST_Response( $response );
+					$response->set_status( 201 );
+
+					return $response;
+				},
+				'permission_callback' => array( $this, 'permissionCheck' ),
+				'args' => array(
+					'active_stylesheet' => array(
+						'type' => 'string',
+						'description' => 'Name of a stylesheet to activate after install.',
+						'sanitize_callback' => 'sanitize_title',
+					),
+					'themes' => array(
+						'required' => true,
+						'type' => 'array',
+						'description' => 'List of theeme zips and stylesheets to install.',
+						'items' => array(
+							'type' => 'string',
+						),
+						'sanitize_callback' => function ( $assets ) {
+							$cleanAssets = array();
+							foreach ( $assets as $asset ) {
+								$wpOrgUrl = 'https://downloads.wordpress.org/theme/' . $asset . '.latest-stable.zip';
+								if ( wp_http_validate_url( $asset ) ) {
+									$cleanAssets[] = $asset;
+								} else if ( wp_http_validate_url( $wpOrgUrl ) ) {
+									$cleanAssets[] = $wpOrgUrl;
+								}
+							}
+
+							return $cleanAssets;
+						},
+					),
 				),
-			],
-		) );
+			)
+		);
 	}
 
 	/**
@@ -156,51 +167,55 @@ class Router {
 	 * @return void
 	 */
 	private function registerRemove() {
-		register_rest_route( 'bgc/v1', '/themes/', array(
-			'methods' => 'DELETE',
-			'callback' => function ( $request ) {
-				$stylesheets = $request->get_param( 'stylesheets' );
+		register_rest_route(
+			'bgc/v1',
+			'/themes/',
+			array(
+				'methods' => 'DELETE',
+				'callback' => function ( $request ) {
+					$stylesheets = $request->get_param( 'stylesheets' );
 
-				$this->themeInstaller->delete( $stylesheets );
+					$this->themeInstaller->delete( $stylesheets );
 
-				// @TODO --- Revert to default theme if active theme is deleted.
+					// @TODO --- Revert to default theme if active theme is deleted.
 
-				$updatedList = $this->themeInstaller->getCollection();
+					$updatedList = $this->themeInstaller->getCollection();
 
-				$response = new \WP_REST_Response( $updatedList );
+					$response = new \WP_REST_Response( $updatedList );
 
-				return $response;
-			},
-			'permission_callback' => [ $this, 'permissionCheck' ],
-			'args' => [
-				'stylesheets' => array(
-					'required' => true,
-					'description' => 'A list of theme file stylesheets',
-					'type' => 'array',
-					'validate_callback' => function ( $stylesheets ) {
-						$valid = true;
-						foreach ( $stylesheets as $stylesheet ) {
-							if ( ! $this->validateThemeExists( $stylesheet ) ) {
-								$valid = false;
-								break;
+					return $response;
+				},
+				'permission_callback' => array( $this, 'permissionCheck' ),
+				'args' => array(
+					'stylesheets' => array(
+						'required' => true,
+						'description' => 'A list of theme file stylesheets',
+						'type' => 'array',
+						'validate_callback' => function ( $stylesheets ) {
+							$valid = true;
+							foreach ( $stylesheets as $stylesheet ) {
+								if ( ! $this->validateThemeExists( $stylesheet ) ) {
+									$valid = false;
+									break;
+								}
 							}
-						}
 
-						return $valid;
-					},
-					'sanitize_callback' => function ( $stylesheets ) {
-						foreach ( $stylesheets as &$stylesheet ) {
-							$stylesheet = sanitize_title( $stylesheet );
-						}
+							return $valid;
+						},
+						'sanitize_callback' => function ( $stylesheets ) {
+							foreach ( $stylesheets as &$stylesheet ) {
+								$stylesheet = sanitize_title( $stylesheet );
+							}
 
-						return $stylesheets;
-					},
-					'items' => [
-						'type' => 'string',
-					]
+							return $stylesheets;
+						},
+						'items' => array(
+							'type' => 'string',
+						),
+					),
 				),
-			]
-		) );
+			)
+		);
 	}
 
 	/**
@@ -211,17 +226,21 @@ class Router {
 	 * @return void
 	 */
 	private function registerList() {
-		register_rest_route( 'bgc/v1', '/themes/', array(
-			'methods' => 'GET',
-			'callback' => function () {
-				$response = $this->themeInstaller->getCollection();
+		register_rest_route(
+			'bgc/v1',
+			'/themes/',
+			array(
+				'methods' => 'GET',
+				'callback' => function () {
+					$response = $this->themeInstaller->getCollection();
 
-				$response = new \WP_REST_Response( $response );
+					$response = new \WP_REST_Response( $response );
 
-				return $response;
-			},
-			'permission_callback' => [ $this, 'permissionCheck' ]
-		) );
+					return $response;
+				},
+				'permission_callback' => array( $this, 'permissionCheck' ),
+			)
+		);
 	}
 
 	/**

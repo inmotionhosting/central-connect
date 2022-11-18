@@ -11,7 +11,7 @@
  * @subpackage Boldgrid_Connect/includes
  * @copyright  BoldGrid.com
  * @version    $Id$
- * @author     BoldGrid <support@boldgrid.com>
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
 /**
@@ -26,7 +26,7 @@
  * @since      1.0.0
  * @package    Boldgrid_Connect
  * @subpackage Boldgrid_Connect/includes
- * @author     BoldGrid <support@boldgrid.com>
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 class Central_Connect_Loader {
 	/**

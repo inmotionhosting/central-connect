@@ -62,8 +62,8 @@ class Central_Connect_Upgrade {
 
 		// Set the default version in db if no version is set.
 		if ( ! $this->get_option() ) {
-            $this->set_option( '1.0.0' );
-        }
+			$this->set_option( '1.0.0' );
+		}
 
 		// Get current version from constant set in plugin.
 		$version = CENTRAL_CONNECT_VERSION;
@@ -73,7 +73,7 @@ class Central_Connect_Upgrade {
 			$methods = $this->get_upgrade_methods();
 
 			// Format found methods to versions.
-			foreach( $methods as $method ) {
+			foreach ( $methods as $method ) {
 				$ver = substr( $method, 11 );
 				$ver = str_replace( '_', '.', $ver );
 
@@ -82,13 +82,13 @@ class Central_Connect_Upgrade {
 				$verLow = str_replace( 'x', '0', $ver );
 
 				// If upgrade method version is greater than stored DB version.
-				if ( version_compare( $verHigh, $this->get_option(), 'gt' )  &&
-                
+				if ( version_compare( $verHigh, $this->get_option(), 'gt' ) &&
+
 					// The config version is less than or equal to upgrade method versions.
 					version_compare( $verLow, $version, 'le' ) ) {
-						if ( is_callable( array( $this, $method ) ) ) {
-                            $this->$method();
-                        }
+					if ( is_callable( array( $this, $method ) ) ) {
+						$this->$method();
+					}
 				}
 			}
 
@@ -111,9 +111,12 @@ class Central_Connect_Upgrade {
 	 */
 	public function get_upgrade_methods() {
 		$methods = get_class_methods( $this );
-		$methods = array_filter( $methods, function( $key ) {
-			return strpos( $key, 'upgrade_to_' ) !== false;
-		} );
+		$methods = array_filter(
+			$methods,
+			function( $key ) {
+				return strpos( $key, 'upgrade_to_' ) !== false;
+			}
+		);
 
 		return $methods;
 	}
@@ -158,9 +161,9 @@ class Central_Connect_Upgrade {
 	 * @since 2.0.0
 	 */
 	public function upgrade_to_2_0_0() {
-        // If option isn't set in DB already, update it with IMH as default provider.
-        if ( empty( get_site_option( "{$this->prefix}_provider", '' ) ) ) {
-            update_site_option( "{$this->prefix}_provider", 'InMotion Hosting' );
-        }
+		// If option isn't set in DB already, update it with IMH as default provider.
+		if ( empty( get_site_option( "{$this->prefix}_provider", '' ) ) ) {
+			update_site_option( "{$this->prefix}_provider", 'InMotion Hosting' );
+		}
 	}
 }

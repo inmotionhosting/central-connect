@@ -54,13 +54,13 @@ Central_Connect_Version_Check::init( plugin_basename( __FILE__ ), '5.0', '5.6', 
  * Kicks off our core plugin code.
  */
 function central_connect_plugin_load() {
-	if ( ! function_exists ( 'central_connect_run' ) ) {
+	if ( ! function_exists( 'central_connect_run' ) ) {
 		/**
 		 * The core plugin class that is used to define internationalization,
 		 * admin-specific hooks, and public-facing site hooks.
 		 */
 		require CENTRAL_CONNECT_PATH . '/includes/class-central-connect.php';
-	
+
 		/**
 		 * Begins execution of the plugin.
 		 *
@@ -75,7 +75,7 @@ function central_connect_plugin_load() {
 			$plugin = new Central_Connect();
 			$plugin->run();
 		}
-	
+
 		central_connect_run();
 	}
 }

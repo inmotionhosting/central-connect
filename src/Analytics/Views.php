@@ -6,7 +6,7 @@
  *
  * @since      2.0.0
  * @package    BoldGrid\Connect\Analytics
- * @author     BoldGrid <support@boldgrid.com>
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  * @link       https://boldgrid.com
  */
 
@@ -42,16 +42,24 @@ class Views {
 	 */
 	public function initialize() {
 		// Grab the current status code.
-		add_filter( 'status_header', function ( $statusHeader, $code ) {
-			$this->statusCode = $code;
-			return $statusHeader;
-		}, 10, 3 );
+		add_filter(
+			'status_header',
+			function ( $statusHeader, $code ) {
+				$this->statusCode = $code;
+				return $statusHeader;
+			},
+			10,
+			3
+		);
 
-		add_action( 'wp_print_footer_scripts', function () {
-			if ( ! $this->viewCounted && 200 === $this->statusCode ) {
-				$this->countView();
+		add_action(
+			'wp_print_footer_scripts',
+			function () {
+				if ( ! $this->viewCounted && 200 === $this->statusCode ) {
+					$this->countView();
+				}
 			}
-		} );
+		);
 	}
 
 	/**
@@ -75,9 +83,9 @@ class Views {
 	 * @return array Page Views Stats.
 	 */
 	public static function getStats() {
-		return [
-			'dates' => get_option( 'boldgrid_connect_analytics', [] ),
-		];
+		return array(
+			'dates' => get_option( 'boldgrid_connect_analytics', array() ),
+		);
 	}
 
 	/**

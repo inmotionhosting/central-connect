@@ -1,16 +1,16 @@
-=== BoldGrid Connect ===
+=== Central Connect ===
 Contributors: boldgrid, imh_brad, joemoto, rramo012, timph
-Tags: boldgrid, connect, manage
+Tags: inmotion, connect, manage
 Requires at least: 5.0
-Tested up to: 6.0
+Tested up to: 6.1
 Requires PHP: 5.4
 Stable tag: 2.0.1
 
-Connects users and sites with BoldGrid Central.
+Connects users and sites with InMotion Central.
 
 == Description ==
 
-Manage all your WordPress websites in a single dashboard. BoldGrid Central
+Manage all your WordPress websites in a single dashboard. Central
 allows you to manage themes, plugins & backups all from within a single interface.
 Using our single sign in feature, you can log into central and access any of your connected websites.
 
@@ -20,7 +20,7 @@ Using our single sign in feature, you can log into central and access any of you
 * PHP 5.4 or higher
 
 = Manually =
-1. Upload the entire boldgrid-connect folder to the /wp-content/plugins/ directory.
+1. Upload the entire central-connect folder to the /wp-content/plugins/ directory.
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==

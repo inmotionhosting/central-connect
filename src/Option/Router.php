@@ -1,24 +1,24 @@
 <?php
 /**
-* File: Router.php
-*
-* Setup the Router.
-*
-* @since      2.0.0
-* @package    BoldGrid\Connect\Rest
-* @author     BoldGrid <support@boldgrid.com>
-* @link       https://boldgrid.com
-*/
+ * File: Router.php
+ *
+ * Setup the Router.
+ *
+ * @since      2.0.0
+ * @package    BoldGrid\Connect\Rest
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
+ * @link       https://boldgrid.com
+ */
 
 namespace Central\Connect\Option;
 
 /**
-* Class: Router
-*
-* Setup the Router.
-*
-* @since 2.0.0
-*/
+ * Class: Router
+ *
+ * Setup the Router.
+ *
+ * @since 2.0.0
+ */
 class Router {
 
 	/**
@@ -29,11 +29,14 @@ class Router {
 	 * @return void
 	 */
 	public function register() {
-		add_action( 'rest_api_init', function () {
-			$this->registerGet();
-			$this->registerDelete();
-			$this->registerUpdate();
-		} );
+		add_action(
+			'rest_api_init',
+			function () {
+				$this->registerGet();
+				$this->registerDelete();
+				$this->registerUpdate();
+			}
+		);
 	}
 
 	/**
@@ -44,27 +47,33 @@ class Router {
 	 * @return void
 	 */
 	public function registerGet() {
-		register_rest_route( 'bgc/v1', '/options/', [
-			'methods' => 'GET',
-			'callback' => function ( $request ) {
-				$option = $request->get_param( 'name' );
-				$optionVal = get_option( $option, null );
+		register_rest_route(
+			'bgc/v1',
+			'/options/',
+			array(
+				'methods' => 'GET',
+				'callback' => function ( $request ) {
+					$option = $request->get_param( 'name' );
+					$optionVal = get_option( $option, null );
 
-				$response = new \WP_REST_Response( [
-					'data' => $optionVal
-				] );
+					$response = new \WP_REST_Response(
+						array(
+							'data' => $optionVal,
+						)
+					);
 
-				return $response;
-			},
-			'permission_callback' => [ $this, 'permissionCheck' ],
-			'args' => [
-				'name' => [
-					'required' => true,
-					'description' => 'Option name.',
-					'type' => 'string',
-				],
-			]
-		] );
+					return $response;
+				},
+				'permission_callback' => array( $this, 'permissionCheck' ),
+				'args' => array(
+					'name' => array(
+						'required' => true,
+						'description' => 'Option name.',
+						'type' => 'string',
+					),
+				),
+			)
+		);
 	}
 
 	/**
@@ -75,26 +84,30 @@ class Router {
 	 * @return void
 	 */
 	public function registerDelete() {
-		register_rest_route( 'bgc/v1', '/options/', [
-			'methods' => 'DELETE',
-			'callback' => function ( $request ) {
-				$name = $request->get_param( 'name' );
-				delete_option( $name );
+		register_rest_route(
+			'bgc/v1',
+			'/options/',
+			array(
+				'methods' => 'DELETE',
+				'callback' => function ( $request ) {
+					$name = $request->get_param( 'name' );
+					delete_option( $name );
 
-				$response = new \WP_REST_Response( [] );
-				$response->set_status( 204 );
+					$response = new \WP_REST_Response( array() );
+					$response->set_status( 204 );
 
-				return $response;
-			},
-			'permission_callback' => [ $this, 'permissionCheck' ],
-			'args' => [
-				'name' => [
-					'required' => true,
-					'description' => 'Option name.',
-					'type' => 'string',
-				],
-			]
-		] );
+					return $response;
+				},
+				'permission_callback' => array( $this, 'permissionCheck' ),
+				'args' => array(
+					'name' => array(
+						'required' => true,
+						'description' => 'Option name.',
+						'type' => 'string',
+					),
+				),
+			)
+		);
 	}
 
 	/**
@@ -105,38 +118,44 @@ class Router {
 	 * @return void
 	 */
 	public function registerUpdate() {
-		register_rest_route( 'bgc/v1', '/options/', [
-			'methods' => 'POST',
-			'callback' => function ( $request ) {
-				$option = $request->get_param( 'name' );
-				$newValue = $request->get_param( 'value' );
+		register_rest_route(
+			'bgc/v1',
+			'/options/',
+			array(
+				'methods' => 'POST',
+				'callback' => function ( $request ) {
+					$option = $request->get_param( 'name' );
+					$newValue = $request->get_param( 'value' );
 
-				update_option( $option, $newValue );
+					update_option( $option, $newValue );
 
-				if ( 'boldgrid_api_key' === $option ) {
-					delete_transient( 'boldgrid_api_data' );
-					delete_site_transient( 'boldgrid_api_data' );
-				}
+					if ( 'boldgrid_api_key' === $option ) {
+						delete_transient( 'boldgrid_api_data' );
+						delete_site_transient( 'boldgrid_api_data' );
+					}
 
-				$response = new \WP_REST_Response( [
-					'data' => get_option( $option, null )
-				] );
+					$response = new \WP_REST_Response(
+						array(
+							'data' => get_option( $option, null ),
+						)
+					);
 
-				return $response;
-			},
-			'permission_callback' => [ $this, 'permissionCheck' ],
-			'args' => [
-				'name' => [
-					'required' => true,
-					'description' => 'Option name.',
-					'type' => 'string',
-				],
-				'value' => [
-					'required' => true,
-					'description' => 'Option Value.',
-				],
-			]
-		] );
+					return $response;
+				},
+				'permission_callback' => array( $this, 'permissionCheck' ),
+				'args' => array(
+					'name' => array(
+						'required' => true,
+						'description' => 'Option name.',
+						'type' => 'string',
+					),
+					'value' => array(
+						'required' => true,
+						'description' => 'Option Value.',
+					),
+				),
+			)
+		);
 	}
 
 	/**

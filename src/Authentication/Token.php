@@ -1,24 +1,24 @@
 <?php
 /**
-* File: Central.php
-*
-* Setup Access Token authentication method.
-*
-* @since      2.0.0
-* @package    BoldGrid\Connect\Rest
-* @author     BoldGrid <support@boldgrid.com>
-* @link       https://boldgrid.com
-*/
+ * File: Central.php
+ *
+ * Setup Access Token authentication method.
+ *
+ * @since      2.0.0
+ * @package    BoldGrid\Connect\Rest
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
+ * @link       https://boldgrid.com
+ */
 
 namespace Central\Connect\Authentication;
 
 /**
-* Class: Central
-*
-* Setup Access Token authentication method.
-*
-* @since 2.0.0
-*/
+ * Class: Central
+ *
+ * Setup Access Token authentication method.
+ *
+ * @since 2.0.0
+ */
 class Token {
 
 	/**
@@ -31,19 +31,19 @@ class Token {
 	 */
 	public function create( $user, $expires = '+2 hours' ) {
 		$accessTokens = get_user_option( 'bgc_access_tokens', $user->ID );
-		$accessTokens = is_array( $accessTokens ) ? $accessTokens : [];
+		$accessTokens = is_array( $accessTokens ) ? $accessTokens : array();
 		$accessTokens = $this->cleanUpOldTokens( $accessTokens );
 
 		$rawToken = wp_generate_password( 128 );
 
-		$newAccessToken = [
+		$newAccessToken = array(
 			'site_url' => get_site_url(),
 			'login_url' => wp_login_url(),
 			'wp_user_id' => $user->ID,
 			'access_token_hash' => wp_hash_password( $rawToken ),
 			'expires_at' => strtotime( $expires ),
 			'issued_at' => time(),
-		];
+		);
 
 		$accessTokens[] = $newAccessToken;
 
@@ -82,7 +82,7 @@ class Token {
 	 * @return boolean      Is the token valid?
 	 */
 	public function remoteValidate( $token, $environmentId ) {
-		do_action('bgc_remote_validate');
+		do_action( 'bgc_remote_validate' );
 
 		$configs = \Central_Connect_Service::get( 'configs' );
 		$url     = $configs['asset_server'] . $configs['ajax_calls']['verify_env_token'];
@@ -102,7 +102,7 @@ class Token {
 		if ( 200 === $httpCode && ! empty( $body['is_valid'] ) ) {
 			return true;
 		} else {
-			sleep(3);
+			sleep( 3 );
 			return false;
 		}
 	}
@@ -168,7 +168,7 @@ class Token {
 	 * @return array Valid tokens.
 	 */
 	private function cleanUpOldTokens( $accessTokens ) {
-		$updatedAccessTokens = [];
+		$updatedAccessTokens = array();
 		foreach ( $accessTokens as $accessToken ) {
 			if ( ! empty( $accessToken['expires_at'] ) ) {
 
@@ -187,22 +187,25 @@ class Token {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param array $accessTokens   List of access tokens for this user in the DB.
+	 * @param array  $accessTokens   List of access tokens for this user in the DB.
 	 * @param string $providedToken Users Token.
 	 * @return array.               Token args.
 	 */
 	private function findMatchingToken( $accessTokens, $providedToken ) {
 		// Find matching value.
-		$matchedTokenParams = array_filter( $accessTokens, function ( $token ) use ( $providedToken ) {
-			$match = false;
-			if ( ! empty( $token['access_token_hash'] ) ) {
-				if ( wp_check_password( $providedToken, $token['access_token_hash'] ) ) {
-					$match = true;
+		$matchedTokenParams = array_filter(
+			$accessTokens,
+			function ( $token ) use ( $providedToken ) {
+				$match = false;
+				if ( ! empty( $token['access_token_hash'] ) ) {
+					if ( wp_check_password( $providedToken, $token['access_token_hash'] ) ) {
+						$match = true;
+					}
 				}
-			}
 
-			return $match;
-		} );
+				return $match;
+			}
+		);
 
 		return reset( $matchedTokenParams );
 	}

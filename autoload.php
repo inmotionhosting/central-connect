@@ -1,5 +1,5 @@
 <?php
-function central_connect_autoload ( $pClassName ) {
+function central_connect_autoload( $pClassName ) {
 	if ( false === strpos( $pClassName, 'Central\\Connect' ) ) {
 		return;
 	}

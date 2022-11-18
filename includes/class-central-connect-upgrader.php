@@ -1,24 +1,24 @@
 <?php
 /**
-* File: UpgraderSkin.php
-*
-* Remove feedback from upgrader.
-*
-* @since      2.0.0
-* @package    BoldGrid\Connect\Rest
-* @author     BoldGrid <support@boldgrid.com>
-* @link       https://boldgrid.com
-*/
+ * File: UpgraderSkin.php
+ *
+ * Remove feedback from upgrader.
+ *
+ * @since      2.0.0
+ * @package    BoldGrid\Connect\Rest
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
+ * @link       https://boldgrid.com
+ */
 
 include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
 /**
-* Class: UpgraderSkin
-*
-* Remove feedback from upgrader.
-*
-* @since 2.0.0
-*/
+ * Class: UpgraderSkin
+ *
+ * Remove feedback from upgrader.
+ *
+ * @since 2.0.0
+ */
 class Central_Connect_Upgrader_Skin extends \WP_Upgrader_Skin {
 
 
@@ -50,7 +50,9 @@ class Central_Connect_Upgrader_Skin extends \WP_Upgrader_Skin {
 			\wp_send_json_error(
 				array(
 					'error' => \esc_html__( 'There was an error installing. Please try again.', 'boldgrid-connect' ),
-				), 400 );
+				),
+				400
+			);
 		}
 	}
 

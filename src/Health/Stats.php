@@ -1,24 +1,24 @@
 <?php
 /**
-* File: Router.php
-*
-* Setup the Router.
-*
-* @since      2.0.0
-* @package    BoldGrid\Connect\Rest
-* @author     BoldGrid <support@boldgrid.com>
-* @link       https://boldgrid.com
-*/
+ * File: Router.php
+ *
+ * Setup the Router.
+ *
+ * @since      2.0.0
+ * @package    BoldGrid\Connect\Rest
+ * @author     BoldGrid <support@boldgrid.com>
+ * @link       https://boldgrid.com
+ */
 
 namespace BoldGrid\Connect\Health;
 
 /**
-* Class: Router
-*
-* Setup the Router.
-*
-* @since 2.0.0
-*/
+ * Class: Router
+ *
+ * Setup the Router.
+ *
+ * @since 2.0.0
+ */
 class Stats {
 
 	/**
@@ -37,21 +37,27 @@ class Stats {
 		include_once ABSPATH . 'wp-admin/includes/misc.php';
 
 		// Disable Rest Test & async tests
-		add_filter( 'site_status_tests', function ( $tests ) {
-			$tests['async'] = [];
-			unset( $tests['direct']['rest_availability'] );
+		add_filter(
+			'site_status_tests',
+			function ( $tests ) {
+				$tests['async'] = array();
+				unset( $tests['direct']['rest_availability'] );
 
-			return $tests;
-		} );
+				return $tests;
+			}
+		);
 
 		// Capture all the results as they run.
-		$allTests = [];
-		add_filter( 'site_status_test_result', function ( $result ) use ( &$allTests ) {
-			$allTests[] = $result;
-			return $result;
-		} );
+		$allTests = array();
+		add_filter(
+			'site_status_test_result',
+			function ( $result ) use ( &$allTests ) {
+				$allTests[] = $result;
+				return $result;
+			}
+		);
 
-		set_current_screen('site-health');
+		set_current_screen( 'site-health' );
 		$siteHealth = new \WP_Site_Health();
 		$siteHealth->enqueue_scripts();
 

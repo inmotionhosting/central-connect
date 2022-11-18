@@ -1,24 +1,24 @@
 <?php
 /**
-* File: Installer.php
-*
-* Plugin install actions.
-*
-* @since      2.0.0
-* @package    BoldGrid\Connect\Rest
-* @author     BoldGrid <support@boldgrid.com>
-* @link       https://boldgrid.com
-*/
+ * File: Installer.php
+ *
+ * Plugin install actions.
+ *
+ * @since      2.0.0
+ * @package    BoldGrid\Connect\Rest
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
+ * @link       https://boldgrid.com
+ */
 
 namespace Central\Connect\Plugin;
 
 /**
-* Class: Installer
-*
-* Plugin install actions.
-*
-* @since 2.0.0
-*/
+ * Class: Installer
+ *
+ * Plugin install actions.
+ *
+ * @since 2.0.0
+ */
 class Installer {
 
 	/**
@@ -37,7 +37,7 @@ class Installer {
 
 		$updates = get_site_transient( 'update_plugins' );
 
-		$plugins = [];
+		$plugins = array();
 		foreach ( \get_plugins() as $filePath => $plugin ) {
 			$plugin['File'] = $filePath;
 			$plugin['IsActive'] = is_plugin_active( $filePath );
@@ -76,12 +76,15 @@ class Installer {
 		include_once ABSPATH . 'wp-admin/includes/plugin.php';
 		include_once CENTRAL_CONNECT_PATH . 'includes/class-central-connect-upgrader.php';
 
-		add_filter( 'upgrader_package_options', function ( $options ) {
-			$options['clear_destination'] = true;
-			$options['clear_working'] = true;
+		add_filter(
+			'upgrader_package_options',
+			function ( $options ) {
+				$options['clear_destination'] = true;
+				$options['clear_working'] = true;
 
-			return $options;
-		} );
+				return $options;
+			}
+		);
 
 		wp_cache_flush();
 

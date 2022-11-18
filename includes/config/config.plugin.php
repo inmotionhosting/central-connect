@@ -11,7 +11,7 @@
  * @subpackage Boldgrid_Connect/admin
  * @copyright  BoldGrid.com
  * @version    $Id$
- * @author     BoldGrid <support@boldgrid.com>
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
 if ( ! defined( 'WPINC' ) ) {
@@ -35,8 +35,8 @@ return array(
 	'main_file_path'        => CENTRAL_CONNECT_PATH . 'boldgrid-connect.php',
 	'plugin_transient_name' => 'boldgrid_connect_version_data',
 
-	'branding' => [
-		'InMotion Hosting' => [
+	'branding' => array(
+		'InMotion Hosting' => array(
 			'primaryColor' => '#c32227',
 			'productName'  => 'InMotion Central',
 			'tos'          => 'https://www.inmotionhosting.com/legal/',
@@ -44,8 +44,8 @@ return array(
 			'logo'         => '/assets/img/imh.svg',
 			'central_url'  => 'https://central.inmotionhosting.com/wordpress',
 			'providerUrl'  => 'https://www.inmotionhosting.com',
-		],
-		'BoldGrid' => [
+		),
+		'BoldGrid' => array(
 			'primaryColor' => '#f95b26',
 			'productName'  => 'BoldGrid Central',
 			'tos'          => 'https://www.boldgrid.com/terms-of-service/',
@@ -53,6 +53,6 @@ return array(
 			'logo'         => '/assets/img/boldgrid-logo-vertical-black.svg',
 			'central_url'  => 'https://www.boldgrid.com/central',
 			'providerUrl'  => 'https://www.boldgrid.com',
-		],
-	]
+		),
+	),
 );

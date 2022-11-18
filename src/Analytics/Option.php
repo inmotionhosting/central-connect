@@ -6,7 +6,7 @@
  *
  * @since      2.0.0
  * @package    Central\Connect
- * @author     BoldGrid <support@boldgrid.com>
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  * @link       https://boldgrid.com
  */
 

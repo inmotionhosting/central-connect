@@ -69,7 +69,7 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 					$arguments = array();
 					$args = func_num_args();
 					for ( $i = 4; $i < $args; $i++ ) {
-						$arg = func_get_arg($i);
+						$arg = func_get_arg( $i );
 						$arguments[] = $arg;
 					}
 					// Call the callback with any args required.

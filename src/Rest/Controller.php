@@ -1,24 +1,24 @@
 <?php
 /**
-* File: Server.php
-*
-* Setup the Rest Router extension.
-*
-* @since      2.0.0
-* @package    BoldGrid\Connect\Rest
-* @author     BoldGrid <support@boldgrid.com>
-* @link       https://boldgrid.com
-*/
+ * File: Server.php
+ *
+ * Setup the Rest Router extension.
+ *
+ * @since      2.0.0
+ * @package    BoldGrid\Connect\Rest
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
+ * @link       https://boldgrid.com
+ */
 
 namespace Central\Connect\Rest;
 
 /**
-* Class: Router
-*
-* Setup the Rest Server extension.
-*
-* @since 2.0.0
-*/
+ * Class: Router
+ *
+ * Setup the Rest Server extension.
+ *
+ * @since 2.0.0
+ */
 class Controller extends \WP_REST_Controller {
 
 	/**

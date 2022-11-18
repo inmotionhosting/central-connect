@@ -1,24 +1,24 @@
 <?php
 /**
-* File: Installer.php
-*
-* Theme install actions.
-*
-* @since      2.0.0
-* @package    BoldGrid\Connect\Rest
-* @author     BoldGrid <support@boldgrid.com>
-* @link       https://boldgrid.com
-*/
+ * File: Installer.php
+ *
+ * Theme install actions.
+ *
+ * @since      2.0.0
+ * @package    BoldGrid\Connect\Rest
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
+ * @link       https://boldgrid.com
+ */
 
 namespace Central\Connect\Theme;
 
 /**
-* Class: Installer
-*
-* Theme install actions.
+ * Class: Installer
+ *
+ * Theme install actions.
 
-* @since 2.0.0
-*/
+ * @since 2.0.0
+ */
 class Installer {
 
 	/**
@@ -32,7 +32,7 @@ class Installer {
 	public function formatThemeResource( $wpTheme ) {
 		include_once ABSPATH . 'wp-admin/includes/theme.php';
 
-		$fields = [
+		$fields = array(
 			'Name',
 			'ThemeURI',
 			'Description',
@@ -43,10 +43,10 @@ class Installer {
 			'Status',
 			'Tags',
 			'TextDomain',
-			'DomainPath'
-		];
+			'DomainPath',
+		);
 
-		$formatted = [];
+		$formatted = array();
 		foreach ( $fields as $field ) {
 			$formatted[ $field ] = $wpTheme->get( $field );
 		}
@@ -64,11 +64,11 @@ class Installer {
 	 * @return array List of themes.
 	 */
 	public function getCollection() {
-		$themes = [];
+		$themes = array();
 
 		wp_cache_delete( 'themes', 'themes' );
 
-		foreach( wp_get_themes() as $theme ) {
+		foreach ( wp_get_themes() as $theme ) {
 			$themes[] = $this->formatThemeResource( $theme );
 		}
 
@@ -89,7 +89,7 @@ class Installer {
 		include_once CENTRAL_CONNECT_PATH . 'includes/class-central-connect-upgrader.php';
 
 		$results = false;
-		foreach( $stylesheets as $stylesheet ) {
+		foreach ( $stylesheets as $stylesheet ) {
 			$directory = get_theme_root( $stylesheet ) . trailingslashit( "/$stylesheet" );
 			$upgrader = new \Theme_Upgrader( new \Central_Connect_Upgrader_Skin() );
 			$upgrader->init();
@@ -109,12 +109,15 @@ class Installer {
 		include_once ABSPATH . 'wp-admin/includes/theme.php';
 		include_once CENTRAL_CONNECT_PATH . 'includes/class-central-connect-upgrader.php';
 
-		add_filter( 'upgrader_package_options', function ( $options ) {
-			$options['clear_destination'] = true;
-			$options['clear_working'] = true;
+		add_filter(
+			'upgrader_package_options',
+			function ( $options ) {
+				$options['clear_destination'] = true;
+				$options['clear_working'] = true;
 
-			return $options;
-		} );
+				return $options;
+			}
+		);
 
 		wp_cache_flush();
 

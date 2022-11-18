@@ -11,7 +11,7 @@
  * @subpackage Boldgrid_Connect/includes
  * @copyright  BoldGrid.com
  * @version    $Id$
- * @author     BoldGrid <support@boldgrid.com>
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
 /**
@@ -21,7 +21,7 @@
  *
  * @since      1.0.0
  * @package    Boldgrid_Connect
- * @author     BoldGrid <support@boldgrid.com>
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  *
  * phpcs:disable WordPress.VIP
  */
@@ -39,13 +39,15 @@ class Central_Connect_Login {
 		$login = $this;
 
 		add_action(
-			'init', function () use ( $login ) {
+			'init',
+			function () use ( $login ) {
 				global $pagenow;
 
 				if ( 'wp-login.php' === $pagenow && get_option( 'boldgrid_api_key' ) ) {
 					$login->authenticate();
 				}
-			}, 20
+			},
+			20
 		);
 	}
 
@@ -105,12 +107,12 @@ class Central_Connect_Login {
 					$user = $tokenValidator->getValidUser( $token );
 					$valid = $user && ! empty( $user->ID );
 
-				// Validate an environment auth code remotely.
+					// Validate an environment auth code remotely.
 				} else {
 					$valid = $user && $tokenValidator->remoteValidate( $token, $environment_id );
 				}
 
-			// Verify the site token.
+				// Verify the site token.
 			} else {
 				$valid = $user && $this->remote_validate( $token );
 			}
@@ -162,7 +164,7 @@ class Central_Connect_Login {
 	 * @return bool
 	 */
 	public function remote_validate( $token ) {
-		do_action('bgc_remote_validate');
+		do_action( 'bgc_remote_validate' );
 
 		$configs   = Boldgrid_Connect_Service::get( 'configs' );
 		$url       = $configs['asset_server'] . $configs['ajax_calls']['verify_site_token'];

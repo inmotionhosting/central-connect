@@ -1,26 +1,26 @@
 <?php
 /**
-* File: Server.php
-*
-* Setup the Rest Router extension.
-*
-* @since      2.0.0
-* @package    BoldGrid\Connect\Rest
-* @author     BoldGrid <support@boldgrid.com>
-* @link       https://boldgrid.com
-*/
+ * File: Server.php
+ *
+ * Setup the Rest Router extension.
+ *
+ * @since      2.0.0
+ * @package    BoldGrid\Connect\Rest
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
+ * @link       https://boldgrid.com
+ */
 
 namespace Central\Connect\View\Central;
 
 use Central\Connect\Option;
 
 /**
-* Class: Router
-*
-* Setup the Rest Server extension.
-*
-* @since 2.0.0
-*/
+ * Class: Router
+ *
+ * Setup the Rest Server extension.
+ *
+ * @since 2.0.0
+ */
 class ConnectNotice {
 
 	/**
@@ -31,35 +31,38 @@ class ConnectNotice {
 	public function initialize() {
 		$page = isset( $_REQUEST['page'] ) ? sanitize_text_field( $_REQUEST['page'] ) : null;
 		if ( $page === 'central-connect' ) {
-			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		}
 
-		add_action( 'admin_post_boldgrid_connect_provider', [ $this, 'admin_post' ] );
-		add_action( 'admin_print_footer_scripts-plugins.php', [ $this, 'printRestNonce' ] );
-		add_action( 'admin_menu', [ $this, 'add_submenu' ] );
-		add_action( 'admin_init', function () {
-			global $pagenow;
+		add_action( 'admin_post_boldgrid_connect_provider', array( $this, 'admin_post' ) );
+		add_action( 'admin_print_footer_scripts-plugins.php', array( $this, 'printRestNonce' ) );
+		add_action( 'admin_menu', array( $this, 'add_submenu' ) );
+		add_action(
+			'admin_init',
+			function () {
+				global $pagenow;
 
-			if ( ! current_user_can( 'manage_options' ) && ! self::isConnected() ) {
-				return;
-			}
+				if ( ! current_user_can( 'manage_options' ) && ! self::isConnected() ) {
+					return;
+				}
 
-			if (
+				if (
 				( 'index.php' === $pagenow || 'plugins.php' === $pagenow )
 				&& ! self::isConnected()
 				&& current_user_can( 'manage_options' )
-			) {
-				add_action( 'admin_notices', [ $this, 'render'] );
-				add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
-			}
+				) {
+					add_action( 'admin_notices', array( $this, 'render' ) );
+					add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+				}
 
-			if (
+				if (
 				'options-general.php' === $pagenow
 				&& current_user_can( 'manage_options' )
-			) {
-				$this->handleConnectRedirect();
+				) {
+					$this->handleConnectRedirect();
+				}
 			}
-		} );
+		);
 	}
 
 	/**
@@ -81,7 +84,7 @@ class ConnectNotice {
 	 * @return boolean
 	 */
 	public static function isConnected() {
-		return !! Option\Connect::get( 'environment_id' );
+		return ! ! Option\Connect::get( 'environment_id' );
 	}
 
 	/**
@@ -97,8 +100,8 @@ class ConnectNotice {
 
 		global $_wp_admin_css_colors;
 
-		$user_admin_color = get_user_meta(get_current_user_id(), 'admin_color', true);
-		$color = $_wp_admin_css_colors[$user_admin_color]->colors[2];
+		$user_admin_color = get_user_meta( get_current_user_id(), 'admin_color', true );
+		$color = $_wp_admin_css_colors[ $user_admin_color ]->colors[2];
 
 		if ( ! empty( $provider ) && ! empty( $configs['branding'][ $provider ]['primaryColor'] ) ) {
 			$color = $configs['branding'][ $provider ]['primaryColor'];
@@ -129,25 +132,28 @@ class ConnectNotice {
 				$centralUrl = $configs['central_url'] . '/projects?environment_id=' . Option\Connect::get( 'environment_id' );
 
 				?>
-				<div class="bg-container"> <?php
-					if ( self::isConnected() ) { ?>
+				<div class="central-container"> 
+				<?php
+				if ( self::isConnected() ) {
+					?>
 						<div class="central-connect-active">
-							<h2 class="central-connect-active__heading"><?php print esc_html__( 'Site Connected', 'central-connect' ) ?></h2>
+							<h2 class="central-connect-active__heading"><?php print esc_html__( 'Site Connected', 'central-connect' ); ?></h2>
 							<p class="central-connect-active__sub-heading">
 								<span class="dashicons dashicons-yes-alt"></span>
-								<?php print esc_html__( 'This site\'s connection is working properly.', 'central-connect' ) ?></p>
+								<?php print esc_html__( 'This site\'s connection is working properly.', 'central-connect' ); ?></p>
 							<p>
-								<?php print esc_html__( 'Log into Central and access this site\'s controls. Manage your backups, SEO, page speed and more!', 'central-connect' ) ?>
+								<?php print esc_html__( 'Log into Central and access this site\'s controls. Manage your backups, SEO, page speed and more!', 'central-connect' ); ?>
 							</p>
 							<a target="_blank" class="button button-primary"
-								href="<?php print $centralUrl; ?>"><?php print esc_html__( 'Manage In Central', 'central-connect' ) ?></a>
+								href="<?php print $centralUrl; ?>"><?php print esc_html__( 'Manage In Central', 'central-connect' ); ?></a>
 						</div>
-					<?php } else {
-						$this->render();
-					}
+					<?php
+				} else {
+					$this->render();
+				}
 				?>
 				</div>
-			<?php
+				<?php
 			}
 		);
 	}
@@ -172,12 +178,12 @@ class ConnectNotice {
 	}
 
 	/**
-	* Prints a TOS blurb used throughout the connection prompts.
-	*
-	* @since 2.0.0
-	*
-	* @echo string
-	*/
+	 * Prints a TOS blurb used throughout the connection prompts.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @echo string
+	 */
 	public static function termsOfService() {
 		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 		$provider = get_option( 'boldgrid_connect_provider', 'BoldGrid' );
@@ -212,11 +218,13 @@ class ConnectNotice {
 		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 		$provider = get_option( 'boldgrid_connect_provider', 'BoldGrid' );
 
-		$query = http_build_query( [
-			'url' => get_site_url(),
-			'token' => $token,
-			'site_title' => get_bloginfo( 'name' )
-		] );
+		$query = http_build_query(
+			array(
+				'url' => get_site_url(),
+				'token' => $token,
+				'site_title' => get_bloginfo( 'name' ),
+			)
+		);
 
 		return trailingslashit( $configs['branding'][ $provider ]['central_url'] ) . 'connect/wordpress?' . $query;
 	}
@@ -245,7 +253,8 @@ class ConnectNotice {
 
 		$connectUrl = get_admin_url( null, 'options-general.php?page=central-connect&token_redirect=1' );
 
-		if ( ! empty( $provider ) ) : ?>
+		if ( ! empty( $provider ) ) :
+			?>
 			<div class="central-connect-prompt__logo">
 			<a href="<?php echo $configs['branding'][ $provider ]['providerUrl']; ?>">
 				<img src="<?php echo self::getBrandLogo(); ?>" alt="<?php esc_attr_e( 'Connect your site', 'central-connect' ); ?>" target="_blank" />
@@ -256,31 +265,37 @@ class ConnectNotice {
 				<p><?php esc_html_e( 'Connect your site to Central for remote access to this install and any other WordPress installs you connect. Central makes it easy to set up your site if you\'re a beginner and fast if you\'re an expert. Our one-of-a-kind tools and services help you bring everything together.', 'central-connect' ); ?></p>
 				<p><?php esc_html_e( 'Connecting to Central is completely free and includes a free WordPress environment that you can use for testing or staging changes.', 'central-connect' ); ?></p>
 				<div class="central-connect-prompt__description__action">
-					<a class="button-primary" target="_blank" href="<?php echo $connectUrl ?>"><?php
-						esc_html_e( "Connect to $productName", 'central-connect' ); ?></a> <?php echo self::termsOfService() ?>
+					<a class="button-primary" target="_blank" href="<?php echo $connectUrl; ?>">
+																			   <?php
+																				esc_html_e( "Connect to $productName", 'central-connect' );
+																				?>
+						</a> <?php echo self::termsOfService(); ?>
 				</div>
 			</div>
-		<?php else :
+			<?php
+		else :
 			$redirect = urlencode( remove_query_arg( 'provider', $_SERVER['REQUEST_URI'] ) );
 			$redirect = urlencode( $_SERVER['REQUEST_URI'] );
 			?>
 			<div class="central-connect-prompt__description">
 				<h2><?php esc_html_e( 'Get Started by Choosing your Central Provider', 'central-connect' ); ?></h2>
 				<p><?php esc_html_e( 'Connect your site to a Central provider for remote access to this install and any other WordPress installs you connect.  Central makes it easy to set up your site if you\'re a beginner and fast if you\'re an expert.  Our one-of-a-kind tools and services help you bring everything together.', 'central-connect' ); ?></p>
-				<p><?php esc_html_e( 'Connecting to Central is completely free and includes a free WordPress environment that you can use for testing or staging changes.','central-connect' ); ?></p>
+				<p><?php esc_html_e( 'Connecting to Central is completely free and includes a free WordPress environment that you can use for testing or staging changes.', 'central-connect' ); ?></p>
 				<form action="<?php echo admin_url( 'admin-post.php' ); ?>" method="post">
 					<input type="hidden" name="action" value="boldgrid_connect_provider">
-					<?php wp_nonce_field( 'boldgrid_connect_provider', 'boldgrid_connect_provider_nonce', FALSE ); ?>
+					<?php wp_nonce_field( 'boldgrid_connect_provider', 'boldgrid_connect_provider_nonce', false ); ?>
 					<input type="hidden" name="_wp_http_referer" value="<?php echo $redirect; ?>">
 				<?php
-					foreach( $configs['branding'] as $providerName => $settings ) { ?>
+				foreach ( $configs['branding'] as $providerName => $settings ) {
+					?>
 						<input type="radio" id="<?php echo $providerName; ?>" name="provider" value="<?php echo $providerName; ?>">
 						<label for="<?php echo $providerName; ?>"><?php echo $providerName; ?></label><br>
 					<?php } ?>
 					<?php submit_button( 'Get Started' ); ?>
 				</form>
 			</div>
-		<?php endif;
+			<?php
+		endif;
 	}
 
 	public function admin_post() {
@@ -290,11 +305,11 @@ class ConnectNotice {
 		}
 
 		// Check and set option for provider on submission.
-		if ( isset ( $_POST['provider'] ) ) {
+		if ( isset( $_POST['provider'] ) ) {
 			update_option( 'boldgrid_connect_provider', $_POST['provider'] );
 		}
 
-		if ( ! isset ( $_POST['_wp_http_referer'] ) ) {
+		if ( ! isset( $_POST['_wp_http_referer'] ) ) {
 			die( 'Missing target.' );
 		}
 
@@ -315,9 +330,13 @@ class ConnectNotice {
 		<div class="central-panel central-connect-prompt">
 			<div class="central-connect-prompt__attn">
 				<span class="dashicons dashicons-info"></span>
-				<?php esc_html_e( 'Finish setup by connecting to Central to unlock multiple WordPress environments,
-					performance optimization, site protection and more!', 'central-connect' ); ?>
-				<span class="notice-dismiss" title="Dismiss this notice"></span>
+				<?php
+				esc_html_e(
+					'Finish setup by connecting to Central to unlock multiple WordPress environments,
+					performance optimization, site protection and more!',
+					'central-connect'
+				);
+				?>
 			</div>
 			<div class="central-connect-prompt__body">
 				<?php self::getNoticeBody(); ?>

@@ -1,24 +1,24 @@
 <?php
 /**
-* File: Router.php
-*
-* Setup the Router.
-*
-* @since      2.0.0
-* @package    BoldGrid\Connect\Rest
-* @author     BoldGrid <support@boldgrid.com>
-* @link       https://boldgrid.com
-*/
+ * File: Router.php
+ *
+ * Setup the Router.
+ *
+ * @since      2.0.0
+ * @package    BoldGrid\Connect\Rest
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
+ * @link       https://boldgrid.com
+ */
 
 namespace Central\Connect\Health;
 
 /**
-* Class: Router
-*
-* Setup the Router.
-*
-* @since 2.0.0
-*/
+ * Class: Router
+ *
+ * Setup the Router.
+ *
+ * @since 2.0.0
+ */
 class Router {
 
 	/**
@@ -29,9 +29,12 @@ class Router {
 	 * @return void
 	 */
 	public function register() {
-		add_action( 'rest_api_init', function () {
-			$this->registerScan();
-		} );
+		add_action(
+			'rest_api_init',
+			function () {
+				$this->registerScan();
+			}
+		);
 	}
 
 	/**
@@ -42,16 +45,20 @@ class Router {
 	 * @return void
 	 */
 	private function registerScan() {
-		register_rest_route( 'bgc/v1', '/health/', [
-			'methods' => 'GET',
-			'callback' => function () {
-				$stats = new Stats();
-				$response = new \WP_REST_Response( $stats->getSiteHealth() );
+		register_rest_route(
+			'bgc/v1',
+			'/health/',
+			array(
+				'methods' => 'GET',
+				'callback' => function () {
+					$stats = new Stats();
+					$response = new \WP_REST_Response( $stats->getSiteHealth() );
 
-				return $response;
-			},
-			'permission_callback' => [ $this, 'pluginPermissionCheck' ],
-		] );
+					return $response;
+				},
+				'permission_callback' => array( $this, 'pluginPermissionCheck' ),
+			)
+		);
 	}
 
 	/**

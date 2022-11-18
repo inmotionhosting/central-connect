@@ -4,7 +4,7 @@
  *
  * @since      2.0.0
  * @package    BoldGrid\Connect
- * @author     BoldGrid <support@boldgrid.com>
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  * @link       https://boldgrid.com
  */
 
@@ -29,11 +29,11 @@ class Stats {
 	public function getData() {
 		$healthStats = new Health\Stats();
 
-		return [
+		return array(
 			'debug' => self::getDebugInfo(),
 			'views' => Views::getStats(),
 			'health' => $healthStats->getSiteHealth(),
-		];
+		);
 	}
 
 	/**

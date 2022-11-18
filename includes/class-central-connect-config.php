@@ -11,7 +11,7 @@
  * @subpackage Boldgrid_Connect/includes
  * @copyright  BoldGrid.com
  * @version    $Id$
- * @author     BoldGrid <support@boldgrid.com>
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
 /**

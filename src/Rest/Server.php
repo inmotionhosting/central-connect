@@ -1,26 +1,26 @@
 <?php
 /**
-* File: Server.php
-*
-* Setup the Rest Server extension.
-*
-* @since      2.0.0
-* @package    BoldGrid\Connect\Rest
-* @author     BoldGrid <support@boldgrid.com>
-* @link       https://boldgrid.com
-*/
+ * File: Server.php
+ *
+ * Setup the Rest Server extension.
+ *
+ * @since      2.0.0
+ * @package    BoldGrid\Connect\Rest
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
+ * @link       https://boldgrid.com
+ */
 
 namespace Central\Connect\Rest;
 
 use Central\Connect;
 
 /**
-* Class: Server
-*
-* Setup the Rest Server extension.
-*
-* @since 2.0.0
-*/
+ * Class: Server
+ *
+ * Setup the Rest Server extension.
+ *
+ * @since 2.0.0
+ */
 class Server {
 
 	/**
@@ -68,24 +68,30 @@ class Server {
 	 */
 	private function enableHeadCors() {
 		// Auto discovery.
-		add_action( 'send_headers', function() {
-			$requestMethod = ! empty( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : null;
-			if ( ! did_action('rest_api_init') && $requestMethod === 'HEAD' ) {
+		add_action(
+			'send_headers',
+			function() {
+				$requestMethod = ! empty( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : null;
+				if ( ! did_action( 'rest_api_init' ) && $requestMethod === 'HEAD' ) {
+					header( 'Access-Control-Allow-Origin: *' );
+					header( 'Access-Control-Expose-Headers: Link' );
+					header( 'Access-Control-Allow-Methods: HEAD' );
+					header( 'Access-Control-Allow-Headers: Authorization, X-WP-Nonce, X-BGC-Auth, Content-Type, Content-Disposition, Content-MD5', false );
+				}
+			}
+		);
+
+		// Cross site authentication with X-WP-Nonce.
+		remove_filter( 'rest_pre_serve_request', 'rest_send_cors_headers' );
+		add_filter(
+			'rest_pre_serve_request',
+			function ( $value ) {
 				header( 'Access-Control-Allow-Origin: *' );
 				header( 'Access-Control-Expose-Headers: Link' );
 				header( 'Access-Control-Allow-Methods: HEAD' );
-				header( 'Access-Control-Allow-Headers: Authorization, X-WP-Nonce, X-BGC-Auth, Content-Type, Content-Disposition, Content-MD5' , false);
+				header( 'Access-Control-Allow-Headers: Authorization, X-WP-Nonce, Content-Type, Content-Disposition, Content-MD5, X-BGC-Auth', false );
+				return $value;
 			}
-		} );
-
-		//Cross site authentication with X-WP-Nonce.
-		remove_filter( 'rest_pre_serve_request', 'rest_send_cors_headers' );
-		add_filter( 'rest_pre_serve_request', function ( $value ) {
-			header( 'Access-Control-Allow-Origin: *' );
-			header( 'Access-Control-Expose-Headers: Link' );
-			header( 'Access-Control-Allow-Methods: HEAD' );
-			header( 'Access-Control-Allow-Headers: Authorization, X-WP-Nonce, Content-Type, Content-Disposition, Content-MD5, X-BGC-Auth', false );
-			return $value;
-		} );
+		);
 	}
 }

@@ -11,7 +11,7 @@
  * @subpackage Boldgrid_Connect/admin
  * @copyright  BoldGrid.com
  * @version    $Id$
- * @author     BoldGrid <support@boldgrid.com>
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
 // Prevent direct calls.
