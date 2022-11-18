@@ -5,7 +5,7 @@
  * Setup the Router.
  *
  * @since      2.0.0
- * @package    BoldGrid\Connect\Analytics
+ * @package    Central\Connect\Analytics
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  * @link       https://boldgrid.com
  */

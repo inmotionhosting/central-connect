@@ -1,26 +1,26 @@
 <?php
 /**
- * File: class-boldgrid-connect-login.php
+ * File: class-central-connect-login.php
  *
  * Login support functionality.
  *
- * @link       https://www.boldgrid.com
+ * @link       https://www.inmotionhosting.com
  * @since      1.0.0
  *
- * @package    Boldgrid_Connect
- * @subpackage Boldgrid_Connect/includes
- * @copyright  BoldGrid.com
+ * @package    Central_Connect
+ * @subpackage Central_Connect/includes
+ * @copyright  InMotionHosting.com
  * @version    $Id$
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
 /**
- * Class: Boldgrid_Connect_Login
+ * Class: Central_Connect_Login
  *
  * Login support functionality.
  *
  * @since      1.0.0
- * @package    Boldgrid_Connect
+ * @package    Central_Connect
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  *
  * phpcs:disable WordPress.VIP

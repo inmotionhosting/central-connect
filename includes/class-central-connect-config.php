@@ -1,21 +1,21 @@
 <?php
 /**
- * File: class-boldgrid-connect-config.php
+ * File: class-central-connect-config.php
  *
  * Defines configuration properties of the plugin.
  *
- * @link       https://www.boldgrid.com
+ * @link       https://www.inmotionhosting.com
  * @since      1.0.0
  *
- * @package    Boldgrid_Connect
- * @subpackage Boldgrid_Connect/includes
- * @copyright  BoldGrid.com
+ * @package    Central_Connect
+ * @subpackage Central_Connect/includes
+ * @copyright  InMotionHosting.com
  * @version    $Id$
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
 /**
- * Class: Boldgrid_Connect_Config.
+ * Class: Central_Connect_Config.
  *
  * @since 1.0.0
  */

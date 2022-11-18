@@ -5,7 +5,7 @@
  * Modifications to the installed plugin listing page.
  *
  * @since      2.0.0
- * @package    BoldGrid\Connect\Integrations
+ * @package    Central\Connect\Integrations
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  * @link       https://boldgrid.com
  */

@@ -5,7 +5,7 @@
  * Remove feedback from upgrader.
  *
  * @since      2.0.0
- * @package    BoldGrid\Connect\Rest
+ * @package    Central\Connect\Rest
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  * @link       https://boldgrid.com
  */

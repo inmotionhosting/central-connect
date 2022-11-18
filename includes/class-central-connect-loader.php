@@ -1,21 +1,21 @@
 <?php
 /**
- * File: class-boldgrid-connect-loader.php
+ * File: class-central-connect-loader.php
  *
  * Register all actions and filters for the plugin.
  *
- * @link       https://www.boldgrid.com
+ * @link       https://www.inmotionhosting.com
  * @since      1.0.0
  *
- * @package    Boldgrid_Connect
- * @subpackage Boldgrid_Connect/includes
- * @copyright  BoldGrid.com
+ * @package    Central_Connect
+ * @subpackage Central_Connect/includes
+ * @copyright  InMotionHosting.com
  * @version    $Id$
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
 /**
- * Class: Boldgrid_Connect_Loader
+ * Class: Central_Connect_Loader
  *
  * Register all actions and filters for the plugin.
  *
@@ -24,8 +24,8 @@
  * run function to execute the list of actions and filters.
  *
  * @since      1.0.0
- * @package    Boldgrid_Connect
- * @subpackage Boldgrid_Connect/includes
+ * @package    Central_Connect
+ * @subpackage Central_Connect/includes
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 class Central_Connect_Loader {
