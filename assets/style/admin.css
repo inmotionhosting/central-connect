@@ -23,14 +23,6 @@
 	margin-right: 1em;
 }
 
-.central-connect-prompt__attn .notice-dismiss::before {
-	color: #fff;
-}
-
-.central-connect-prompt__attn .notice-dismiss:hover::before {
-	color: red;
-}
-
 .central-connect-prompt__body {
 	display: flex;
 }

@@ -317,7 +317,7 @@ class ConnectNotice {
 				<span class="dashicons dashicons-info"></span>
 				<?php esc_html_e( 'Finish setup by connecting to Central to unlock multiple WordPress environments,
 					performance optimization, site protection and more!', 'central-connect' ); ?>
-				<!--- <span class="notice-dismiss" title="Dismiss this notice"></span> -->
+				<span class="notice-dismiss" title="Dismiss this notice"></span>
 			</div>
 			<div class="central-connect-prompt__body">
 				<?php self::getNoticeBody(); ?>
