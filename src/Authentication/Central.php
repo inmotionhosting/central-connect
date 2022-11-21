@@ -21,6 +21,13 @@ namespace Central\Connect\Authentication;
  */
 class Central {
 
+	/**
+	 * WordPress REST server.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @var \WP_REST_Server $restServer Instance of WP_REST_Server.
+	 */
 	protected $restServer;
 
 	/**

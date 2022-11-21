@@ -67,7 +67,7 @@ class Router {
 			array(
 				'methods' => 'PUT',
 				'callback' => function ( $request ) {
-					$files = $request->get_param( 'files' ) ?: array();
+					$files = $request->get_param( 'files' ) ?: array(); //phpcs:ignore WordPress.PHP.DisallowShortTernary.Found
 					$active = $request->get_param( 'active' );
 
 					include_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -197,7 +197,7 @@ class Router {
 					$response = $this->pluginInstaller->getCollection();
 					$response = new \WP_REST_Response( $response );
 
-					// Add a custom status code
+					// Add a custom status code.
 					$response->set_status( 201 );
 
 					return $response;
@@ -239,7 +239,7 @@ class Router {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param array $files
+	 * @param array $files Array of files to test if they exist.
 	 * @return boolean     Do all the files exist.
 	 */
 	public function validateFilesExists( $files ) {

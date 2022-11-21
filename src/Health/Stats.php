@@ -36,7 +36,7 @@ class Stats {
 		include_once ABSPATH . 'wp-admin/includes/plugin.php';
 		include_once ABSPATH . 'wp-admin/includes/misc.php';
 
-		// Disable Rest Test & async tests
+		// Disable Rest Test & async tests.
 		add_filter(
 			'site_status_tests',
 			function ( $tests ) {

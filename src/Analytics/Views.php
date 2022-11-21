@@ -24,16 +24,20 @@ use Central\Connect\Analytics\Option;
 class Views {
 
 	/**
-	 * Have we alreadt counted a page view?
+	 * Have we already counted a page view?
 	 *
-	 * @since X.X.X
+	 * @since 1.0.0
+	 *
+	 * @var bool $viewCounted Has the view been counted.
 	 */
 	protected $viewCounted = false;
 
 	/**
 	 * Status Code.
 	 *
-	 * @since X.X.X
+	 * @since 1.0.0
+	 *
+	 * @var int $statusCode Current status code.
 	 */
 	protected $statusCode;
 
@@ -96,6 +100,6 @@ class Views {
 	 * @return string Date.
 	 */
 	public function getDateFormat() {
-		return date( 'Y-m-d' );
+		return gmdate( 'Y-m-d' );
 	}
 }

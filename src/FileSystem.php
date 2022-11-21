@@ -21,6 +21,11 @@ namespace Central\Connect;
  */
 class FileSystem {
 
+	/**
+	 * Initialize the class and set class properties.
+	 *
+	 * @since    1.0.0
+	 */
 	public function __construct() {
 		$this->wpFilesystem = $this->init();
 

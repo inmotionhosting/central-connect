@@ -4,12 +4,19 @@
  *
  * Remove feedback from upgrader.
  *
- * @since      2.0.0
- * @package    Central\Connect\Rest
+ * @link       https://central.inmotionhosting.com
+ * @since      1.0.0
+ *
+ * @package    Central_Connect
+ * @subpackage Central_Connect/includes
+ * @copyright  InMotionHosting.com
+ * @version    $Id$
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
- * @link       https://boldgrid.com
  */
 
+/**
+ * Include core WordPress upgrader file.
+ */
 include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
 /**
@@ -49,7 +56,7 @@ class Central_Connect_Upgrader_Skin extends \WP_Upgrader_Skin {
 		if ( ! empty( $errors ) ) {
 			\wp_send_json_error(
 				array(
-					'error' => \esc_html__( 'There was an error installing. Please try again.', 'boldgrid-connect' ),
+					'error' => \esc_html__( 'There was an error installing. Please try again.', 'central-connect' ),
 				),
 				400
 			);
@@ -62,7 +69,8 @@ class Central_Connect_Upgrader_Skin extends \WP_Upgrader_Skin {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $string The feedback string.
+	 * @param string $string  The feedback string.
+	 * @param mixed  ...$args Additional arguments to pass.
 	 */
 	public function feedback( $string, ...$args ) {}
 }

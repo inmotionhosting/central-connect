@@ -88,8 +88,8 @@ class Central_Connect_Login {
 	 */
 	public function authenticate() {
 		// Authentication parameters.
-		$token        = ! empty( $_REQUEST['token'] ) ? sanitize_text_field( $_REQUEST['token'] ) : null; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-		$redirect_url = ! empty( $_REQUEST['redirect_url'] ) ? $_REQUEST['redirect_url'] : user_admin_url(); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		$token        = ! empty( $_REQUEST['token'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['token'] ) ) : null; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		$redirect_url = ! empty( $_REQUEST['redirect_url'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_url'] ) ) : user_admin_url(); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 
 		if ( is_user_logged_in() && $token ) {
 			wp_safe_redirect( $redirect_url );
@@ -101,7 +101,7 @@ class Central_Connect_Login {
 		if ( $token ) {
 			$user = $this->get_user();
 			if ( ! empty( $_REQUEST['environment_id'] ) ) {
-				$environment_id = sanitize_text_field( $_REQUEST['environment_id'] );
+				$environment_id = sanitize_text_field( wp_unslash( $_REQUEST['environment_id'] ) );
 				$tokenValidator = new \BoldGrid\Connect\Authentication\Token();
 				if ( ! empty( $_REQUEST['has_access_token'] ) ) {
 					$user = $tokenValidator->getValidUser( $token );

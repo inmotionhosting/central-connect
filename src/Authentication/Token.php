@@ -26,8 +26,10 @@ class Token {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param WP_User $user WP User to create an access token for.
-	 * @return array Access token.
+	 * @param WP_User $user    WP User to create an access token for.
+	 * @param string  $expires A date/time string to be parsed by strtotim() for the expiration time.
+	 *
+	 * @return array  Access token.
 	 */
 	public function create( $user, $expires = '+2 hours' ) {
 		$accessTokens = get_user_option( 'bgc_access_tokens', $user->ID );
@@ -56,11 +58,11 @@ class Token {
 	}
 
 	/**
-	 * Is this the presented token formatted as a BG Token?
+	 * Is this the presented token formatted as a Central Token?
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $environmentId Environment ID.
+	 * @param string $providedToken Authentication token provided.
 	 */
 	public function isBGToken( $providedToken ) {
 		$providedToken = preg_replace( '/Bearer\s+/', '', $providedToken );
@@ -73,13 +75,14 @@ class Token {
 	}
 
 	/**
-	 * Validate a Central token with the BoldGrid API.
+	 * Validate a Central token with the Central API.
 	 *
-	 * @since X.X.X
+	 * @since 1.0.0
 	 *
-	 * @param string $token Api
-	 * @param string $environmentId Api
-	 * @return boolean      Is the token valid?
+	 * @param string $token         Token to validate.
+	 * @param string $environmentId User's Central Environment ID.
+	 *
+	 * @return boolean Is the token valid?
 	 */
 	public function remoteValidate( $token, $environmentId ) {
 		do_action( 'bgc_remote_validate' );
@@ -127,7 +130,7 @@ class Token {
 	 * @since 2.0.0
 	 *
 	 * @param string $providedToken Access Token from user.
-	 * @param int    $userId        User Id to auth as.
+	 *
 	 * @return WP_User
 	 */
 	public function getValidUser( $providedToken ) {

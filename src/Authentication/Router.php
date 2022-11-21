@@ -83,7 +83,7 @@ class Router {
 					// Find the requested user, or default.
 					$user = $this->selectUser( $userId );
 
-					if ( $user !== false && user_can( $userId, 'manage_options' ) ) {
+					if ( false !== $user && user_can( $userId, 'manage_options' ) ) {
 						$response = new \WP_REST_Response(
 							array(
 								'errors' => array(
@@ -123,7 +123,7 @@ class Router {
 					'token' => array(
 						'required' => true,
 						'type' => 'string',
-						'description' => 'BoldGrid Authentication token',
+						'description' => 'Central Authentication token',
 					),
 					'user_id' => array(
 						'required' => false,

@@ -1,16 +1,15 @@
 <?php
-
 /**
- * BoldGrid Source Code
+ * Central Connect Source Code
  *
- * @package Boldgrid_Connect
+ * @package Central_Connect
  * @copyright BoldGrid.com
  * @version 2.0.0
  * @author BoldGrid.com <wpb@boldgrod.com>
  */
 
 /**
- * Boldgrid Upgrade Class
+ * Central Upgrade Class
  *
  * Responsible for performing any upgrade methods that
  * are version specific needs.
@@ -144,6 +143,8 @@ class Central_Connect_Upgrade {
 	 * @access public
 	 *
 	 * @since 2.0.0
+	 *
+	 * @param string $version Version number to set in database for upgrade checks.
 	 */
 	public function set_option( $version ) {
 		update_site_option( "{$this->prefix}_version", $version );

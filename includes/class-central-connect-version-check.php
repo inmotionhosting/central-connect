@@ -1,12 +1,21 @@
 <?php
 /**
- * WordPress and PHP Version checking.
+ * File: class-central-connect-version-check.php
+ *
+ * @link       https://central.inmotionhosting.com
+ * @since      1.0.0
+ *
+ * @package    Central_Connect
+ * @subpackage Central_Connect/includes
+ * @copyright  InMotionHosting.com
+ * @version    $Id$
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
 if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 
 	/**
-	 * Boldgrid_Connect_Version_Check Class.
+	 * Central_Connect_Version_Check Class.
 	 *
 	 * This class is used to determine if a supported PHP version and
 	 * WP version are in use before initializing plugin code.
@@ -14,6 +23,8 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 	class Central_Connect_Version_Check {
 
 		/**
+		 * The main plugin file.
+		 *
 		 * @var string $plugin Main plugin file.
 		 *
 		 * @access private
@@ -21,6 +32,8 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		private static $plugin;
 
 		/**
+		 * Minimum PHP version required.
+		 *
 		 * @var string $php_version Minimum PHP version required.
 		 *
 		 * @access private
@@ -28,6 +41,8 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		private static $php_version;
 
 		/**
+		 * Minimum WordPress version required.
+		 *
 		 * @var string $wp_version Minimum WordPress version required.
 		 *
 		 * @access private
@@ -42,11 +57,11 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		 * @access public
 		 *
 		 * @param  string   $plugin      Root plugin file.
-		 * @param  string   $php_version Minimum PHP version required.
 		 * @param  string   $wp_version  Minimum WordPress version required.
+		 * @param  string   $php_version Minimum PHP version required.
 		 * @param  callable $callback    Callback method to call if version check passes.
 		 *
-		 * @return null
+		 * @return void
 		 */
 		public static function init( $plugin, $wp_version, $php_version, $callback = null ) {
 			self::$plugin = $plugin;
@@ -91,7 +106,7 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		 *
 		 * @access public
 		 *
-		 * @return null
+		 * @return void
 		 */
 		public static function success_hook() {
 			$file = explode( '/', self::$plugin );
@@ -106,10 +121,10 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		 *
 		 * @access public
 		 *
-		 * @return null
+		 * @return void
 		 */
 		public static function admin_notice() {
-			printf( '<div class="error"><p>%s</p></div>', self::get_message() );
+			printf( '<div class="error"><p>%s</p></div>', esc_html( self::get_message() ) );
 			// Disables the activate message.
 			if ( isset( $_GET['activate'] ) ) {
 				unset( $_GET['activate'] );
@@ -123,7 +138,7 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		 *
 		 * @access public
 		 *
-		 * @return null
+		 * @return void
 		 */
 		public static function deactivate() {
 			error_log( self::get_message() );
@@ -182,7 +197,8 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		 */
 		public static function get_message() {
 			return sprintf(
-				'The plugin <code>%1$s</code> requires at least WordPress %2$s and PHP %3$s. You are currently running WordPress %4$s and PHP %5$s.',
+				/* translators: %1s: plugin directory name, %2s: Required WordPress version, %3s: Required PHP version, %4s: Current WordPress version, %5s: Current PHP version. */
+				__( 'The plugin <code>%1$s</code> requires at least WordPress %2$s and PHP %3$s. You are currently running WordPress %4$s and PHP %5$s.', 'central-connect' ),
 				dirname( plugin_basename( self::$plugin ) ),
 				self::$wp_version,
 				self::$php_version,

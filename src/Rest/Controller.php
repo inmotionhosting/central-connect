@@ -30,6 +30,13 @@ class Controller extends \WP_REST_Controller {
 	 */
 	protected $namespace = 'bgc/v1';
 
+	/**
+	 * Make sure current can activate plugins for api calls.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return boolean Has Access?
+	 */
 	public function permissionCheck() {
 		return current_user_can( 'activate_plugins' );
 	}

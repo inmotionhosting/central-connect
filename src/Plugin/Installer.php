@@ -26,7 +26,7 @@ class Installer {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @return void
+	 * @return array List of plugins and associated plugin data.
 	 */
 	public function getCollection() {
 		if ( ! function_exists( 'get_plugins' ) ) {
@@ -70,6 +70,8 @@ class Installer {
 	 * Install a plugin.
 	 *
 	 * @since 2.0.0
+	 *
+	 * @param string $plugin_zip WordPress plugin zip to install.
 	 */
 	public function install( $plugin_zip ) {
 		include_once ABSPATH . 'wp-admin/includes/misc.php';

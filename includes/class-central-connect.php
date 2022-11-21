@@ -179,7 +179,7 @@ class Central_Connect {
 			}
 		);
 
-		// Inspirations
+		// Inspirations.
 		add_filter(
 			'boldgrid_inspirations_configs',
 			function ( $configs ) use ( $optionConfigs ) {
@@ -188,7 +188,7 @@ class Central_Connect {
 			}
 		);
 
-		// BoldGrid Library
+		// BoldGrid Library.
 		add_filter(
 			'Boldgrid\Library\Configs\set',
 			function( $configs ) use ( $optionConfigs ) {
@@ -229,7 +229,7 @@ class Central_Connect {
 						if ( strpos( strtolower( $brand ), $confs['brand'] ) !== false ) {
 							update_site_option( 'boldgrid_connect_provider', $brand );
 							// This option controls hiding various menu items from the plugins/library.
-							update_site_option( 'boldgrid_connect_hide_menu', $brand === 'InMotion Hosting' );
+							update_site_option( 'boldgrid_connect_hide_menu', 'InMotion Hosting' === $brand );
 						}
 					}
 				}

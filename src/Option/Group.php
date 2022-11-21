@@ -58,7 +58,7 @@ abstract class Group {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param  string $key
+	 * @param string $key Key to delete from array of options.
 	 */
 	public static function delete( $key ) {
 		$option = get_option( static::OPTION_NAMESPACE, array() );

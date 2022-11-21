@@ -80,8 +80,9 @@ class Installer {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param Stylesheets $stylesheets A list of stylesheets.
-	 * @return void
+	 * @param  string $stylesheets A list of stylesheets.
+	 *
+	 * @return mixed  $results     Array containing results of delete process or false.
 	 */
 	public function delete( $stylesheets ) {
 		include_once ABSPATH . 'wp-admin/includes/misc.php';
@@ -103,6 +104,8 @@ class Installer {
 	 * Install a theme.
 	 *
 	 * @since 2.0.0
+	 *
+	 * @param string $themeZip Location of theme .zip file.
 	 */
 	public function install( $themeZip ) {
 		include_once ABSPATH . 'wp-admin/includes/misc.php';

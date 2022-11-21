@@ -67,11 +67,12 @@ class Router {
 				'callback' => function ( $request ) {
 					$response = array( 'error' => 'Unable to switch theme' );
 					$status = 400;
-					$stylesheet = $request->get_param( 'stylesheet' ) ?: '';
+					$stylesheet = $request->get_param( 'stylesheet' ) ?: ''; //phpcs:ignore WordPress.PHP.DisallowShortTernary.Found
 					switch_theme( $stylesheet );
 
 					$currentTheme = wp_get_theme();
-					if ( $stylesheet === get_stylesheet() ) {
+
+					if ( get_stylesheet() === $stylesheet ) {
 						$response = $this->themeInstaller->formatThemeResource( $currentTheme );
 						$status = 200;
 					}
@@ -248,7 +249,8 @@ class Router {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param array $files
+	 * @param string $stylesheet Directory name for the theme.
+	 *
 	 * @return boolean     Do all the files exist.
 	 */
 	public function validateThemeExists( $stylesheet ) {
