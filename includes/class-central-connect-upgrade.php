@@ -1,11 +1,15 @@
 <?php
 /**
- * Central Connect Source Code
+ * File: class-central-connect-upgrade.php
  *
- * @package Central_Connect
- * @copyright BoldGrid.com
- * @version 2.0.0
- * @author BoldGrid.com <wpb@boldgrod.com>
+ * @link       https://central.inmotionhosting.com
+ * @since      1.0.0
+ *
+ * @package    Central_Connect
+ * @subpackage Central_Connect/includes
+ * @copyright  InMotionHosting.com
+ * @version    $Id$
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
 /**

@@ -1,10 +1,12 @@
 === Central Connect ===
-Contributors: boldgrid, imh_brad, joemoto, rramo012, timph
+Contributors: inmotionhosting, imh_brad, joemoto, rramo012, timph, jamesros161
 Tags: inmotion, connect, manage
 Requires at least: 5.0
 Tested up to: 6.1
 Requires PHP: 5.4
 Stable tag: 2.0.1
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Connects users and sites with InMotion Central.
 
@@ -29,13 +31,13 @@ Using our single sign in feature, you can log into central and access any of you
 
 Release Date: June 28th, 2022
 
-* Bug Fix: Fixes BoldGrid API server not being filtered correctly. 
+* Bug Fix: Fixes Central API server not being filtered correctly. 
 
 = 2.0.0 =
 
 Release Date: TBD
 
-* Feature:  Single signin through BoldGrid Central.
+* Feature:  Single signin through Central.
 * Feature:  New rest endpoints.
 
 = 1.0.2 =
@@ -48,7 +50,7 @@ Release Date: October 15th, 2019
 
 Release Date: September 11th, 2019
 
-* Bug fix: Fixed conflict between tgmpa plugin installer and the BoldGrid custom update classes.
+* Bug fix: Fixed conflict between tgmpa plugin installer and the custom update classes.
 * Bug fix: Added composer hook for library build.
 * Update:  Updated dependencies.
 
