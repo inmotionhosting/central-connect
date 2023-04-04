@@ -102,7 +102,7 @@ class Central_Connect_Login {
 			$user = $this->get_user();
 			if ( ! empty( $_REQUEST['environment_id'] ) ) {
 				$environment_id = sanitize_text_field( wp_unslash( $_REQUEST['environment_id'] ) );
-				$tokenValidator = new \BoldGrid\Connect\Authentication\Token();
+				$tokenValidator = new \Central\Connect\Authentication\Token();
 				if ( ! empty( $_REQUEST['has_access_token'] ) ) {
 					$user = $tokenValidator->getValidUser( $token );
 					$valid = $user && ! empty( $user->ID );
