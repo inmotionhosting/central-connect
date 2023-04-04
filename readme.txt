@@ -4,7 +4,7 @@ Tags: inmotion, connect, manage
 Requires at least: 5.0
 Tested up to: 6.1
 Requires PHP: 5.4
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,7 +27,7 @@ Using our single sign in feature, you can log into central and access any of you
 
 == Changelog ==
 
-= 2.0.2 =
+= 2.0.3 =
 
 Release Date: April 4th, 2023
 
