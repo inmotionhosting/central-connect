@@ -5,12 +5,12 @@
  * Setup the Router.
  *
  * @since      2.0.0
- * @package    BoldGrid\Connect\Rest
- * @author     BoldGrid <support@boldgrid.com>
+ * @package    Central\Connect\Rest
+ * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  * @link       https://boldgrid.com
  */
 
-namespace BoldGrid\Connect\Health;
+namespace Central\Connect\Health;
 
 /**
  * Class: Router
