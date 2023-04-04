@@ -166,7 +166,7 @@ class Central_Connect_Login {
 	public function remote_validate( $token ) {
 		do_action( 'bgc_remote_validate' );
 
-		$configs   = Boldgrid_Connect_Service::get( 'configs' );
+		$configs   = \Central_Connect_Service::get( 'configs' );
 		$url       = $configs['asset_server'] . $configs['ajax_calls']['verify_site_token'];
 		$args      = array(
 			'method'  => 'POST',
