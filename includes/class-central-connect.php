@@ -218,6 +218,17 @@ class Central_Connect {
 		add_filter(
 			'option_bg_connect_configs',
 			function( $value, $option ) {
+				/**
+				 * The BoldGrid Library applies this filter before the
+				 * 'configs' service gets registered above. In order for this
+				 * value to not be 'null', we need to run setup_configs() here
+				 * as well. Just checking for a null value doesn't work below,
+				 * because the Boldgrid_Connect_Service::get() method throws an
+				 * error if the requested service hasn't been registered
+				 */
+				$config = new Central_Connect_Config();
+				$config->setup_configs();
+
 				$value = is_array( $value ) ? $value : array();
 				$conf = \Central_Connect_Service::get( 'configs' );
 
