@@ -2,9 +2,9 @@
 Contributors: inmotionhosting, imh_brad, joemoto, rramo012, timph, jamesros161
 Tags: inmotion, connect, manage
 Requires at least: 5.0
-Tested up to: 6.1
+Tested up to: 6.4
 Requires PHP: 5.4
-Stable tag: 2.0.3
+Stable tag: 2.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,12 @@ Using our single sign in feature, you can log into central and access any of you
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 2.0.4 =
+
+Release Date: January 12th, 2024
+
+* Update: Removing submenu and connect notice. 
 
 = 2.0.3 =
 

@@ -147,11 +147,13 @@ class Central_Connect {
 		$login = new Central_Connect_Login();
 		$login->setup();
 
-		$connectNotice = new Connect\View\Central\ConnectNotice();
-		$connectNotice->initialize();
+		// Disabling the connect notice and menu for now.
+		//$connectNotice = new Connect\View\Central\ConnectNotice();
+		//$connectNotice->initialize();
 
-		$installedPlugins = new Connect\Plugin\Installed();
-		$installedPlugins->initialize();
+		// Remove "My Connection" page from plugins list.
+		//$installedPlugins = new Connect\Plugin\Installed();
+		//$installedPlugins->initialize();
 
 		$inspirations = new Connect\Integrations\Inspirations();
 		$inspirations->initialize();

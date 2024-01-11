@@ -141,6 +141,7 @@ class ConnectNotice {
 				<div class="central-container"> 
 				<?php
 				if ( self::isConnected() ) {
+					
 					?>
 						<div class="central-connect-active">
 							<h2 class="central-connect-active__heading"><?php print esc_html__( 'Site Connected', 'central-connect' ); ?></h2>
@@ -151,7 +152,7 @@ class ConnectNotice {
 								<?php print esc_html__( 'Log into Central and access this site\'s controls. Manage your backups, SEO, page speed and more!', 'central-connect' ); ?>
 							</p>
 							<a target="_blank" class="button button-primary"
-								href="<?php echo esc_url( $connectUrl ); ?>"><?php print esc_html__( 'Manage In Central', 'central-connect' ); ?></a>
+								href="<?php echo esc_url( $centralUrl ); ?>"><?php print esc_html__( 'Manage In Central', 'central-connect' ); ?></a>
 						</div>
 					<?php
 				} else {
