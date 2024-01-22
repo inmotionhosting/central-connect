@@ -41,7 +41,7 @@ class Central {
 			function( $restServer ) {
 
 				// Store the current Rest server.
-				$this->resetServer = $restServer;
+				$this->restServer = $restServer;
 
 				add_filter( 'rest_authentication_errors', array( $this, 'addRemoteAuth' ), 20 );
 			}
@@ -105,7 +105,7 @@ class Central {
 	 * @return string           Value of header.
 	 */
 	public function getHeader( $headerKey ) {
-		$headers = $this->resetServer->get_headers( $_SERVER );
+		$headers = $this->restServer->get_headers( $_SERVER );
 
 		$value = null;
 		foreach ( $headers as $key => $header ) {
