@@ -67,7 +67,7 @@ class Inspirations {
 							'You\'ve deployed this site on a development environment. To make this website public, you\'ll need to transfer to a production environment. Head back over to %s when you\'re done making changes to deploy your website.',
 							'central-connect'
 						),
-						esc_html( $productName ),
+						esc_html( $productName )
 					),
 					esc_html__( 'Publish Site', 'central-connect' )
 				);
