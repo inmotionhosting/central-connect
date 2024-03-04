@@ -15,7 +15,7 @@
  * Plugin Name:       Central Connect
  * Plugin URI:        https://central.inmotionhosting.com
  * Description:       Safe and easy management for all of your WordPress websites. SEO, Backups, 1-click login, site transfers, and more on one dashboard.
- * Version:           2.0.4
+ * Version:           2.0.5
  * Author:            InMotion Hosting
  * Author URI:        https://inmotionhosting.com
  * License:           GPL-2.0+

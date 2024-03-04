@@ -4,7 +4,7 @@ Tags: inmotion, connect, manage
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 5.4
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,12 @@ Using our single sign in feature, you can log into central and access any of you
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 2.0.5 =
+
+Release Date: March 4th, 2024
+
+* Bug Fix: Fixing PHP errors for various PHP version old and new.
 
 = 2.0.4 =
 
