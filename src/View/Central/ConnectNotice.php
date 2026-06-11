@@ -339,9 +339,16 @@ class ConnectNotice {
 	 * @return void
 	 */
 	public function admin_post() {
-		// Validate nonce.
-		if ( ! empty( $_POST['boldgrid_connect_provider_nonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['boldgrid_connect_provider_nonce'] ) ), 'boldgrid_connect_provider' ) ) {
+		// Validate nonce. A missing nonce must be rejected as well; previously
+		// the check only fired when a nonce was present but invalid, so a
+		// request with no nonce bypassed CSRF protection entirely.
+		if ( empty( $_POST['boldgrid_connect_provider_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['boldgrid_connect_provider_nonce'] ) ), 'boldgrid_connect_provider' ) ) {
 			die( 'Invalid nonce.' );
+		}
+
+		// Only administrators may change the connect provider.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			die( 'Unauthorized.' );
 		}
 
 		// Check and set option for provider on submission.
