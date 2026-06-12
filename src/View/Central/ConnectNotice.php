@@ -343,12 +343,12 @@ class ConnectNotice {
 		// the check only fired when a nonce was present but invalid, so a
 		// request with no nonce bypassed CSRF protection entirely.
 		if ( empty( $_POST['boldgrid_connect_provider_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['boldgrid_connect_provider_nonce'] ) ), 'boldgrid_connect_provider' ) ) {
-			die( 'Invalid nonce.' );
+			wp_die( __( 'Invalid nonce.', 'central-connect' ) );
 		}
 
 		// Only administrators may change the connect provider.
 		if ( ! current_user_can( 'manage_options' ) ) {
-			die( 'Unauthorized.' );
+			wp_die( __( 'Unauthorized.', 'central-connect' ) );
 		}
 
 		// Check and set option for provider on submission.
@@ -360,7 +360,7 @@ class ConnectNotice {
 		}
 
 		if ( ! isset( $_POST['_wp_http_referer'] ) ) {
-			die( 'Missing target.' );
+			wp_die( __( 'Missing target.', 'central-connect' ) );
 		}
 
 		$url = add_query_arg( 'provider', $provider, urldecode( sanitize_text_field( wp_unslash( $_POST['_wp_http_referer'] ) ) ) );
