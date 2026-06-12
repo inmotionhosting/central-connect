@@ -342,7 +342,7 @@ class ConnectNotice {
 		// Validate nonce. A missing nonce must be rejected as well; previously
 		// the check only fired when a nonce was present but invalid, so a
 		// request with no nonce bypassed CSRF protection entirely.
-		if ( empty( $_POST['boldgrid_connect_provider_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['boldgrid_connect_provider_nonce'] ) ), 'boldgrid_connect_provider' ) ) {
+		if ( empty( $_POST['boldgrid_connect_provider_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['boldgrid_connect_provider_nonce'] ) ), 'boldgrid_connect_provider' ) ) {
 			wp_die( __( 'Invalid nonce.', 'central-connect' ) );
 		}
 
