@@ -61,6 +61,11 @@ class Router {
 			'/auth/',
 			array(
 				'methods' => 'POST',
+				// Authorization is enforced inside the callback by validating the
+				// caller's Central environment token via Token::remoteValidate().
+				// Declared explicitly so WordPress never falls back to its
+				// permissive default for routes without a permission_callback.
+				'permission_callback' => '__return_true',
 				'callback' => function ( $request ) {
 
 					// Reach out to our API servers to validate their token.
@@ -83,41 +88,41 @@ class Router {
 					// Find the requested user, or default.
 					$user = $this->selectUser( $userId );
 
+					// Reject requests that explicitly target an administrator
+					// account through the user_id parameter. Returning here is
+					// required: previously the response was built but then
+					// overwritten by the token creation below, so the guard had
+					// no effect and any environment-token holder could mint an
+					// administrator access token (privilege escalation).
 					if ( false !== $user && user_can( $userId, 'manage_options' ) ) {
-						$response = new \WP_REST_Response(
+						return new \WP_REST_Response(
 							array(
 								'errors' => array(
 									'name' => 'user_not_qualified',
 									'message' => 'Please try again with a WordPress administrator account.',
 								),
-							)
+							),
+							400
 						);
-
-						$response->set_status( 400 );
 					}
 
 					// User found, create token and return to view.
 					if ( $user ) {
-
 						$tokenHelper = new Token();
 						$accessToken = $tokenHelper->create( $user );
-						$response = new \WP_REST_Response( $accessToken );
-
-						// User not found.
-					} else {
-						$response = new \WP_REST_Response(
-							array(
-								'errors' => array(
-									'name' => 'user_not_found',
-									'message' => 'Unable to find a user to authenticate as.',
-								),
-							)
-						);
-
-						$response->set_status( 400 );
+						return new \WP_REST_Response( $accessToken );
 					}
 
-					return $response;
+					// User not found.
+					return new \WP_REST_Response(
+						array(
+							'errors' => array(
+								'name' => 'user_not_found',
+								'message' => 'Unable to find a user to authenticate as.',
+							),
+						),
+						400
+					);
 				},
 				'args' => array(
 					'token' => array(

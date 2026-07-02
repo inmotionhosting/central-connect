@@ -22,6 +22,30 @@ namespace Central\Connect\Option;
 class Router {
 
 	/**
+	 * Options that may be read, written, or deleted through the REST API.
+	 *
+	 * The endpoints expose generic option access, so the option name must be
+	 * restricted to the BoldGrid/Central options the platform manages.
+	 * Without this allowlist a caller could read or overwrite arbitrary core
+	 * WordPress options (e.g. admin_email, siteurl, active_plugins) leading to
+	 * full site takeover.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @var string[]
+	 */
+	const ALLOWED_OPTIONS = array(
+		'central_connect',
+		'boldgrid_api_key',
+		'boldgrid_api_url',
+		'boldgrid_connect_provider',
+		'boldgrid_connect_analytics',
+		'boldgrid_connect_hide_menu',
+		'bg_connect_configs',
+		'bglib_configs',
+	);
+
+	/**
 	 * Register routes.
 	 *
 	 * @since 2.0.0
@@ -54,6 +78,11 @@ class Router {
 				'methods' => 'GET',
 				'callback' => function ( $request ) {
 					$option = $request->get_param( 'name' );
+
+					if ( ! $this->isAllowedOption( $option ) ) {
+						return $this->optionNotAllowed();
+					}
+
 					$optionVal = get_option( $option, null );
 
 					$response = new \WP_REST_Response(
@@ -91,6 +120,11 @@ class Router {
 				'methods' => 'DELETE',
 				'callback' => function ( $request ) {
 					$name = $request->get_param( 'name' );
+
+					if ( ! $this->isAllowedOption( $name ) ) {
+						return $this->optionNotAllowed();
+					}
+
 					delete_option( $name );
 
 					$response = new \WP_REST_Response( array() );
@@ -126,6 +160,10 @@ class Router {
 				'callback' => function ( $request ) {
 					$option = $request->get_param( 'name' );
 					$newValue = $request->get_param( 'value' );
+
+					if ( ! $this->isAllowedOption( $option ) ) {
+						return $this->optionNotAllowed();
+					}
 
 					update_option( $option, $newValue );
 
@@ -167,5 +205,32 @@ class Router {
 	 */
 	public function permissionCheck() {
 		return current_user_can( 'manage_options' );
+	}
+
+	/**
+	 * Determine whether an option name may be accessed through the API.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param mixed $name Option name from the request.
+	 * @return boolean Whether the option is allowed.
+	 */
+	private function isAllowedOption( $name ) {
+		return is_string( $name ) && in_array( $name, self::ALLOWED_OPTIONS, true );
+	}
+
+	/**
+	 * Build the response returned when an option is not in the allowlist.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return \WP_Error
+	 */
+	private function optionNotAllowed() {
+		return new \WP_Error(
+			'rest_forbidden_option',
+			'You are not allowed to access this option.',
+			array( 'status' => 403 )
+		);
 	}
 }

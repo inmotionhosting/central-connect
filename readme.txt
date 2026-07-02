@@ -2,9 +2,9 @@
 Contributors: inmotionhosting, imh_brad, joemoto, rramo012, timph, jamesros161
 Tags: inmotion, connect, manage
 Requires at least: 5.0
-Tested up to: 6.4
+Tested up to: 7.0
 Requires PHP: 5.4
-Stable tag: 2.0.5
+Stable tag: 2.0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,16 @@ Using our single sign in feature, you can log into central and access any of you
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 2.0.6 =
+
+Release Date: June 17th, 2026
+
+* Bug Fix: Fixed sanitization of nonce to use `sanitize_key()` instead of s`antize_text_field()`.
+* Bug Fix: Set an allowlist for options that can be changed
+* Bug Fix: Fixed the inverted nonce check.
+* Bug Fix: Added explicit `permission_callback` for auth route.
+* Update: Use `wp_die()` for better error output in dashboard when nonce fails.
 
 = 2.0.5 =
 
