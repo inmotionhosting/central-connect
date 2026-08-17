@@ -58,40 +58,18 @@ class Server {
 		$analyticsRouter = new Connect\Analytics\Router();
 		$analyticsRouter->register_routes();
 
-		$this->enableHeadCors();
+		$this->registerCorsHooks();
 	}
 
 	/**
-	 * Force enable cors request for HEAD requests.
+	 * Restrict CORS to allowlisted Central portal origins.
 	 *
 	 * @since 2.0.0
 	 */
-	private function enableHeadCors() {
-		// Auto discovery.
-		add_action(
-			'send_headers',
-			function() {
-				$requestMethod = ! empty( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : null;
-				if ( ! did_action( 'rest_api_init' ) && 'HEAD' === $requestMethod ) {
-					header( 'Access-Control-Allow-Origin: *' );
-					header( 'Access-Control-Expose-Headers: Link' );
-					header( 'Access-Control-Allow-Methods: HEAD' );
-					header( 'Access-Control-Allow-Headers: Authorization, X-WP-Nonce, X-BGC-Auth, Content-Type, Content-Disposition, Content-MD5', false );
-				}
-			}
-		);
+	private function registerCorsHooks() {
+		$cors = new Cors();
 
-		// Cross site authentication with X-WP-Nonce.
-		remove_filter( 'rest_pre_serve_request', 'rest_send_cors_headers' );
-		add_filter(
-			'rest_pre_serve_request',
-			function ( $value ) {
-				header( 'Access-Control-Allow-Origin: *' );
-				header( 'Access-Control-Expose-Headers: Link' );
-				header( 'Access-Control-Allow-Methods: HEAD' );
-				header( 'Access-Control-Allow-Headers: Authorization, X-WP-Nonce, Content-Type, Content-Disposition, Content-MD5, X-BGC-Auth', false );
-				return $value;
-			}
-		);
+		add_action( 'send_headers', array( $cors, 'sendHeadDiscoveryHeaders' ) );
+		add_filter( 'rest_pre_serve_request', array( $cors, 'sendRestCorsHeaders' ), PHP_INT_MAX, 4 );
 	}
 }
