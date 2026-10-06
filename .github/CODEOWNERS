@@ -1,2 +1,4 @@
 # Org code owners. Any one listed team can approve.
 * @inmotionhosting/elt @inmotionhosting/eng1 @inmotionhosting/eng2 @inmotionhosting/eng3 @inmotionhosting/eng7 @inmotionhosting/eng9
+# Changes to code owners require ELT or ENG2.
+/.github/CODEOWNERS @inmotionhosting/elt @inmotionhosting/eng2
