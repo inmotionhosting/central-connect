@@ -22,6 +22,15 @@ namespace Central\Connect;
 class FileSystem {
 
 	/**
+	 * WordPress filesystem instance.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @var \WP_Filesystem_Base
+	 */
+	public $wpFilesystem;
+
+	/**
 	 * Initialize the class and set class properties.
 	 *
 	 * @since    1.0.0
