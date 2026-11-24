@@ -27,6 +27,15 @@ Using our single sign in feature, you can log into central and access any of you
 
 == Changelog ==
 
+= 2.0.7 =
+
+Release Date: TBD
+
+* Security: The Central environment-token validation used by `/bgc/v1/auth/` and `wp-login.php` no longer contacts Central for sites that have no API key, for malformed tokens or environment ids, or once a per-client / per-site rate limit is reached. The stored environment id is preferred over the caller-supplied value.
+* Security: Removed the 3 second delay on failed token validation; failures are rate limited instead.
+* Security: `/bgc/v1/auth/` only issues access tokens for administrator accounts and no longer falls back to the default administrator when an unknown `user_id` is supplied.
+* Update: Added a PHPUnit (WordPress test library) suite.
+
 = 2.0.6 =
 
 Release Date: June 17th, 2026

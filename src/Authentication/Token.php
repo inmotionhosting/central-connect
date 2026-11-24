@@ -12,6 +12,8 @@
 
 namespace Central\Connect\Authentication;
 
+use Central\Connect\Option;
+
 /**
  * Class: Central
  *
@@ -20,6 +22,24 @@ namespace Central\Connect\Authentication;
  * @since 2.0.0
  */
 class Token {
+
+	/**
+	 * Upper bound on an environment token presented for remote validation.
+	 *
+	 * @since 2.0.7
+	 *
+	 * @var int
+	 */
+	const MAX_TOKEN_LENGTH = 1024;
+
+	/**
+	 * Upper bound on an environment id presented for remote validation.
+	 *
+	 * @since 2.0.7
+	 *
+	 * @var int
+	 */
+	const MAX_ENVIRONMENT_ID_LENGTH = 128;
 
 	/**
 	 * Save an access token for the user.
@@ -77,6 +97,9 @@ class Token {
 	/**
 	 * Validate a Central token with the Central API.
 	 *
+	 * Boolean wrapper around validateEnvironmentToken() kept for callers that
+	 * only need a yes/no answer.
+	 *
 	 * @since 1.0.0
 	 *
 	 * @param string $token         Token to validate.
@@ -85,6 +108,80 @@ class Token {
 	 * @return boolean Is the token valid?
 	 */
 	public function remoteValidate( $token, $environmentId ) {
+		return true === $this->validateEnvironmentToken( $token, $environmentId );
+	}
+
+	/**
+	 * Validate a Central environment token, guarding the outbound call.
+	 *
+	 * This path is reachable by unauthenticated visitors (REST /bgc/v1/auth/
+	 * and wp-login.php), so everything that can be decided locally is decided
+	 * before the site contacts Central with its own API key:
+	 *
+	 * - a site without a Central API key is not connected and never relays;
+	 * - malformed tokens / environment ids are rejected without a relay;
+	 * - an opt-in caller allowlist (`central_connect_auth_allowed_ips`);
+	 * - per-client and per-site rate limits bound how many outbound
+	 *   validation calls a visitor can cause;
+	 * - when the site already knows its environment id, that stored value is
+	 *   what gets sent to Central. A request naming a different environment
+	 *   is only relayed through a much smaller "re-pair" bucket so a one-time
+	 *   legitimate move keeps working but the route cannot be used to spray
+	 *   arbitrary environment ids at Central.
+	 *
+	 * Failures return immediately; the previous 3 second sleep let any
+	 * visitor pin a PHP worker for free and has been replaced by the limiter.
+	 *
+	 * @since 2.0.7
+	 *
+	 * @param string $token         Token to validate.
+	 * @param string $environmentId Central Environment ID named by the caller.
+	 *
+	 * @return true|\WP_Error True when Central confirms the token, otherwise a
+	 *                        WP_Error carrying an HTTP status in its data.
+	 */
+	public function validateEnvironmentToken( $token, $environmentId ) {
+		$siteKey = get_option( 'boldgrid_api_key' );
+		if ( ! is_string( $siteKey ) || '' === trim( $siteKey ) ) {
+			return new \WP_Error(
+				'central_connect_not_connected',
+				'This site is not connected to Central.',
+				array( 'status' => 403 )
+			);
+		}
+
+		if ( ! self::isWellFormedToken( $token ) ) {
+			return new \WP_Error(
+				'central_connect_invalid_token',
+				'The remote access token is malformed.',
+				array( 'status' => 400 )
+			);
+		}
+
+		if ( ! self::isWellFormedEnvironmentId( $environmentId ) ) {
+			return new \WP_Error(
+				'central_connect_invalid_environment',
+				'The environment id is malformed.',
+				array( 'status' => 400 )
+			);
+		}
+
+		$callerCheck = $this->checkAllowedCaller();
+		if ( is_wp_error( $callerCheck ) ) {
+			return $callerCheck;
+		}
+
+		$storedEnvironmentId = Option\Connect::get( 'environment_id' );
+		$storedEnvironmentId = is_scalar( $storedEnvironmentId ) ? (string) $storedEnvironmentId : '';
+		$rebind              = '' !== $storedEnvironmentId && ! hash_equals( $storedEnvironmentId, (string) $environmentId );
+
+		$throttle = $this->throttleRemoteValidation( $rebind );
+		if ( is_wp_error( $throttle ) ) {
+			return $throttle;
+		}
+
+		$environmentToSend = $rebind || '' === $storedEnvironmentId ? (string) $environmentId : $storedEnvironmentId;
+
 		do_action( 'bgc_remote_validate' );
 
 		$configs = \Central_Connect_Service::get( 'configs' );
@@ -92,8 +189,8 @@ class Token {
 		$args    = array(
 			'body'    => array(
 				'token' => $token,
-				'environment_id' => $environmentId,
-				'key' => get_option( 'boldgrid_api_key' ),
+				'environment_id' => $environmentToSend,
+				'key' => $siteKey,
 			),
 			'timeout' => 15,
 		);
@@ -104,10 +201,175 @@ class Token {
 
 		if ( 200 === $httpCode && ! empty( $body['is_valid'] ) ) {
 			return true;
-		} else {
-			sleep( 3 );
+		}
+
+		return new \WP_Error(
+			'restx_logged_out',
+			'Sorry, your remote access token is not valid.',
+			array( 'status' => 403 )
+		);
+	}
+
+	/**
+	 * Consume rate-limit budget for an outbound Central validation call.
+	 *
+	 * Shared by every unauthenticated path that can make the site contact
+	 * Central (environment-token and site-token validation). Buckets exist
+	 * per client IP and per site so a distributed caller is still bounded.
+	 *
+	 * @since 2.0.7
+	 *
+	 * @param bool $rebind Whether the caller named an environment id different
+	 *                     from the one the site already stores.
+	 *
+	 * @return true|\WP_Error True when the call may proceed, WP_Error (429) otherwise.
+	 */
+	public function throttleRemoteValidation( $rebind = false ) {
+		$limits  = self::rateLimits();
+		$limiter = new RateLimiter();
+		$ip      = RateLimiter::clientIp();
+
+		$checks = array(
+			array( 'remote_validate:ip:' . $ip, $limits['ip'] ),
+			array( 'remote_validate:site', $limits['site'] ),
+		);
+
+		if ( $rebind ) {
+			$checks[] = array( 'remote_validate:rebind:ip:' . $ip, $limits['rebind_ip'] );
+			$checks[] = array( 'remote_validate:rebind:site', $limits['rebind_site'] );
+		}
+
+		foreach ( $checks as $check ) {
+			list( $scope, $limit ) = $check;
+			if ( ! $limiter->attempt( $scope, $limit['limit'], $limit['window'] ) ) {
+				return new \WP_Error(
+					'central_connect_too_many_attempts',
+					'Too many authentication attempts. Please try again later.',
+					array(
+						'status' => 429,
+						'retry_after' => $limiter->retryAfter( $scope, $limit['window'] ),
+					)
+				);
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Rate-limit configuration for remote validation calls.
+	 *
+	 * @since 2.0.7
+	 *
+	 * @return array Buckets keyed by name, each with `limit` and `window` (seconds).
+	 */
+	public static function rateLimits() {
+		$defaults = array(
+			'ip'          => array( 'limit' => 5, 'window' => 600 ),
+			'site'        => array( 'limit' => 20, 'window' => 600 ),
+			'rebind_ip'   => array( 'limit' => 2, 'window' => 3600 ),
+			'rebind_site' => array( 'limit' => 5, 'window' => 3600 ),
+		);
+
+		/**
+		 * Filters the rate limits applied to outbound Central validation calls.
+		 *
+		 * @since 2.0.7
+		 *
+		 * @param array $limits Buckets keyed by `ip`, `site`, `rebind_ip`, `rebind_site`,
+		 *                      each an array with integer `limit` and `window` (seconds).
+		 */
+		$limits = apply_filters( 'central_connect_auth_rate_limits', $defaults );
+
+		foreach ( $defaults as $name => $default ) {
+			if ( empty( $limits[ $name ] ) || ! is_array( $limits[ $name ] ) ) {
+				$limits[ $name ] = $default;
+				continue;
+			}
+			$limits[ $name ]['limit']  = isset( $limits[ $name ]['limit'] ) ? max( 1, (int) $limits[ $name ]['limit'] ) : $default['limit'];
+			$limits[ $name ]['window'] = isset( $limits[ $name ]['window'] ) ? max( 1, (int) $limits[ $name ]['window'] ) : $default['window'];
+		}
+
+		return $limits;
+	}
+
+	/**
+	 * Enforce the optional caller IP allowlist.
+	 *
+	 * Disabled by default (empty list). Hosts that know Central's egress
+	 * addresses can restrict the unauthenticated validation paths to them.
+	 *
+	 * @since 2.0.7
+	 *
+	 * @return true|\WP_Error
+	 */
+	private function checkAllowedCaller() {
+		/**
+		 * Filters the list of client IPs allowed to trigger remote token validation.
+		 *
+		 * @since 2.0.7
+		 *
+		 * @param string[] $allowed Exact IP addresses. Empty means no restriction.
+		 */
+		$allowed = apply_filters( 'central_connect_auth_allowed_ips', array() );
+		if ( ! is_array( $allowed ) || empty( $allowed ) ) {
+			return true;
+		}
+
+		$ip = RateLimiter::clientIp();
+		foreach ( $allowed as $candidate ) {
+			if ( is_string( $candidate ) && '' !== $candidate && hash_equals( $candidate, $ip ) ) {
+				return true;
+			}
+		}
+
+		return new \WP_Error(
+			'central_connect_caller_not_allowed',
+			'This client is not allowed to authenticate remotely.',
+			array( 'status' => 403 )
+		);
+	}
+
+	/**
+	 * Whether a presented environment token is plausibly a Central token.
+	 *
+	 * Printable, non-whitespace ASCII with a bounded length. The check is
+	 * intentionally loose about format but strict about what cannot be a
+	 * token, so arbitrary visitor payloads are not forwarded to Central.
+	 *
+	 * @since 2.0.7
+	 *
+	 * @param mixed $token Raw request value.
+	 *
+	 * @return bool
+	 */
+	public static function isWellFormedToken( $token ) {
+		if ( ! is_string( $token ) || '' === $token || strlen( $token ) > self::MAX_TOKEN_LENGTH ) {
 			return false;
 		}
+
+		return 1 === preg_match( '/^[\x21-\x7E]+$/', $token );
+	}
+
+	/**
+	 * Whether a presented environment id is plausibly a Central environment id.
+	 *
+	 * @since 2.0.7
+	 *
+	 * @param mixed $environmentId Raw request value.
+	 *
+	 * @return bool
+	 */
+	public static function isWellFormedEnvironmentId( $environmentId ) {
+		if ( is_int( $environmentId ) ) {
+			$environmentId = (string) $environmentId;
+		}
+
+		if ( ! is_string( $environmentId ) || '' === $environmentId || strlen( $environmentId ) > self::MAX_ENVIRONMENT_ID_LENGTH ) {
+			return false;
+		}
+
+		return 1 === preg_match( '/^[A-Za-z0-9._:-]+$/', $environmentId );
 	}
 
 	/**

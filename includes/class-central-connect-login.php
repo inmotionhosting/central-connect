@@ -164,6 +164,25 @@ class Central_Connect_Login {
 	 * @return bool
 	 */
 	public function remote_validate( $token ) {
+		/**
+		 * Same guard as the environment-token path: this is reachable by any
+		 * visitor through wp-login.php, so never contact Central for a site
+		 * that has no API key, for a malformed token, or past the rate limit.
+		 */
+		$siteKey = get_option( 'boldgrid_api_key' );
+		if ( ! is_string( $siteKey ) || '' === trim( $siteKey ) ) {
+			return false;
+		}
+
+		if ( ! \Central\Connect\Authentication\Token::isWellFormedToken( $token ) ) {
+			return false;
+		}
+
+		$tokenHelper = new \Central\Connect\Authentication\Token();
+		if ( is_wp_error( $tokenHelper->throttleRemoteValidation() ) ) {
+			return false;
+		}
+
 		do_action( 'bgc_remote_validate' );
 
 		$configs   = \Central_Connect_Service::get( 'configs' );
@@ -171,7 +190,7 @@ class Central_Connect_Login {
 		$args      = array(
 			'method'  => 'POST',
 			'body'    => array(
-				'key'   => get_option( 'boldgrid_api_key' ),
+				'key'   => $siteKey,
 				'token' => $token,
 			),
 			'timeout' => 10,

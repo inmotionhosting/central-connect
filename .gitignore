@@ -10,3 +10,5 @@ bower_components
 vendor/
 package-lock.json
 yarn-error.log
+.phpunit.result.cache
+phpunit.xml
