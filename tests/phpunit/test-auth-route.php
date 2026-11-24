@@ -209,6 +209,7 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		$this->assertSame( 400, $response->get_status() );
 		$this->assertSame( 'user_not_found', $response->get_data()['errors']['name'] );
 		$this->assertArrayNotHasKey( 'access_token', $response->get_data() );
+		$this->assertEmpty( Connect::get( 'environment_id' ), 'Environment must only be stored once a token is issued.' );
 	}
 
 	/**
@@ -225,6 +226,25 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		$this->assertSame( 400, $response->get_status() );
 		$this->assertSame( 'user_not_qualified', $response->get_data()['errors']['name'] );
 		$this->assertEmpty( get_user_option( 'bgc_access_tokens', $subscriber ) );
+		$this->assertEmpty( Connect::get( 'environment_id' ), 'Environment must only be stored once a token is issued.' );
+	}
+
+	/**
+	 * A site with no administrator cannot issue a token and must not record
+	 * the environment either.
+	 */
+	public function test_site_without_administrator_issues_nothing() {
+		foreach ( get_users( array( 'role' => 'administrator', 'fields' => 'ID' ) ) as $id ) {
+			wp_delete_user( $id );
+		}
+		$this->connect_site();
+		$this->central_accepts();
+
+		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'user_not_found', $response->get_data()['errors']['name'] );
+		$this->assertEmpty( Connect::get( 'environment_id' ) );
 	}
 
 	/**

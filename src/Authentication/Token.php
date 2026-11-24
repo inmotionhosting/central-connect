@@ -387,6 +387,91 @@ class Token {
 	}
 
 	/**
+	 * Authenticate an access token presented by an unauthenticated caller.
+	 *
+	 * Wraps getValidUser() with a per-client failure limit. Each failed
+	 * attempt costs a password-hash comparison per stored token for the
+	 * targeted user, so repeated failures from one client are refused before
+	 * the lookup instead of being slowed down with sleep(), which only tied
+	 * up a PHP worker for the caller. A successful authentication clears the
+	 * client's failure bucket.
+	 *
+	 * Used by both entry points that accept an access token from the
+	 * network: the X-BGC-Auth REST header and the wp-login.php
+	 * has_access_token flow.
+	 *
+	 * @since 2.0.7
+	 *
+	 * @param string $providedToken Access token (base64 "user:token"), without a Bearer prefix.
+	 *
+	 * @return \WP_User|\WP_Error The user, or a WP_Error with status 401 (invalid) or 429 (limited).
+	 */
+	public function authenticateAccessToken( $providedToken ) {
+		$limits  = self::accessTokenFailureLimits();
+		$limiter = new RateLimiter();
+		$scope   = 'access_token_failures:ip:' . RateLimiter::clientIp();
+
+		if ( $limiter->isLimited( $scope, $limits['limit'], $limits['window'] ) ) {
+			return new \WP_Error(
+				'central_connect_too_many_attempts',
+				'Too many failed authentication attempts. Please try again later.',
+				array(
+					'status' => 429,
+					'retry_after' => $limiter->retryAfter( $scope, $limits['window'] ),
+				)
+			);
+		}
+
+		$user = $this->getValidUser( $providedToken );
+		if ( $user instanceof \WP_User ) {
+			$limiter->reset( $scope );
+			return $user;
+		}
+
+		$limiter->attempt( $scope, $limits['limit'], $limits['window'] );
+
+		return new \WP_Error(
+			'restx_logged_out',
+			'Sorry, your access token is invalid.',
+			array( 'status' => 401 )
+		);
+	}
+
+	/**
+	 * Rate limit applied to failed access-token attempts per client.
+	 *
+	 * @since 2.0.7
+	 *
+	 * @return array {
+	 *     @type int $limit  Failed attempts allowed per window.
+	 *     @type int $window Window length in seconds.
+	 * }
+	 */
+	public static function accessTokenFailureLimits() {
+		$defaults = array(
+			'limit'  => 20,
+			'window' => 600,
+		);
+
+		/**
+		 * Filters the failed access-token attempt limit per client IP.
+		 *
+		 * @since 2.0.7
+		 *
+		 * @param array $limits Array with integer `limit` and `window` (seconds).
+		 */
+		$limits = apply_filters( 'central_connect_access_token_failure_limits', $defaults );
+		if ( ! is_array( $limits ) ) {
+			return $defaults;
+		}
+
+		return array(
+			'limit'  => isset( $limits['limit'] ) ? max( 1, (int) $limits['limit'] ) : $defaults['limit'],
+			'window' => isset( $limits['window'] ) ? max( 1, (int) $limits['window'] ) : $defaults['window'],
+		);
+	}
+
+	/**
 	 * Validate a given token for a user.
 	 *
 	 * @since 2.0.0

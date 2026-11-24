@@ -131,6 +131,85 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 	}
 
 	/**
+	 * A Central-confirmed environment id is remembered by the SSO path too,
+	 * so a transferred site that only signs in through the browser does not
+	 * stay in the small re-pair bucket forever.
+	 */
+	public function test_confirmed_sso_persists_environment_id() {
+		self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$this->connect_site( 'site-key', 'old-env' );
+		$this->central_accepts();
+
+		$this->authenticate( array( 'token' => 'good-token', 'environment_id' => 'new-env' ) );
+		$this->assertSame( 'new-env', \Central\Connect\Option\Connect::get( 'environment_id' ) );
+
+		// Follow-up logins with the new id now use the normal bucket, not re-pair.
+		$this->assertSame( 'new-env', $this->sent_body( 0 )['environment_id'] );
+		$this->central_rejects();
+		$rebind_limit = \Central\Connect\Authentication\Token::rateLimits()['rebind_ip']['limit'];
+		for ( $i = 0; $i <= $rebind_limit; $i++ ) {
+			wp_set_current_user( 0 );
+			$this->authenticate( array( 'token' => 'stale-' . $i, 'environment_id' => 'new-env' ) );
+		}
+		$this->assertCount( $rebind_limit + 2, $this->http_requests );
+	}
+
+	/**
+	 * A rejected SSO attempt does not change the stored environment id.
+	 */
+	public function test_rejected_sso_does_not_persist_environment_id() {
+		self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$this->connect_site( 'site-key', 'old-env' );
+		$this->central_rejects();
+
+		$location = $this->authenticate( array( 'token' => 'bad-token', 'environment_id' => 'new-env' ) );
+
+		$this->assertSame( 'wp-login.php', $location );
+		$this->assertSame( 'old-env', \Central\Connect\Option\Connect::get( 'environment_id' ) );
+	}
+
+	/**
+	 * has_access_token SSO logs the token's user in.
+	 */
+	public function test_access_token_sso_logs_in_token_owner() {
+		$admin  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$issued = ( new \Central\Connect\Authentication\Token() )->create( get_user_by( 'id', $admin ) );
+		$this->connect_site( 'site-key', 'env-1' );
+
+		$location = $this->authenticate( array( 'token' => $issued['access_token'], 'environment_id' => 'env-1', 'has_access_token' => '1' ) );
+
+		$this->assertSame( user_admin_url(), $location );
+		$this->assertSame( $admin, get_current_user_id() );
+		$this->assertCount( 0, $this->http_requests, 'Access-token SSO is local and must not contact Central.' );
+	}
+
+	/**
+	 * has_access_token SSO shares the per-client failure limit with the
+	 * X-BGC-Auth header, so issued tokens cannot be brute forced through
+	 * wp-login.php either.
+	 */
+	public function test_access_token_sso_is_rate_limited_after_failures() {
+		$admin  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$issued = ( new \Central\Connect\Authentication\Token() )->create( get_user_by( 'id', $admin ) );
+		$this->connect_site( 'site-key', 'env-1' );
+		$limit = \Central\Connect\Authentication\Token::accessTokenFailureLimits()['limit'];
+
+		for ( $i = 0; $i < $limit; $i++ ) {
+			$location = $this->authenticate( array( 'token' => base64_encode( $admin . ':guess-' . $i ), 'environment_id' => 'env-1', 'has_access_token' => '1' ) );
+			$this->assertSame( 'wp-login.php', $location );
+		}
+
+		$location = $this->authenticate( array( 'token' => $issued['access_token'], 'environment_id' => 'env-1', 'has_access_token' => '1' ) );
+		$this->assertSame( 'wp-login.php', $location, 'Exhausted client must be refused even with a valid token.' );
+		$this->assertSame( 0, get_current_user_id() );
+
+		$_SERVER['REMOTE_ADDR'] = '203.0.113.78';
+		$location               = $this->authenticate( array( 'token' => $issued['access_token'], 'environment_id' => 'env-1', 'has_access_token' => '1' ) );
+		$this->assertSame( user_admin_url(), $location );
+		$this->assertSame( $admin, get_current_user_id() );
+	}
+
+	/**
 	 * The redirect target must stay on this host.
 	 */
 	public function test_redirect_url_is_restricted_to_local_host() {

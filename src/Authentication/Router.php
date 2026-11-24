@@ -80,8 +80,6 @@ class Router {
 						return $result;
 					}
 
-					Option\Connect::update( 'environment_id', (string) $environmentId );
-
 					// If the remote token is valid assign a local token.
 					$user = $this->selectUser( $request->get_param( 'user_id' ) );
 					if ( is_wp_error( $user ) ) {
@@ -98,6 +96,9 @@ class Router {
 
 					$tokenHelper = new Token();
 					$accessToken = $tokenHelper->create( $user );
+
+					// Only remember the environment once a token was actually issued for it.
+					Option\Connect::update( 'environment_id', (string) $environmentId );
 
 					return new \WP_REST_Response( $accessToken );
 				},

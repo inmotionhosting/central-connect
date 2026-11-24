@@ -5,7 +5,6 @@
  * @package Central_Connect
  */
 
-use Central\Connect\Authentication\Central;
 use Central\Connect\Authentication\Token;
 
 /**
@@ -62,7 +61,7 @@ class Test_Access_Token_Auth extends Central_Connect_Test_Case {
 	 */
 	public function test_repeated_failures_are_rate_limited() {
 		$admin  = self::factory()->user->create( array( 'role' => 'administrator' ) );
-		$limits = Central::failureLimits();
+		$limits = Token::accessTokenFailureLimits();
 
 		for ( $i = 0; $i < $limits['limit']; $i++ ) {
 			$result = $this->authenticate_with( base64_encode( $admin . ':bad-' . $i ) );
@@ -83,6 +82,24 @@ class Test_Access_Token_Auth extends Central_Connect_Test_Case {
 		$_SERVER['REMOTE_ADDR'] = '203.0.113.77';
 		$result                 = $this->authenticate_with( 'Bearer ' . $issued['access_token'] );
 		$this->assertTrue( $result );
+	}
+
+	/**
+	 * A successful authentication clears the client's failure bucket, so a
+	 * few stale-token failures followed by a valid token do not accumulate
+	 * towards a lockout.
+	 */
+	public function test_success_resets_failure_bucket() {
+		$admin  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$limits = Token::accessTokenFailureLimits();
+		$issued = ( new Token() )->create( get_user_by( 'id', $admin ) );
+
+		for ( $round = 0; $round < 2; $round++ ) {
+			for ( $i = 0; $i < $limits['limit'] - 1; $i++ ) {
+				$this->authenticate_with( base64_encode( $admin . ':bad-' . $round . '-' . $i ) );
+			}
+			$this->assertTrue( $this->authenticate_with( 'Bearer ' . $issued['access_token'] ) );
+		}
 	}
 
 	/**

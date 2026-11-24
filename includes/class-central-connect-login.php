@@ -104,12 +104,22 @@ class Central_Connect_Login {
 				$environment_id = sanitize_text_field( wp_unslash( $_REQUEST['environment_id'] ) );
 				$tokenValidator = new \Central\Connect\Authentication\Token();
 				if ( ! empty( $_REQUEST['has_access_token'] ) ) {
-					$user = $tokenValidator->getValidUser( $token );
-					$valid = $user && ! empty( $user->ID );
+					// Same per-client failure limit as the X-BGC-Auth REST header.
+					$user  = $tokenValidator->authenticateAccessToken( $token );
+					$valid = $user instanceof \WP_User && ! empty( $user->ID );
 
 					// Validate an environment auth code remotely.
 				} else {
 					$valid = $user && $tokenValidator->remoteValidate( $token, $environment_id );
+
+					/**
+					 * Remember the environment Central just confirmed, exactly as
+					 * the REST auth route does, so a site that only ever signs in
+					 * through the browser is not left on a stale environment id.
+					 */
+					if ( $valid ) {
+						\Central\Connect\Option\Connect::update( 'environment_id', $environment_id );
+					}
 				}
 
 				// Verify the site token.

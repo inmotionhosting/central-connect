@@ -94,6 +94,10 @@ class RateLimiter {
 		$now    = time();
 		$bucket = $this->bucket( $this->key( $scope ), $now, max( 1, (int) $window ) );
 
+		if ( 0 === $bucket['count'] ) {
+			return 0;
+		}
+
 		return max( 0, (int) $bucket['reset'] - $now );
 	}
 
