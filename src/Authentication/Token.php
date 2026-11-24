@@ -424,6 +424,21 @@ class Token {
 
 		$user = $this->getValidUser( $providedToken );
 		if ( $user instanceof \WP_User ) {
+			/**
+			 * Tokens are only issued to users who can manage options, but
+			 * enforce the same requirement when a token is used so an older
+			 * token for a demoted or non-admin account cannot be replayed.
+			 */
+			if ( ! user_can( $user, 'manage_options' ) ) {
+				$limiter->attempt( $scope, $limits['limit'], $limits['window'] );
+
+				return new \WP_Error(
+					'restx_logged_out',
+					'Sorry, your access token is invalid.',
+					array( 'status' => 401 )
+				);
+			}
+
 			$limiter->reset( $scope );
 			return $user;
 		}

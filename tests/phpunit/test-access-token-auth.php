@@ -85,6 +85,26 @@ class Test_Access_Token_Auth extends Central_Connect_Test_Case {
 	}
 
 	/**
+	 * A token that was issued to (or whose owner has since become) a
+	 * non-administrator is refused when used, even though it is otherwise
+	 * valid. Covers tokens minted before issuance required manage_options.
+	 */
+	public function test_token_for_non_administrator_is_refused() {
+		$editor = self::factory()->user->create( array( 'role' => 'editor' ) );
+		$issued = ( new Token() )->create( get_user_by( 'id', $editor ) );
+
+		$result = $this->authenticate_with( 'Bearer ' . $issued['access_token'] );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 401, $result->get_error_data()['status'] );
+		$this->assertSame( 0, get_current_user_id() );
+
+		// Promoting the owner makes the same token usable.
+		get_user_by( 'id', $editor )->set_role( 'administrator' );
+		$this->assertTrue( $this->authenticate_with( 'Bearer ' . $issued['access_token'] ) );
+	}
+
+	/**
 	 * A successful authentication clears the client's failure bucket, so a
 	 * few stale-token failures followed by a valid token do not accumulate
 	 * towards a lockout.
