@@ -238,10 +238,8 @@ class Router {
 	 * Given a list of plugin files, make sure they are all installed plugins.
 	 *
 	 * Each entry must be a plugin basename known to get_plugins() and pass
-	 * validate_file(). An existence check alone is not enough: core's
-	 * delete_plugins() removes dirname( WP_PLUGIN_DIR . $file ) recursively
-	 * without validating the path, so a traversal such as "../../index.php"
-	 * would delete far more than a plugin.
+	 * validate_file(). An existence check alone is not enough because core's
+	 * delete_plugins() does not validate the path it is given.
 	 *
 	 * @since 2.0.0
 	 *
