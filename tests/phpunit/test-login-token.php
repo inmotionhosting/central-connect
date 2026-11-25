@@ -114,6 +114,59 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 	}
 
 	/**
+	 * Malformed tokens and environment ids on wp-login.php never reach
+	 * Central, on either the environment-token or the site-token path.
+	 *
+	 * @dataProvider malformed_login_requests
+	 *
+	 * @param array $request Request parameters.
+	 */
+	public function test_malformed_login_request_is_not_forwarded( $request ) {
+		self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$this->connect_site( 'site-key', 'env-1' );
+		$this->http_response = $this->central_response( array( 'is_valid' => true, 'validated' => true ) );
+
+		$location = $this->authenticate( $request );
+
+		$this->assertSame( 'wp-login.php', $location );
+		$this->assertCount( 0, $this->http_requests );
+		$this->assertSame( 0, get_current_user_id() );
+	}
+
+	/**
+	 * Login requests that must be rejected locally.
+	 *
+	 * @return array[]
+	 */
+	public function malformed_login_requests() {
+		$long = str_repeat( 'a', \Central\Connect\Authentication\Token::MAX_TOKEN_LENGTH + 1 );
+
+		return array(
+			'env token with space'   => array( array( 'token' => 'abc def', 'environment_id' => 'env-1' ) ),
+			'env token too long'     => array( array( 'token' => $long, 'environment_id' => 'env-1' ) ),
+			'env id is a url'        => array( array( 'token' => 'good-token', 'environment_id' => 'https://example.com/x' ) ),
+			'env id with spaces'     => array( array( 'token' => 'good-token', 'environment_id' => '1 2' ) ),
+			'site token with space'  => array( array( 'token' => 'abc def' ) ),
+			'site token too long'    => array( array( 'token' => $long ) ),
+		);
+	}
+
+	/**
+	 * has_access_token SSO refuses a token whose owner is no longer an administrator.
+	 */
+	public function test_access_token_sso_refuses_demoted_user() {
+		$admin  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$issued = ( new \Central\Connect\Authentication\Token() )->create( get_user_by( 'id', $admin ) );
+		$this->connect_site( 'site-key', 'env-1' );
+		get_user_by( 'id', $admin )->set_role( 'subscriber' );
+
+		$location = $this->authenticate( array( 'token' => $issued['access_token'], 'environment_id' => 'env-1', 'has_access_token' => '1' ) );
+
+		$this->assertSame( 'wp-login.php', $location );
+		$this->assertSame( 0, get_current_user_id() );
+	}
+
+	/**
 	 * The caller allowlist gates the site-token relay as well as the
 	 * environment-token relay.
 	 */
