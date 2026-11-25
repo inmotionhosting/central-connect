@@ -200,6 +200,7 @@ class Token {
 		$body     = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( 200 === $httpCode && ! empty( $body['is_valid'] ) ) {
+			$this->releaseRemoteValidation();
 			return true;
 		}
 
@@ -217,6 +218,11 @@ class Token {
 	 * Central (environment-token and site-token validation). Buckets exist
 	 * per client IP and per site so a distributed caller is still bounded.
 	 *
+	 * Every applicable bucket is checked before any is consumed, so a refused
+	 * request costs nothing: rejected re-pair attempts do not drain the normal
+	 * buckets, and once a site-wide bucket is full no per-IP transient is
+	 * written. Site-wide buckets are checked ahead of per-IP ones.
+	 *
 	 * @since 2.0.7
 	 *
 	 * @param bool $rebind Whether the caller named an environment id different
@@ -229,27 +235,31 @@ class Token {
 		$limiter = new RateLimiter();
 		$ip      = RateLimiter::clientIp();
 
-		$checks = array(
-			array( 'remote_validate:ip:' . $ip, $limits['ip'] ),
-			array( 'remote_validate:site', $limits['site'] ),
-		);
+		$checks = array( array( 'remote_validate:total', $limits['total'] ) );
+
+		if ( $rebind ) {
+			$checks[] = array( 'remote_validate:rebind:site', $limits['rebind_site'] );
+		}
+
+		$checks[] = array( 'remote_validate:site', $limits['site'] );
 
 		if ( $rebind ) {
 			$checks[] = array( 'remote_validate:rebind:ip:' . $ip, $limits['rebind_ip'] );
-			$checks[] = array( 'remote_validate:rebind:site', $limits['rebind_site'] );
+		}
+
+		$checks[] = array( 'remote_validate:ip:' . $ip, $limits['ip'] );
+
+		foreach ( $checks as $check ) {
+			list( $scope, $limit ) = $check;
+			if ( $limiter->isLimited( $scope, $limit['limit'], $limit['window'] ) ) {
+				return $this->tooManyAttempts( $limiter, $scope, $limit['window'] );
+			}
 		}
 
 		foreach ( $checks as $check ) {
 			list( $scope, $limit ) = $check;
 			if ( ! $limiter->attempt( $scope, $limit['limit'], $limit['window'] ) ) {
-				return new \WP_Error(
-					'central_connect_too_many_attempts',
-					'Too many authentication attempts. Please try again later.',
-					array(
-						'status' => 429,
-						'retry_after' => $limiter->retryAfter( $scope, $limit['window'] ),
-					)
-				);
+				return $this->tooManyAttempts( $limiter, $scope, $limit['window'] );
 			}
 		}
 
@@ -257,7 +267,53 @@ class Token {
 	}
 
 	/**
+	 * Refund the per-IP and per-site budget after Central confirms a token.
+	 *
+	 * An unauthenticated caller cannot obtain a Central-confirmed token, so
+	 * confirmed validations (dashboard refreshes, Central backend jobs) do not
+	 * count against the tight `ip` / `site` buckets. They still count against
+	 * the larger `total` bucket, which bounds all outbound calls.
+	 *
+	 * @since 2.0.7
+	 *
+	 * @return void
+	 */
+	public function releaseRemoteValidation() {
+		$limits  = self::rateLimits();
+		$limiter = new RateLimiter();
+
+		$limiter->release( 'remote_validate:ip:' . RateLimiter::clientIp(), $limits['ip']['window'] );
+		$limiter->release( 'remote_validate:site', $limits['site']['window'] );
+	}
+
+	/**
+	 * Build the 429 error returned when a remote-validation bucket is full.
+	 *
+	 * @since 2.0.7
+	 *
+	 * @param RateLimiter $limiter Limiter instance.
+	 * @param string      $scope   Exhausted bucket.
+	 * @param int         $window  Bucket window in seconds.
+	 *
+	 * @return \WP_Error
+	 */
+	private function tooManyAttempts( $limiter, $scope, $window ) {
+		return new \WP_Error(
+			'central_connect_too_many_attempts',
+			'Too many authentication attempts. Please try again later.',
+			array(
+				'status' => 429,
+				'retry_after' => $limiter->retryAfter( $scope, $window ),
+			)
+		);
+	}
+
+	/**
 	 * Rate-limit configuration for remote validation calls.
+	 *
+	 * `ip` and `site` count calls Central did not confirm (confirmed calls are
+	 * refunded); `total` counts every outbound call; the `rebind_*` buckets
+	 * count calls naming an environment other than the stored one.
 	 *
 	 * @since 2.0.7
 	 *
@@ -267,6 +323,7 @@ class Token {
 		$defaults = array(
 			'ip'          => array( 'limit' => 5, 'window' => 600 ),
 			'site'        => array( 'limit' => 20, 'window' => 600 ),
+			'total'       => array( 'limit' => 120, 'window' => 600 ),
 			'rebind_ip'   => array( 'limit' => 2, 'window' => 3600 ),
 			'rebind_site' => array( 'limit' => 5, 'window' => 3600 ),
 		);
@@ -276,10 +333,13 @@ class Token {
 		 *
 		 * @since 2.0.7
 		 *
-		 * @param array $limits Buckets keyed by `ip`, `site`, `rebind_ip`, `rebind_site`,
+		 * @param array $limits Buckets keyed by `ip`, `site`, `total`, `rebind_ip`, `rebind_site`,
 		 *                      each an array with integer `limit` and `window` (seconds).
 		 */
 		$limits = apply_filters( 'central_connect_auth_rate_limits', $defaults );
+		if ( ! is_array( $limits ) ) {
+			return $defaults;
+		}
 
 		foreach ( $defaults as $name => $default ) {
 			if ( empty( $limits[ $name ] ) || ! is_array( $limits[ $name ] ) ) {
@@ -296,14 +356,23 @@ class Token {
 	/**
 	 * Enforce the optional caller IP allowlist.
 	 *
-	 * Disabled by default (empty list). Hosts that know Central's egress
-	 * addresses can restrict the unauthenticated validation paths to them.
+	 * Disabled by default (empty list). When set, it gates every
+	 * unauthenticated path that relays a token to Central: the REST
+	 * `/bgc/v1/auth/` route and both wp-login.php token flows (environment
+	 * token and site token).
+	 *
+	 * Those requests do not come only from Central's servers. The Central
+	 * dashboard calls `/bgc/v1/auth/` from the customer's browser, and
+	 * single sign-on to wp-login.php is a browser request, so both arrive
+	 * from the customer's own IP. An allowlist of Central egress addresses
+	 * alone will break dashboard connections and SSO; only use it when the
+	 * callers are known (server-to-server traffic, a proxy, or office IPs).
 	 *
 	 * @since 2.0.7
 	 *
 	 * @return true|\WP_Error
 	 */
-	private function checkAllowedCaller() {
+	public function checkAllowedCaller() {
 		/**
 		 * Filters the list of client IPs allowed to trigger remote token validation.
 		 *

@@ -34,6 +34,8 @@ Release Date: TBD
 * Security: The Central environment-token validation used by `/bgc/v1/auth/` and `wp-login.php` no longer contacts Central for sites that have no API key, for malformed tokens or environment ids, or once a per-client / per-site rate limit is reached. The stored environment id is preferred over the caller-supplied value.
 * Security: Removed the 3 second delay on failed token validation; failures are rate limited instead.
 * Security: `/bgc/v1/auth/` only issues access tokens for administrator accounts and no longer falls back to the default administrator when an unknown `user_id` is supplied.
+* Security: `/bgc/v1/plugins/` only accepts `files` entries that are installed plugin basenames.
+* Security: Access tokens presented through the `X-BGC-Auth` header or the `wp-login.php` `has_access_token` flow are only accepted for users who can manage options.
 * Update: Added a PHPUnit (WordPress test library) suite.
 
 = 2.0.6 =

@@ -268,7 +268,9 @@ class Router {
 				return false;
 			}
 
-			if ( ! $fileSystem->wpFilesystem->is_file( trailingslashit( WP_PLUGIN_DIR ) . $file ) ) {
+			$path   = trailingslashit( WP_PLUGIN_DIR ) . $file;
+			$isFile = empty( $fileSystem->wpFilesystem ) ? is_file( $path ) : $fileSystem->wpFilesystem->is_file( $path );
+			if ( ! $isFile ) {
 				return false;
 			}
 		}

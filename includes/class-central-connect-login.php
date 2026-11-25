@@ -177,7 +177,8 @@ class Central_Connect_Login {
 		/**
 		 * Same guard as the environment-token path: this is reachable by any
 		 * visitor through wp-login.php, so never contact Central for a site
-		 * that has no API key, for a malformed token, or past the rate limit.
+		 * that has no API key, for a malformed token, for a caller outside the
+		 * `central_connect_auth_allowed_ips` allowlist, or past the rate limit.
 		 */
 		$siteKey = get_option( 'boldgrid_api_key' );
 		if ( ! is_string( $siteKey ) || '' === trim( $siteKey ) ) {
@@ -189,6 +190,10 @@ class Central_Connect_Login {
 		}
 
 		$tokenHelper = new \Central\Connect\Authentication\Token();
+		if ( is_wp_error( $tokenHelper->checkAllowedCaller() ) ) {
+			return false;
+		}
+
 		if ( is_wp_error( $tokenHelper->throttleRemoteValidation() ) ) {
 			return false;
 		}
@@ -210,6 +215,11 @@ class Central_Connect_Login {
 		$http_code = wp_remote_retrieve_response_code( $response );
 		$body      = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		return 200 === $http_code && ! empty( $body['validated'] );
+		$valid = 200 === $http_code && ! empty( $body['validated'] );
+		if ( $valid ) {
+			$tokenHelper->releaseRemoteValidation();
+		}
+
+		return $valid;
 	}
 }

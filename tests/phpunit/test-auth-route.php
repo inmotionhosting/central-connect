@@ -5,6 +5,7 @@
  * @package Central_Connect
  */
 
+use Central\Connect\Authentication\RateLimiter;
 use Central\Connect\Authentication\Token;
 use Central\Connect\Option\Connect;
 
@@ -363,6 +364,114 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		$this->assertSame( 403, $response->get_status() );
 		$this->assertCount( $limit + 1, $this->http_requests );
 		$this->assertSame( self::ENV, Connect::get( 'environment_id' ), 'Stored environment must not change on a failed re-pair.' );
+	}
+
+	/**
+	 * Re-pair requests refused by an exhausted rebind bucket must not drain
+	 * the normal per-IP and per-site buckets.
+	 */
+	public function test_refused_rebind_requests_do_not_consume_normal_buckets() {
+		self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$this->connect_site( 'k', self::ENV );
+		$this->central_rejects();
+
+		$limits       = Token::rateLimits();
+		$rebind_limit = $limits['rebind_ip']['limit'];
+		$ip_limit     = $limits['ip']['limit'];
+
+		for ( $i = 0; $i < $rebind_limit + 10; $i++ ) {
+			$this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => 'other-env-' . $i ) );
+		}
+		$this->assertCount( $rebind_limit, $this->http_requests );
+
+		for ( $i = 0; $i < $ip_limit - $rebind_limit; $i++ ) {
+			$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN . $i, 'environment_id' => self::ENV ) );
+			$this->assertSame( 403, $response->get_status(), 'Refused re-pair attempts must not have consumed the per-IP bucket.' );
+		}
+		$this->assertCount( $ip_limit, $this->http_requests );
+
+		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$this->assertSame( 429, $response->get_status() );
+	}
+
+	/**
+	 * Once the site-wide bucket is full, new client addresses do not get
+	 * per-IP transients written for them.
+	 */
+	public function test_full_site_bucket_writes_no_per_ip_transient() {
+		$this->connect_site();
+		$this->central_rejects();
+
+		add_filter(
+			'central_connect_auth_rate_limits',
+			function ( $limits ) {
+				$limits['site'] = array( 'limit' => 1, 'window' => 600 );
+				return $limits;
+			}
+		);
+
+		$this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+
+		$_SERVER['REMOTE_ADDR'] = '203.0.113.200';
+		$response               = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+
+		$this->assertSame( 429, $response->get_status() );
+		$this->assertFalse( get_transient( RateLimiter::TRANSIENT_PREFIX . md5( 'remote_validate:ip:203.0.113.200' ) ) );
+	}
+
+	/**
+	 * Central-confirmed validations do not count against the per-IP and
+	 * per-site buckets, so repeated legitimate connections are not refused.
+	 */
+	public function test_confirmed_validations_are_not_counted_against_ip_bucket() {
+		self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$this->connect_site( 'k', self::ENV );
+		$this->central_accepts();
+
+		$attempts = Token::rateLimits()['ip']['limit'] + 3;
+		for ( $i = 0; $i < $attempts; $i++ ) {
+			$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+			$this->assertSame( 200, $response->get_status() );
+		}
+		$this->assertCount( $attempts, $this->http_requests );
+	}
+
+	/**
+	 * The `total` bucket still bounds confirmed validations.
+	 */
+	public function test_total_bucket_bounds_confirmed_validations() {
+		self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$this->connect_site( 'k', self::ENV );
+		$this->central_accepts();
+
+		add_filter(
+			'central_connect_auth_rate_limits',
+			function ( $limits ) {
+				$limits['total'] = array( 'limit' => 3, 'window' => 600 );
+				return $limits;
+			}
+		);
+
+		for ( $i = 0; $i < 3; $i++ ) {
+			$this->assertSame( 200, $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) )->get_status() );
+		}
+
+		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$this->assertSame( 429, $response->get_status() );
+		$this->assertCount( 3, $this->http_requests );
+	}
+
+	/**
+	 * A filter returning a non-array falls back to the defaults.
+	 */
+	public function test_non_array_rate_limit_filter_uses_defaults() {
+		add_filter( 'central_connect_auth_rate_limits', '__return_false' );
+
+		$limits = Token::rateLimits();
+
+		$this->assertSame( 5, $limits['ip']['limit'] );
+		$this->assertSame( 20, $limits['site']['limit'] );
+		$this->assertArrayHasKey( 'total', $limits );
 	}
 
 	/**

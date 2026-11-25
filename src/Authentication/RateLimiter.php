@@ -64,6 +64,33 @@ class RateLimiter {
 	}
 
 	/**
+	 * Give back one previously consumed attempt.
+	 *
+	 * Used when an attempt turned out to be legitimate and should not count
+	 * against the bucket. The window end is left unchanged.
+	 *
+	 * @since 2.0.7
+	 *
+	 * @param string $scope  Bucket identifier.
+	 * @param int    $window Window length in seconds.
+	 *
+	 * @return void
+	 */
+	public function release( $scope, $window ) {
+		$now    = time();
+		$key    = $this->key( $scope );
+		$bucket = $this->bucket( $key, $now, max( 1, (int) $window ) );
+
+		if ( $bucket['count'] <= 1 ) {
+			delete_transient( $key );
+			return;
+		}
+
+		$bucket['count']--;
+		set_transient( $key, $bucket, max( 1, $bucket['reset'] - $now ) );
+	}
+
+	/**
 	 * Check whether a bucket is exhausted without consuming an attempt.
 	 *
 	 * @since 2.0.7

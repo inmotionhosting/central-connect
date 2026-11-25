@@ -114,6 +114,32 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 	}
 
 	/**
+	 * The caller allowlist gates the site-token relay as well as the
+	 * environment-token relay.
+	 */
+	public function test_site_token_relay_honours_caller_allowlist() {
+		$admin = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$this->connect_site();
+		$this->http_response = $this->central_response( array( 'validated' => true ) );
+
+		add_filter(
+			'central_connect_auth_allowed_ips',
+			function () {
+				return array( '198.51.100.5' );
+			}
+		);
+
+		$location = $this->authenticate( array( 'token' => 'site-token' ) );
+		$this->assertSame( 'wp-login.php', $location );
+		$this->assertCount( 0, $this->http_requests );
+
+		$_SERVER['REMOTE_ADDR'] = '198.51.100.5';
+		$this->authenticate( array( 'token' => 'site-token' ) );
+		$this->assertCount( 1, $this->http_requests );
+		$this->assertSame( $admin, get_current_user_id() );
+	}
+
+	/**
 	 * Legitimate single sign-on: Central confirms the environment token and
 	 * the administrator is logged in and redirected.
 	 */

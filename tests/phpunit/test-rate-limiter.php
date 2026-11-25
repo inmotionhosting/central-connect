@@ -35,6 +35,29 @@ class Test_Rate_Limiter extends WP_UnitTestCase {
 	}
 
 	/**
+	 * release() gives back one attempt and clears an emptied bucket.
+	 */
+	public function test_release_refunds_one_attempt() {
+		$limiter = new RateLimiter();
+
+		$this->assertTrue( $limiter->attempt( 'scope-r', 2, 60 ) );
+		$this->assertTrue( $limiter->attempt( 'scope-r', 2, 60 ) );
+		$this->assertTrue( $limiter->isLimited( 'scope-r', 2, 60 ) );
+
+		$limiter->release( 'scope-r', 60 );
+		$this->assertFalse( $limiter->isLimited( 'scope-r', 2, 60 ) );
+		$this->assertTrue( $limiter->attempt( 'scope-r', 2, 60 ) );
+		$this->assertTrue( $limiter->isLimited( 'scope-r', 2, 60 ) );
+
+		$limiter->release( 'scope-r', 60 );
+		$limiter->release( 'scope-r', 60 );
+		$this->assertFalse( get_transient( RateLimiter::TRANSIENT_PREFIX . md5( 'scope-r' ) ) );
+
+		$limiter->release( 'scope-r', 60 );
+		$this->assertSame( 0, $limiter->retryAfter( 'scope-r', 60 ) );
+	}
+
+	/**
 	 * Scopes are independent.
 	 */
 	public function test_scopes_are_independent() {
