@@ -23,10 +23,10 @@ function central_connect_autoload( $pClassName ) {
 		return;
 	}
 	$updatedClass = str_replace( 'Central\Connect\\', '', $pClassName );
-	$path = __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . $updatedClass . '.php';
-	$path = str_replace( '\\', '/', $path );
+	$path         = __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . $updatedClass . '.php';
+	$path         = str_replace( '\\', '/', $path );
 	if ( file_exists( $path ) && $pClassName !== $updatedClass ) {
-		include( $path );
+		include $path;
 		return;
 	}
 }

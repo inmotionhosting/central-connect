@@ -38,7 +38,7 @@ class Central {
 	public function initialize() {
 		add_action(
 			'rest_api_init',
-			function( $restServer ) {
+			function ( $restServer ) {
 
 				// Store the current Rest server.
 				$this->restServer = $restServer;

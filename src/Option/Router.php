@@ -75,8 +75,8 @@ class Router {
 			'bgc/v1',
 			'/options/',
 			array(
-				'methods' => 'GET',
-				'callback' => function ( $request ) {
+				'methods'             => 'GET',
+				'callback'            => function ( $request ) {
 					$option = $request->get_param( 'name' );
 
 					if ( ! $this->isAllowedOption( $option ) ) {
@@ -94,11 +94,11 @@ class Router {
 					return $response;
 				},
 				'permission_callback' => array( $this, 'permissionCheck' ),
-				'args' => array(
+				'args'                => array(
 					'name' => array(
-						'required' => true,
+						'required'    => true,
 						'description' => 'Option name.',
-						'type' => 'string',
+						'type'        => 'string',
 					),
 				),
 			)
@@ -117,8 +117,8 @@ class Router {
 			'bgc/v1',
 			'/options/',
 			array(
-				'methods' => 'DELETE',
-				'callback' => function ( $request ) {
+				'methods'             => 'DELETE',
+				'callback'            => function ( $request ) {
 					$name = $request->get_param( 'name' );
 
 					if ( ! $this->isAllowedOption( $name ) ) {
@@ -133,11 +133,11 @@ class Router {
 					return $response;
 				},
 				'permission_callback' => array( $this, 'permissionCheck' ),
-				'args' => array(
+				'args'                => array(
 					'name' => array(
-						'required' => true,
+						'required'    => true,
 						'description' => 'Option name.',
-						'type' => 'string',
+						'type'        => 'string',
 					),
 				),
 			)
@@ -156,8 +156,8 @@ class Router {
 			'bgc/v1',
 			'/options/',
 			array(
-				'methods' => 'POST',
-				'callback' => function ( $request ) {
+				'methods'             => 'POST',
+				'callback'            => function ( $request ) {
 					$option = $request->get_param( 'name' );
 					$newValue = $request->get_param( 'value' );
 
@@ -181,14 +181,14 @@ class Router {
 					return $response;
 				},
 				'permission_callback' => array( $this, 'permissionCheck' ),
-				'args' => array(
-					'name' => array(
-						'required' => true,
+				'args'                => array(
+					'name'  => array(
+						'required'    => true,
 						'description' => 'Option name.',
-						'type' => 'string',
+						'type'        => 'string',
 					),
 					'value' => array(
-						'required' => true,
+						'required'    => true,
 						'description' => 'Option Value.',
 					),
 				),

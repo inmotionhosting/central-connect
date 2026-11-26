@@ -78,7 +78,14 @@ class Test_Rate_Limiter extends WP_UnitTestCase {
 
 		// Age the bucket past its reset time without waiting.
 		$key = RateLimiter::TRANSIENT_PREFIX . md5( 'scope-d' );
-		set_transient( $key, array( 'count' => 1, 'reset' => time() - 1 ), 60 );
+		set_transient(
+			$key,
+			array(
+				'count' => 1,
+				'reset' => time() - 1,
+			),
+			60
+		);
 
 		$this->assertFalse( $limiter->isLimited( 'scope-d', 1, 60 ) );
 		$this->assertTrue( $limiter->attempt( 'scope-d', 1, 60 ) );

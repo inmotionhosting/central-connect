@@ -200,9 +200,9 @@ class Central_Connect_Login {
 
 		do_action( 'bgc_remote_validate' );
 
-		$configs   = \Central_Connect_Service::get( 'configs' );
-		$url       = $configs['asset_server'] . $configs['ajax_calls']['verify_site_token'];
-		$args      = array(
+		$configs = \Central_Connect_Service::get( 'configs' );
+		$url     = $configs['asset_server'] . $configs['ajax_calls']['verify_site_token'];
+		$args    = array(
 			'method'  => 'POST',
 			'body'    => array(
 				'key'   => $siteKey,

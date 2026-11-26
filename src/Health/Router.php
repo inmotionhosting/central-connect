@@ -49,8 +49,8 @@ class Router {
 			'bgc/v1',
 			'/health/',
 			array(
-				'methods' => 'GET',
-				'callback' => function () {
+				'methods'             => 'GET',
+				'callback'            => function () {
 					$stats = new Stats();
 					$response = new \WP_REST_Response( $stats->getSiteHealth() );
 

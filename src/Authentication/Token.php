@@ -59,12 +59,12 @@ class Token {
 		$rawToken = wp_generate_password( 128 );
 
 		$newAccessToken = array(
-			'site_url' => get_site_url(),
-			'login_url' => wp_login_url(),
-			'wp_user_id' => $user->ID,
+			'site_url'          => get_site_url(),
+			'login_url'         => wp_login_url(),
+			'wp_user_id'        => $user->ID,
 			'access_token_hash' => wp_hash_password( $rawToken ),
-			'expires_at' => strtotime( $expires ),
-			'issued_at' => time(),
+			'expires_at'        => strtotime( $expires ),
+			'issued_at'         => time(),
 		);
 
 		$accessTokens[] = $newAccessToken;
@@ -86,10 +86,10 @@ class Token {
 	 */
 	public function isBGToken( $providedToken ) {
 		$providedToken = preg_replace( '/Bearer\s+/', '', $providedToken );
-		$tokenValue = base64_decode( $providedToken );
-		$tokenValue = $tokenValue ? $tokenValue : '';
-		$split = explode( ':', $tokenValue );
-		$userId = ! empty( $split[0] ) ? $split[0] : null;
+		$tokenValue    = base64_decode( $providedToken );
+		$tokenValue    = $tokenValue ? $tokenValue : '';
+		$split         = explode( ':', $tokenValue );
+		$userId        = ! empty( $split[0] ) ? $split[0] : null;
 		$providedToken = ! empty( $split[1] ) ? $split[1] : null;
 		return is_numeric( $userId ) && $userId && $providedToken;
 	}
@@ -188,9 +188,9 @@ class Token {
 		$url     = $configs['asset_server'] . $configs['ajax_calls']['verify_env_token'];
 		$args    = array(
 			'body'    => array(
-				'token' => $token,
+				'token'          => $token,
 				'environment_id' => $environmentToSend,
-				'key' => $siteKey,
+				'key'            => $siteKey,
 			),
 			'timeout' => 15,
 		);
@@ -302,7 +302,7 @@ class Token {
 			'central_connect_too_many_attempts',
 			'Too many authentication attempts. Please try again later.',
 			array(
-				'status' => 429,
+				'status'      => 429,
 				'retry_after' => $limiter->retryAfter( $scope, $window ),
 			)
 		);
@@ -321,11 +321,26 @@ class Token {
 	 */
 	public static function rateLimits() {
 		$defaults = array(
-			'ip'          => array( 'limit' => 5, 'window' => 600 ),
-			'site'        => array( 'limit' => 20, 'window' => 600 ),
-			'total'       => array( 'limit' => 120, 'window' => 600 ),
-			'rebind_ip'   => array( 'limit' => 2, 'window' => 3600 ),
-			'rebind_site' => array( 'limit' => 5, 'window' => 3600 ),
+			'ip'          => array(
+				'limit'  => 5,
+				'window' => 600,
+			),
+			'site'        => array(
+				'limit'  => 20,
+				'window' => 600,
+			),
+			'total'       => array(
+				'limit'  => 120,
+				'window' => 600,
+			),
+			'rebind_ip'   => array(
+				'limit'  => 2,
+				'window' => 3600,
+			),
+			'rebind_site' => array(
+				'limit'  => 5,
+				'window' => 3600,
+			),
 		);
 
 		/**
@@ -485,7 +500,7 @@ class Token {
 				'central_connect_too_many_attempts',
 				'Too many failed authentication attempts. Please try again later.',
 				array(
-					'status' => 429,
+					'status'      => 429,
 					'retry_after' => $limiter->retryAfter( $scope, $limits['window'] ),
 				)
 			);
@@ -565,10 +580,10 @@ class Token {
 	 * @return WP_User
 	 */
 	public function getValidUser( $providedToken ) {
-		$tokenValue = base64_decode( $providedToken );
-		$tokenValue = $tokenValue ? $tokenValue : '';
-		$split = explode( ':', $tokenValue );
-		$userId = ! empty( $split[0] ) ? $split[0] : null;
+		$tokenValue    = base64_decode( $providedToken );
+		$tokenValue    = $tokenValue ? $tokenValue : '';
+		$split         = explode( ':', $tokenValue );
+		$userId        = ! empty( $split[0] ) ? $split[0] : null;
 		$providedToken = ! empty( $split[1] ) ? $split[1] : null;
 
 		$user = false;

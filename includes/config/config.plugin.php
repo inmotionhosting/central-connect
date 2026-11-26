@@ -35,7 +35,7 @@ return array(
 	'main_file_path'        => CENTRAL_CONNECT_PATH . 'boldgrid-connect.php',
 	'plugin_transient_name' => 'boldgrid_connect_version_data',
 
-	'branding' => array(
+	'branding'              => array(
 		'InMotion Hosting' => array(
 			'primaryColor' => '#c32227',
 			'productName'  => 'InMotion Central',
@@ -45,7 +45,7 @@ return array(
 			'central_url'  => 'https://central.inmotionhosting.com/wordpress',
 			'providerUrl'  => 'https://www.inmotionhosting.com',
 		),
-		'BoldGrid' => array(
+		'BoldGrid'         => array(
 			'primaryColor' => '#f95b26',
 			'productName'  => 'BoldGrid Central',
 			'tos'          => 'https://www.boldgrid.com/terms-of-service/',

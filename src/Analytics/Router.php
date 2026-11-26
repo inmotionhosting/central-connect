@@ -51,8 +51,8 @@ class Router extends Controller {
 			$this->namespace,
 			'/stats',
 			array(
-				'methods' => 'GET',
-				'callback' => function () {
+				'methods'             => 'GET',
+				'callback'            => function () {
 					$stats = new Stats();
 
 					return $stats->getData();

@@ -30,8 +30,8 @@ class Stats {
 		$healthStats = new Health\Stats();
 
 		return array(
-			'debug' => self::getDebugInfo(),
-			'views' => Views::getStats(),
+			'debug'  => self::getDebugInfo(),
+			'views'  => Views::getStats(),
 			'health' => $healthStats->getSiteHealth(),
 		);
 	}
@@ -45,7 +45,7 @@ class Stats {
 	 */
 	public static function getDebugInfo() {
 		if ( ! class_exists( 'WP_Debug_Data' ) ) {
-			require_once( ABSPATH . 'wp-admin/includes/class-wp-debug-data.php' );
+			require_once ABSPATH . 'wp-admin/includes/class-wp-debug-data.php';
 		}
 
 		require_once ABSPATH . 'wp-admin/includes/misc.php';

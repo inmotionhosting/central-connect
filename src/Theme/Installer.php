@@ -50,7 +50,7 @@ class Installer {
 		foreach ( $fields as $field ) {
 			$formatted[ $field ] = $wpTheme->get( $field );
 		}
-		$formatted['IsActive'] = $wpTheme->get_stylesheet() === get_stylesheet();
+		$formatted['IsActive']        = $wpTheme->get_stylesheet() === get_stylesheet();
 		$formatted['UpdateAvailable'] = (bool) \get_theme_update_available( $wpTheme );
 
 		return $formatted;
@@ -92,7 +92,7 @@ class Installer {
 		$results = false;
 		foreach ( $stylesheets as $stylesheet ) {
 			$directory = get_theme_root( $stylesheet ) . trailingslashit( "/$stylesheet" );
-			$upgrader = new \Theme_Upgrader( new \Central_Connect_Upgrader_Skin() );
+			$upgrader  = new \Theme_Upgrader( new \Central_Connect_Upgrader_Skin() );
 			$upgrader->init();
 			$results[] = $upgrader->clear_destination( $directory );
 		}
@@ -116,7 +116,7 @@ class Installer {
 			'upgrader_package_options',
 			function ( $options ) {
 				$options['clear_destination'] = true;
-				$options['clear_working'] = true;
+				$options['clear_working']     = true;
 
 				return $options;
 			}

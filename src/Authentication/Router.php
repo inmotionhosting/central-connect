@@ -60,7 +60,7 @@ class Router {
 			'bgc/v1',
 			'/auth/',
 			array(
-				'methods' => 'POST',
+				'methods'             => 'POST',
 				/**
 				 * This route is reachable without a WordPress session on purpose:
 				 * Central presents an environment token here to obtain a local
@@ -70,7 +70,7 @@ class Router {
 				 * before relaying the token to Central for confirmation.
 				 */
 				'permission_callback' => '__return_true',
-				'callback' => function ( $request ) {
+				'callback'            => function ( $request ) {
 					$environmentId = $request->get_param( 'environment_id' );
 					$tokenVal      = $request->get_param( 'token' );
 
@@ -86,7 +86,7 @@ class Router {
 						return new \WP_REST_Response(
 							array(
 								'errors' => array(
-									'name' => $user->get_error_code(),
+									'name'    => $user->get_error_code(),
 									'message' => $user->get_error_message(),
 								),
 							),
@@ -102,20 +102,20 @@ class Router {
 
 					return new \WP_REST_Response( $accessToken );
 				},
-				'args' => array(
-					'token' => array(
-						'required' => true,
-						'type' => 'string',
+				'args'                => array(
+					'token'          => array(
+						'required'    => true,
+						'type'        => 'string',
 						'description' => 'Central Authentication token',
 					),
 					'environment_id' => array(
-						'required' => true,
-						'type' => 'string',
+						'required'    => true,
+						'type'        => 'string',
 						'description' => 'Central Environment ID the token was issued for',
 					),
-					'user_id' => array(
-						'required' => false,
-						'type' => 'string',
+					'user_id'        => array(
+						'required'    => false,
+						'type'        => 'string',
 						'description' => 'User ID to authenticate as',
 					),
 				),

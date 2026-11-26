@@ -12,7 +12,7 @@
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
- use Central\Connect;
+use Central\Connect;
 
 /**
  * Class: Central_Connect
@@ -148,12 +148,12 @@ class Central_Connect {
 		$login->setup();
 
 		// Disabling the connect notice and menu for now.
-		//$connectNotice = new Connect\View\Central\ConnectNotice();
-		//$connectNotice->initialize();
+		// $connectNotice = new Connect\View\Central\ConnectNotice();
+		// $connectNotice->initialize();
 
 		// Remove "My Connection" page from plugins list.
-		//$installedPlugins = new Connect\Plugin\Installed();
-		//$installedPlugins->initialize();
+		// $installedPlugins = new Connect\Plugin\Installed();
+		// $installedPlugins->initialize();
 
 		$inspirations = new Connect\Integrations\Inspirations();
 		$inspirations->initialize();
@@ -175,7 +175,7 @@ class Central_Connect {
 
 		add_filter(
 			'BoldgridDemo/configs',
-			function( $configs ) use ( $optionConfigs ) {
+			function ( $configs ) use ( $optionConfigs ) {
 				$configs['servers']['asset'] = ! empty( $optionConfigs['asset_server'] ) ? $optionConfigs['asset_server'] : $configs['servers']['asset'];
 				return $configs;
 			}
@@ -193,9 +193,9 @@ class Central_Connect {
 		// BoldGrid Library.
 		add_filter(
 			'Boldgrid\Library\Configs\set',
-			function( $configs ) use ( $optionConfigs ) {
+			function ( $configs ) use ( $optionConfigs ) {
 				// The timing of this filter doesn't always work as expected, so we should set the bglib_configs option as well.
-				$configs['api']     = ! empty( $optionConfigs['asset_server'] ) ? $optionConfigs['asset_server'] : $configs['api'];
+				$configs['api'] = ! empty( $optionConfigs['asset_server'] ) ? $optionConfigs['asset_server'] : $configs['api'];
 				return $configs;
 			}
 		);
@@ -203,9 +203,9 @@ class Central_Connect {
 		// BoldGrid Connect Plugin.
 		add_filter(
 			'boldgrid_connect_config_setup_configs',
-			function( $configs ) use ( $optionConfigs ) {
+			function ( $configs ) use ( $optionConfigs ) {
 				$configs['asset_server'] = ! empty( $optionConfigs['asset_server'] ) ? $optionConfigs['asset_server'] : $configs['asset_server'];
-				$configs['central_url'] = ! empty( $optionConfigs['central_url'] ) ? $optionConfigs['central_url'] : $configs['central_url'];
+				$configs['central_url']  = ! empty( $optionConfigs['central_url'] ) ? $optionConfigs['central_url'] : $configs['central_url'];
 				return $configs;
 			}
 		);
@@ -219,7 +219,7 @@ class Central_Connect {
 		 */
 		add_filter(
 			'option_bg_connect_configs',
-			function( $value, $option ) {
+			function ( $value, $option ) {
 				/**
 				 * The BoldGrid Library applies this filter before the
 				 * 'configs' service gets registered above. In order for this
@@ -232,7 +232,7 @@ class Central_Connect {
 				$config->setup_configs();
 
 				$value = is_array( $value ) ? $value : array();
-				$conf = \Central_Connect_Service::get( 'configs' );
+				$conf  = \Central_Connect_Service::get( 'configs' );
 
 				$confs = ! empty( $conf ) ? array_merge( $conf, $value ) : $value;
 

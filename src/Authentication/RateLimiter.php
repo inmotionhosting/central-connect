@@ -57,7 +57,7 @@ class RateLimiter {
 			return false;
 		}
 
-		$bucket['count']++;
+		++$bucket['count'];
 		set_transient( $key, $bucket, max( 1, $bucket['reset'] - $now ) );
 
 		return true;
@@ -86,7 +86,7 @@ class RateLimiter {
 			return;
 		}
 
-		$bucket['count']--;
+		--$bucket['count'];
 		set_transient( $key, $bucket, max( 1, $bucket['reset'] - $now ) );
 	}
 

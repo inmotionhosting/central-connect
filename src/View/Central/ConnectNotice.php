@@ -90,7 +90,7 @@ class ConnectNotice {
 	 * @return boolean
 	 */
 	public static function isConnected() {
-		return ! ! Option\Connect::get( 'environment_id' );
+		return (bool) Option\Connect::get( 'environment_id' );
 	}
 
 	/**
@@ -101,13 +101,13 @@ class ConnectNotice {
 	public function enqueue_scripts() {
 		wp_enqueue_style( 'central-connect-styles', plugins_url( './assets/style/admin.css', CENTRAL_CONNECT_FILE ), array(), CENTRAL_CONNECT_VERSION );
 
-		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
+		$configs  = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 		$provider = get_option( 'boldgrid_connect_provider', '' );
 
 		global $_wp_admin_css_colors;
 
 		$user_admin_color = get_user_meta( get_current_user_id(), 'admin_color', true );
-		$color = $_wp_admin_css_colors[ $user_admin_color ]->colors[2];
+		$color            = $_wp_admin_css_colors[ $user_admin_color ]->colors[2];
 
 		if ( ! empty( $provider ) && ! empty( $configs['branding'][ $provider ]['primaryColor'] ) ) {
 			$color = $configs['branding'][ $provider ]['primaryColor'];
@@ -134,14 +134,14 @@ class ConnectNotice {
 			'activate_plugins',
 			'central-connect',
 			function () {
-				$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
+				$configs    = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 				$centralUrl = $configs['central_url'] . '/projects?environment_id=' . Option\Connect::get( 'environment_id' );
 
 				?>
 				<div class="central-container"> 
 				<?php
 				if ( self::isConnected() ) {
-					
+
 					?>
 						<div class="central-connect-active">
 							<h2 class="central-connect-active__heading"><?php print esc_html__( 'Site Connected', 'central-connect' ); ?></h2>
@@ -172,7 +172,7 @@ class ConnectNotice {
 	 */
 	public function handleConnectRedirect() {
 		$isRedirect = false;
-		$page = false;
+		$page       = false;
 
 		if ( isset( $_GET['token_redirect'] ) ) {
 			$isRedirect = sanitize_text_field( wp_unslash( $_GET['token_redirect'] ) );
@@ -184,7 +184,7 @@ class ConnectNotice {
 
 		if ( 'central-connect' === $page && $isRedirect ) {
 			$authentication = new \Central\Connect\Authentication\Token();
-			$token = $authentication->create( wp_get_current_user(), '+5 minutes' );
+			$token          = $authentication->create( wp_get_current_user(), '+5 minutes' );
 
 			$url = self::getConnectUrl( $token['access_token'] );
 			wp_redirect( $url );
@@ -200,7 +200,7 @@ class ConnectNotice {
 	 * @echo string
 	 */
 	public static function termsOfService() {
-		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
+		$configs  = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 		$provider = get_option( 'boldgrid_connect_provider', 'BoldGrid' );
 
 		printf(
@@ -208,7 +208,7 @@ class ConnectNotice {
 				/* Translators: placeholders are links. */
 				__( 'By clicking the <strong>Connect to %3$s</strong> button, you agree to our <a href="%1$s" target="_blank">Terms of Service</a> and our <a href="%2$s" target="_blank">privacy policy</a>.', 'central-connect' ),
 				array(
-					'a' => array(
+					'a'      => array(
 						'href'   => array(),
 						'target' => array(),
 						'rel'    => array(),
@@ -232,13 +232,13 @@ class ConnectNotice {
 	 * @return string
 	 */
 	public static function getConnectUrl( $token ) {
-		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
+		$configs  = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 		$provider = get_option( 'boldgrid_connect_provider', 'BoldGrid' );
 
 		$query = http_build_query(
 			array(
-				'url' => get_site_url(),
-				'token' => $token,
+				'url'        => get_site_url(),
+				'token'      => $token,
 				'site_title' => get_bloginfo( 'name' ),
 			)
 		);
@@ -254,9 +254,9 @@ class ConnectNotice {
 	 * @return string $url The URL for the brand's logo.
 	 */
 	public static function getBrandLogo() {
-		$configs = \Central_Connect_Service::get( 'configs' );
+		$configs  = \Central_Connect_Service::get( 'configs' );
 		$provider = get_option( 'boldgrid_connect_provider', 'BoldGrid' );
-		$url = $configs['branding'][ $provider ]['logo'];
+		$url      = $configs['branding'][ $provider ]['logo'];
 
 		// Allows brands to provide external URL via config or load from local file.
 		if ( substr( $configs['branding'][ $provider ]['logo'], 0, 4 ) !== 'http' ) {
@@ -274,8 +274,8 @@ class ConnectNotice {
 	 * @return void
 	 */
 	public static function getNoticeBody() {
-		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
-		$provider = get_option( 'boldgrid_connect_provider', '' );
+		$configs     = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
+		$provider    = get_option( 'boldgrid_connect_provider', '' );
 		$productName = '';
 
 		if ( ! empty( $provider ) ) {

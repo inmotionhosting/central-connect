@@ -43,12 +43,12 @@ class Inspirations {
 	 * @return void
 	 */
 	public function addMetaBox() {
-		// Prompt currently only shows on cloud wordpress staging sites, should be updated to show on any dev environment.
+		// Prompt currently only shows on cloud WordPress staging sites, should be updated to show on any dev environment.
 		if ( ! defined( 'BOLDGRID_DEMO_VERSION' ) || ! Central\ConnectNotice::isConnected() ) {
 			return;
 		}
 
-		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
+		$configs  = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 		$provider = get_option( 'boldgrid_connect_provider', 'BoldGrid' );
 
 		add_meta_box(
@@ -56,7 +56,7 @@ class Inspirations {
 			esc_html__( 'Publish Website', 'central-connect' ),
 			function () use ( $configs, $provider ) {
 				$productName = $configs['branding'][ $provider ]['productName'];
-				$centralUrl = $configs['branding'][ $provider ]['central_url'];
+				$centralUrl  = $configs['branding'][ $provider ]['central_url'];
 
 				printf(
 					'<p>%1$s</p><a target="_blank" href="' . esc_url( $centralUrl ) . '/projects?environment_id=' . esc_attr( Option\Connect::get( 'environment_id' ) ) .

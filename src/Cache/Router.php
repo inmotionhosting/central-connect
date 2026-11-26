@@ -50,8 +50,8 @@ class Router {
 			'bgc/v1',
 			'/w3cache/',
 			array(
-				'methods' => 'GET',
-				'callback' => function () {
+				'methods'             => 'GET',
+				'callback'            => function () {
 					return $this->getSettings();
 				},
 				'permission_callback' => array( $this, 'pluginPermissionCheck' ),
@@ -71,8 +71,8 @@ class Router {
 			'bgc/v1',
 			'/w3cache/',
 			array(
-				'methods' => 'POST',
-				'callback' => function () {
+				'methods'             => 'POST',
+				'callback'            => function () {
 					if ( function_exists( 'w3tc_config' ) && class_exists( '\W3TC\Dispatcher' ) ) {
 						$config = \w3tc_config();
 						$config->set( 'pgcache.enabled', true );
@@ -109,7 +109,7 @@ class Router {
 		if ( function_exists( 'w3tc_config' ) ) {
 			$config = \w3tc_config();
 
-			$values = array();
+			$values  = array();
 			$options = array( 'pgcache.enabled' );
 			foreach ( $options as $option ) {
 				$values[ $option ] = $config->get( $option );

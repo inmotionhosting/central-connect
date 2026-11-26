@@ -43,8 +43,8 @@ class Installed {
 		add_filter(
 			'plugin_row_meta',
 			function ( $meta, $slug ) {
-				$pluginName = 'central-connect.php';
-				$length = strlen( $pluginName );
+				$pluginName        = 'central-connect.php';
+				$length            = strlen( $pluginName );
 				$hasPluginFilename = substr( $slug, -$length ) === $pluginName;
 				if ( $hasPluginFilename ) {
 					$meta[] = '<a href="' . admin_url( 'options-general.php?page=central-connect' ) . '">' . __( 'My Connection', 'central-connect' ) . '</a>';

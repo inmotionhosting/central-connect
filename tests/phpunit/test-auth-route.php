@@ -47,7 +47,14 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		delete_option( 'boldgrid_api_key' );
 		$this->central_accepts();
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 
 		$this->assertSame( 403, $response->get_status() );
 		$this->assertSame( 'central_connect_not_connected', $response->as_error()->get_error_code() );
@@ -65,7 +72,14 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		$this->connect_site();
 		$this->central_accepts();
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => $token, 'environment_id' => self::ENV ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => $token,
+				'environment_id' => self::ENV,
+			)
+		);
 
 		$this->assertSame( 400, $response->get_status() );
 		$this->assertCount( 0, $this->http_requests );
@@ -97,7 +111,14 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		$this->connect_site();
 		$this->central_accepts();
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => $environment_id ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => $environment_id,
+			)
+		);
 
 		$this->assertSame( 400, $response->get_status() );
 		$this->assertCount( 0, $this->http_requests );
@@ -110,11 +131,11 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 	 */
 	public function malformed_environment_ids() {
 		return array(
-			'empty'        => array( '' ),
-			'url'          => array( 'https://example.com/x' ),
-			'query-ish'    => array( 'a&key=b' ),
-			'spaces'       => array( '1 2' ),
-			'too long'     => array( str_repeat( '1', Token::MAX_ENVIRONMENT_ID_LENGTH + 1 ) ),
+			'empty'     => array( '' ),
+			'url'       => array( 'https://example.com/x' ),
+			'query-ish' => array( 'a&key=b' ),
+			'spaces'    => array( '1 2' ),
+			'too long'  => array( str_repeat( '1', Token::MAX_ENVIRONMENT_ID_LENGTH + 1 ) ),
 		);
 	}
 
@@ -140,7 +161,14 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		$this->connect_site( 'site-key-123' );
 		$this->central_accepts();
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );
@@ -174,7 +202,14 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		$this->connect_site();
 		$this->central_accepts();
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( $admin, $response->get_data()['wp_user_id'] );
@@ -185,12 +220,30 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 	 * An explicit administrator user_id is honoured (coherent with the default).
 	 */
 	public function test_explicit_administrator_user_id_is_honoured() {
-		$default_admin = self::factory()->user->create( array( 'role' => 'administrator', 'user_login' => 'zz-last-admin' ) );
-		$admin         = self::factory()->user->create( array( 'role' => 'administrator', 'user_login' => 'aa-first-admin' ) );
+		$default_admin = self::factory()->user->create(
+			array(
+				'role'       => 'administrator',
+				'user_login' => 'zz-last-admin',
+			)
+		);
+		$admin         = self::factory()->user->create(
+			array(
+				'role'       => 'administrator',
+				'user_login' => 'aa-first-admin',
+			)
+		);
 		$this->connect_site();
 		$this->central_accepts();
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV, 'user_id' => (string) $admin ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+				'user_id'        => (string) $admin,
+			)
+		);
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( $admin, $response->get_data()['wp_user_id'] );
@@ -205,7 +258,15 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		$this->connect_site();
 		$this->central_accepts();
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV, 'user_id' => '999999' ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+				'user_id'        => '999999',
+			)
+		);
 
 		$this->assertSame( 400, $response->get_status() );
 		$this->assertSame( 'user_not_found', $response->get_data()['errors']['name'] );
@@ -222,7 +283,15 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		$this->connect_site();
 		$this->central_accepts();
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV, 'user_id' => (string) $subscriber ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+				'user_id'        => (string) $subscriber,
+			)
+		);
 
 		$this->assertSame( 400, $response->get_status() );
 		$this->assertSame( 'user_not_qualified', $response->get_data()['errors']['name'] );
@@ -235,13 +304,25 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 	 * the environment either.
 	 */
 	public function test_site_without_administrator_issues_nothing() {
-		foreach ( get_users( array( 'role' => 'administrator', 'fields' => 'ID' ) ) as $id ) {
+		foreach ( get_users(
+			array(
+				'role'   => 'administrator',
+				'fields' => 'ID',
+			)
+		) as $id ) {
 			wp_delete_user( $id );
 		}
 		$this->connect_site();
 		$this->central_accepts();
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 
 		$this->assertSame( 400, $response->get_status() );
 		$this->assertSame( 'user_not_found', $response->get_data()['errors']['name'] );
@@ -257,7 +338,14 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		$this->central_rejects();
 
 		$start    = microtime( true );
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 		$elapsed  = microtime( true ) - $start;
 
 		$this->assertSame( 403, $response->get_status() );
@@ -275,7 +363,14 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		$this->connect_site( 'k', self::ENV );
 		$this->central_accepts();
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( self::ENV, $this->sent_body()['environment_id'] );
@@ -291,12 +386,26 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 
 		$limit = Token::rateLimits()['ip']['limit'];
 		for ( $i = 0; $i < $limit; $i++ ) {
-			$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN . $i, 'environment_id' => self::ENV ) );
+			$response = $this->rest(
+				'POST',
+				self::ROUTE,
+				array(
+					'token'          => self::TOKEN . $i,
+					'environment_id' => self::ENV,
+				)
+			);
 			$this->assertSame( 403, $response->get_status() );
 		}
 		$this->assertCount( $limit, $this->http_requests );
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN . 'x', 'environment_id' => self::ENV ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN . 'x',
+				'environment_id' => self::ENV,
+			)
+		);
 
 		$this->assertSame( 429, $response->get_status() );
 		$this->assertSame( 'central_connect_too_many_attempts', $response->as_error()->get_error_code() );
@@ -304,7 +413,14 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 
 		// A different client still has its own budget.
 		$_SERVER['REMOTE_ADDR'] = '203.0.113.11';
-		$response               = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$response               = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 		$this->assertSame( 403, $response->get_status() );
 		$this->assertCount( $limit + 1, $this->http_requests );
 	}
@@ -320,20 +436,40 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		add_filter(
 			'central_connect_auth_rate_limits',
 			function ( $limits ) {
-				$limits['ip']   = array( 'limit' => 100, 'window' => 600 );
-				$limits['site'] = array( 'limit' => 3, 'window' => 600 );
+				$limits['ip']   = array(
+					'limit'  => 100,
+					'window' => 600,
+				);
+				$limits['site'] = array(
+					'limit'  => 3,
+					'window' => 600,
+				);
 				return $limits;
 			}
 		);
 
 		for ( $i = 0; $i < 3; $i++ ) {
 			$_SERVER['REMOTE_ADDR'] = '203.0.113.' . ( 20 + $i );
-			$response               = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+			$response               = $this->rest(
+				'POST',
+				self::ROUTE,
+				array(
+					'token'          => self::TOKEN,
+					'environment_id' => self::ENV,
+				)
+			);
 			$this->assertSame( 403, $response->get_status() );
 		}
 
 		$_SERVER['REMOTE_ADDR'] = '203.0.113.99';
-		$response               = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$response               = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 
 		$this->assertSame( 429, $response->get_status() );
 		$this->assertCount( 3, $this->http_requests );
@@ -350,17 +486,38 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 
 		$limit = Token::rateLimits()['rebind_ip']['limit'];
 		for ( $i = 0; $i < $limit; $i++ ) {
-			$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => 'other-env-' . $i ) );
+			$response = $this->rest(
+				'POST',
+				self::ROUTE,
+				array(
+					'token'          => self::TOKEN,
+					'environment_id' => 'other-env-' . $i,
+				)
+			);
 			$this->assertSame( 403, $response->get_status() );
 			$this->assertSame( 'other-env-' . $i, $this->sent_body( $i )['environment_id'] );
 		}
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => 'other-env-z' ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => 'other-env-z',
+			)
+		);
 		$this->assertSame( 429, $response->get_status() );
 		$this->assertCount( $limit, $this->http_requests );
 
 		// The matching environment is still within its own budget.
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 		$this->assertSame( 403, $response->get_status() );
 		$this->assertCount( $limit + 1, $this->http_requests );
 		$this->assertSame( self::ENV, Connect::get( 'environment_id' ), 'Stored environment must not change on a failed re-pair.' );
@@ -380,17 +537,38 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		$ip_limit     = $limits['ip']['limit'];
 
 		for ( $i = 0; $i < $rebind_limit + 10; $i++ ) {
-			$this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => 'other-env-' . $i ) );
+			$this->rest(
+				'POST',
+				self::ROUTE,
+				array(
+					'token'          => self::TOKEN,
+					'environment_id' => 'other-env-' . $i,
+				)
+			);
 		}
 		$this->assertCount( $rebind_limit, $this->http_requests );
 
 		for ( $i = 0; $i < $ip_limit - $rebind_limit; $i++ ) {
-			$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN . $i, 'environment_id' => self::ENV ) );
+			$response = $this->rest(
+				'POST',
+				self::ROUTE,
+				array(
+					'token'          => self::TOKEN . $i,
+					'environment_id' => self::ENV,
+				)
+			);
 			$this->assertSame( 403, $response->get_status(), 'Refused re-pair attempts must not have consumed the per-IP bucket.' );
 		}
 		$this->assertCount( $ip_limit, $this->http_requests );
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 		$this->assertSame( 429, $response->get_status() );
 	}
 
@@ -405,15 +583,32 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		add_filter(
 			'central_connect_auth_rate_limits',
 			function ( $limits ) {
-				$limits['site'] = array( 'limit' => 1, 'window' => 600 );
+				$limits['site'] = array(
+					'limit'  => 1,
+					'window' => 600,
+				);
 				return $limits;
 			}
 		);
 
-		$this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 
 		$_SERVER['REMOTE_ADDR'] = '203.0.113.200';
-		$response               = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$response               = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 
 		$this->assertSame( 429, $response->get_status() );
 		$this->assertFalse( get_transient( RateLimiter::TRANSIENT_PREFIX . md5( 'remote_validate:ip:203.0.113.200' ) ) );
@@ -430,7 +625,14 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 
 		$attempts = Token::rateLimits()['ip']['limit'] + 3;
 		for ( $i = 0; $i < $attempts; $i++ ) {
-			$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+			$response = $this->rest(
+				'POST',
+				self::ROUTE,
+				array(
+					'token'          => self::TOKEN,
+					'environment_id' => self::ENV,
+				)
+			);
 			$this->assertSame( 200, $response->get_status() );
 		}
 		$this->assertCount( $attempts, $this->http_requests );
@@ -447,16 +649,36 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		add_filter(
 			'central_connect_auth_rate_limits',
 			function ( $limits ) {
-				$limits['total'] = array( 'limit' => 3, 'window' => 600 );
+				$limits['total'] = array(
+					'limit'  => 3,
+					'window' => 600,
+				);
 				return $limits;
 			}
 		);
 
 		for ( $i = 0; $i < 3; $i++ ) {
-			$this->assertSame( 200, $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) )->get_status() );
+			$this->assertSame(
+				200,
+				$this->rest(
+					'POST',
+					self::ROUTE,
+					array(
+						'token'          => self::TOKEN,
+						'environment_id' => self::ENV,
+					)
+				)->get_status()
+			);
 		}
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 		$this->assertSame( 429, $response->get_status() );
 		$this->assertCount( 3, $this->http_requests );
 	}
@@ -483,7 +705,14 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 		$this->connect_site( 'k', self::ENV );
 		$this->central_accepts();
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => 'new-env-1' ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => 'new-env-1',
+			)
+		);
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( 'new-env-1', Connect::get( 'environment_id' ) );
@@ -504,13 +733,27 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 			}
 		);
 
-		$response = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$response = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 		$this->assertSame( 403, $response->get_status() );
 		$this->assertSame( 'central_connect_caller_not_allowed', $response->as_error()->get_error_code() );
 		$this->assertCount( 0, $this->http_requests );
 
 		$_SERVER['REMOTE_ADDR'] = '198.51.100.5';
-		$response               = $this->rest( 'POST', self::ROUTE, array( 'token' => self::TOKEN, 'environment_id' => self::ENV ) );
+		$response               = $this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertCount( 1, $this->http_requests );
 	}

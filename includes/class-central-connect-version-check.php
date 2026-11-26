@@ -65,9 +65,9 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		 * @return void
 		 */
 		public static function init( $plugin, $wp_version, $php_version, $callback = null, ...$callback_args ) {
-			self::$plugin = $plugin;
+			self::$plugin      = $plugin;
 			self::$php_version = $php_version;
-			self::$wp_version = $wp_version;
+			self::$wp_version  = $wp_version;
 			if ( self::is_bad() ) {
 				// Display warnings for WP-CLI.
 				if ( defined( 'WP_CLI' ) ) {

@@ -70,7 +70,7 @@ class Server {
 		// Auto discovery.
 		add_action(
 			'send_headers',
-			function() {
+			function () {
 				$requestMethod = ! empty( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : null;
 				if ( ! did_action( 'rest_api_init' ) && 'HEAD' === $requestMethod ) {
 					header( 'Access-Control-Allow-Origin: *' );
