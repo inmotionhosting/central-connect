@@ -2,9 +2,9 @@
 Contributors: inmotionhosting, imh_brad, joemoto, rramo012, timph, jamesros161
 Tags: inmotion, connect, manage
 Requires at least: 5.0
-Tested up to: 7.0
-Requires PHP: 5.4
-Stable tag: 2.0.6
+Tested up to: 7.2
+Requires PHP: 7.4
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,7 +19,8 @@ Using our single sign in feature, you can log into central and access any of you
 == Installation ==
 
 = Minimum Requirements =
-* PHP 5.4 or higher
+* PHP 7.4 or higher
+* WordPress 5.0 or higher
 
 = Manually =
 1. Upload the entire central-connect folder to the /wp-content/plugins/ directory.
@@ -27,22 +28,30 @@ Using our single sign in feature, you can log into central and access any of you
 
 == Changelog ==
 
-= 2.0.7 =
+= 2.1.0 =
 
-Release Date: TBD
+Release Date: November 26th, 2026
 
 * Security: The Central environment-token validation used by `/bgc/v1/auth/` and `wp-login.php` no longer contacts Central for sites that have no API key, for malformed tokens or environment ids, or once a per-client / per-site rate limit is reached. The stored environment id is preferred over the caller-supplied value.
 * Security: Removed the 3 second delay on failed token validation; failures are rate limited instead.
 * Security: `/bgc/v1/auth/` only issues access tokens for administrator accounts and no longer falls back to the default administrator when an unknown `user_id` is supplied.
 * Security: `/bgc/v1/plugins/` only accepts `files` entries that are installed plugin basenames.
 * Security: Access tokens presented through the `X-BGC-Auth` header or the `wp-login.php` `has_access_token` flow are only accepted for users who can manage options.
+* Update: Requires PHP 7.4 or higher. The plugin header, readme and the activation check now agree (previously PHP 5.4 in the readme and 5.6 at runtime).
+* Update: Tested up to WordPress 7.2.
+* Bug Fix: PHP 8.6 compatibility: the filesystem helper constructor no longer returns a value, and API key checks pass explicit `trim()` characters.
+* Bug Fix: The minimum requirements notice displayed raw `<code>` markup.
+* Update: Addressed WordPress Plugin Check findings: direct file access guards, removed the `Domain Path` header for a folder that does not exist, and prefixed hook names.
+* Update: The `bgc_remote_validate` action is deprecated in favor of `central_connect_remote_validate`; existing listeners still run and receive a deprecation notice. Likewise, the version check's fallback `central-connect:init` action is deprecated in favor of `central_connect_init`.
 * Update: Added a PHPUnit (WordPress test library) suite.
+* Update: Added PHPCS (WordPress Coding Standards and PHPCompatibility), Semgrep and Conftest checks, GitHub Actions CI for PHP 7.4 through 8.6, and a WordPress.org deploy script.
+* Update: Backfilled the missing 2.0.2 changelog entry. Version 2.0.7 was never released; its changes ship in 2.1.0.
 
 = 2.0.6 =
 
 Release Date: June 17th, 2026
 
-* Bug Fix: Fixed sanitization of nonce to use `sanitize_key()` instead of s`antize_text_field()`.
+* Bug Fix: Fixed sanitization of nonce to use `sanitize_key()` instead of `sanitize_text_field()`.
 * Bug Fix: Set an allowlist for options that can be changed
 * Bug Fix: Fixed the inverted nonce check.
 * Bug Fix: Added explicit `permission_callback` for auth route.
@@ -66,6 +75,13 @@ Release Date: April 4th, 2023
 
 * Bug Fix: Resolve correct class names for repo changes. 
 
+= 2.0.2 =
+
+Release Date: January 9th, 2023
+
+* Update: Updated plugin for wp.org submission.
+* Update: First WordPress.org release as Central Connect (formerly BoldGrid Connect).
+
 = 2.0.1 =
 
 Release Date: June 28th, 2022
@@ -74,7 +90,7 @@ Release Date: June 28th, 2022
 
 = 2.0.0 =
 
-Release Date: TBD
+Release Date: Not published on WordPress.org
 
 * Feature:  Single signin through Central.
 * Feature:  New rest endpoints.

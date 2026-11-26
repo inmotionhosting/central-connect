@@ -73,9 +73,9 @@ class Views {
 	 */
 	public function countView() {
 		$this->viewCounted = true;
-		$date = $this->getDateFormat();
-		$value = Option::get( $date );
-		$value++;
+		$date              = $this->getDateFormat();
+		$value             = Option::get( $date );
+		++$value;
 		Option::update( $date, $value );
 	}
 

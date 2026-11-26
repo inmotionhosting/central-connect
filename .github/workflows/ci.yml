@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  php-lint:
+    name: PHP ${{ matrix.php }} lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # PHP 8.6 is the newest release line; keep it informational until setup-php images settle.
+    continue-on-error: ${{ matrix.php == '8.6' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6']
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: none
+
+      - name: PHP syntax lint (fails on compile-time deprecations)
+        run: bash bin/php-lint.sh php
+
+  phpcompat:
+    name: PHPCompatibility (7.4+)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: composer:v2
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: PHPCompatibilityWP
+        run: vendor/bin/phpcs --standard=phpcompat.xml.dist
+
+  phpunit:
+    name: PHPUnit (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: ${{ matrix.php == '8.6' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.1', '8.3', '8.5', '8.6']
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: wordpress_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Subversion (WordPress test library bootstrap)
+        run: sudo apt-get update -q && sudo apt-get install -y -q subversion
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, xml, mysqli, curl, zip, intl
+          coverage: none
+          tools: composer:v2
+
+      - name: Resolve latest WordPress version
+        id: wp
+        run: |
+          latest="$(php -r 'echo json_decode(file_get_contents("https://api.wordpress.org/core/version-check/1.7/"), true)["offers"][0]["version"] ?? "";')"
+          if [ -z "$latest" ]; then
+            echo 'Could not resolve latest WordPress version' >&2
+            exit 1
+          fi
+          echo "version=${latest}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            /tmp/wordpress
+            /tmp/wordpress-tests-lib
+          key: ${{ runner.os }}-wp-tests-lib-${{ steps.wp.outputs.version }}
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Install WordPress test library
+        run: bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 latest true
+
+      - name: PHPUnit
+        env:
+          WP_TESTS_DIR: /tmp/wordpress-tests-lib
+        run: vendor/bin/phpunit --no-coverage

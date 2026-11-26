@@ -38,7 +38,7 @@ abstract class Central_Connect_Test_Case extends WP_UnitTestCase {
 
 		add_filter( 'pre_http_request', array( $this, 'capture_http_request' ), 10, 3 );
 
-		$_SERVER['REMOTE_ADDR'] = '203.0.113.10';
+		$_SERVER['REMOTE_ADDR']    = '203.0.113.10';
 		$GLOBALS['wp_rest_server'] = null;
 	}
 

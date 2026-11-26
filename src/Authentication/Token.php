@@ -26,7 +26,7 @@ class Token {
 	/**
 	 * Upper bound on an environment token presented for remote validation.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @var int
 	 */
@@ -35,7 +35,7 @@ class Token {
 	/**
 	 * Upper bound on an environment id presented for remote validation.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @var int
 	 */
@@ -59,12 +59,12 @@ class Token {
 		$rawToken = wp_generate_password( 128 );
 
 		$newAccessToken = array(
-			'site_url' => get_site_url(),
-			'login_url' => wp_login_url(),
-			'wp_user_id' => $user->ID,
+			'site_url'          => get_site_url(),
+			'login_url'         => wp_login_url(),
+			'wp_user_id'        => $user->ID,
 			'access_token_hash' => wp_hash_password( $rawToken ),
-			'expires_at' => strtotime( $expires ),
-			'issued_at' => time(),
+			'expires_at'        => strtotime( $expires ),
+			'issued_at'         => time(),
 		);
 
 		$accessTokens[] = $newAccessToken;
@@ -72,7 +72,7 @@ class Token {
 		update_user_option( $user->ID, 'bgc_access_tokens', $accessTokens );
 
 		unset( $newAccessToken['access_token_hash'] );
-		$newAccessToken['access_token'] = base64_encode( $user->ID . ':' . $rawToken );
+		$newAccessToken['access_token'] = base64_encode( $user->ID . ':' . $rawToken ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- access token wire format is base64(user_id:token).
 
 		return $newAccessToken;
 	}
@@ -86,10 +86,10 @@ class Token {
 	 */
 	public function isBGToken( $providedToken ) {
 		$providedToken = preg_replace( '/Bearer\s+/', '', $providedToken );
-		$tokenValue = base64_decode( $providedToken );
-		$tokenValue = $tokenValue ? $tokenValue : '';
-		$split = explode( ':', $tokenValue );
-		$userId = ! empty( $split[0] ) ? $split[0] : null;
+		$tokenValue    = base64_decode( $providedToken ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- access token wire format is base64(user_id:token).
+		$tokenValue    = $tokenValue ? $tokenValue : '';
+		$split         = explode( ':', $tokenValue );
+		$userId        = ! empty( $split[0] ) ? $split[0] : null;
 		$providedToken = ! empty( $split[1] ) ? $split[1] : null;
 		return is_numeric( $userId ) && $userId && $providedToken;
 	}
@@ -109,6 +109,30 @@ class Token {
 	 */
 	public function remoteValidate( $token, $environmentId ) {
 		return true === $this->validateEnvironmentToken( $token, $environmentId );
+	}
+
+	/**
+	 * Fire the actions that run right before a token is sent to Central.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return void
+	 */
+	public static function doRemoteValidateAction() {
+		/**
+		 * Fires right before the site asks Central to validate a token.
+		 *
+		 * @since 2.1.0
+		 */
+		do_action( 'central_connect_remote_validate' );
+
+		/**
+		 * Fires right before the site asks Central to validate a token.
+		 *
+		 * @since 2.0.0
+		 * @deprecated 2.1.0 Use central_connect_remote_validate.
+		 */
+		do_action_deprecated( 'bgc_remote_validate', array(), '2.1.0', 'central_connect_remote_validate' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- legacy public hook kept for backward compatibility.
 	}
 
 	/**
@@ -132,7 +156,7 @@ class Token {
 	 * Failures return immediately; the previous 3 second sleep let any
 	 * visitor pin a PHP worker for free and has been replaced by the limiter.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param string $token         Token to validate.
 	 * @param string $environmentId Central Environment ID named by the caller.
@@ -142,7 +166,7 @@ class Token {
 	 */
 	public function validateEnvironmentToken( $token, $environmentId ) {
 		$siteKey = get_option( 'boldgrid_api_key' );
-		if ( ! is_string( $siteKey ) || '' === trim( $siteKey ) ) {
+		if ( ! is_string( $siteKey ) || '' === trim( $siteKey, " \n\r\t\v\0" ) ) {
 			return new \WP_Error(
 				'central_connect_not_connected',
 				'This site is not connected to Central.',
@@ -182,15 +206,15 @@ class Token {
 
 		$environmentToSend = $rebind || '' === $storedEnvironmentId ? (string) $environmentId : $storedEnvironmentId;
 
-		do_action( 'bgc_remote_validate' );
+		self::doRemoteValidateAction();
 
 		$configs = \Central_Connect_Service::get( 'configs' );
 		$url     = $configs['asset_server'] . $configs['ajax_calls']['verify_env_token'];
 		$args    = array(
 			'body'    => array(
-				'token' => $token,
+				'token'          => $token,
 				'environment_id' => $environmentToSend,
-				'key' => $siteKey,
+				'key'            => $siteKey,
 			),
 			'timeout' => 15,
 		);
@@ -223,7 +247,7 @@ class Token {
 	 * buckets, and once a site-wide bucket is full no per-IP transient is
 	 * written. Site-wide buckets are checked ahead of per-IP ones.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param bool $rebind Whether the caller named an environment id different
 	 *                     from the one the site already stores.
@@ -274,7 +298,7 @@ class Token {
 	 * count against the tight `ip` / `site` buckets. They still count against
 	 * the larger `total` bucket, which bounds all outbound calls.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @return void
 	 */
@@ -289,7 +313,7 @@ class Token {
 	/**
 	 * Build the 429 error returned when a remote-validation bucket is full.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param RateLimiter $limiter Limiter instance.
 	 * @param string      $scope   Exhausted bucket.
@@ -302,7 +326,7 @@ class Token {
 			'central_connect_too_many_attempts',
 			'Too many authentication attempts. Please try again later.',
 			array(
-				'status' => 429,
+				'status'      => 429,
 				'retry_after' => $limiter->retryAfter( $scope, $window ),
 			)
 		);
@@ -315,23 +339,38 @@ class Token {
 	 * refunded); `total` counts every outbound call; the `rebind_*` buckets
 	 * count calls naming an environment other than the stored one.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @return array Buckets keyed by name, each with `limit` and `window` (seconds).
 	 */
 	public static function rateLimits() {
 		$defaults = array(
-			'ip'          => array( 'limit' => 5, 'window' => 600 ),
-			'site'        => array( 'limit' => 20, 'window' => 600 ),
-			'total'       => array( 'limit' => 120, 'window' => 600 ),
-			'rebind_ip'   => array( 'limit' => 2, 'window' => 3600 ),
-			'rebind_site' => array( 'limit' => 5, 'window' => 3600 ),
+			'ip'          => array(
+				'limit'  => 5,
+				'window' => 600,
+			),
+			'site'        => array(
+				'limit'  => 20,
+				'window' => 600,
+			),
+			'total'       => array(
+				'limit'  => 120,
+				'window' => 600,
+			),
+			'rebind_ip'   => array(
+				'limit'  => 2,
+				'window' => 3600,
+			),
+			'rebind_site' => array(
+				'limit'  => 5,
+				'window' => 3600,
+			),
 		);
 
 		/**
 		 * Filters the rate limits applied to outbound Central validation calls.
 		 *
-		 * @since 2.0.7
+		 * @since 2.1.0
 		 *
 		 * @param array $limits Buckets keyed by `ip`, `site`, `total`, `rebind_ip`, `rebind_site`,
 		 *                      each an array with integer `limit` and `window` (seconds).
@@ -368,7 +407,7 @@ class Token {
 	 * alone will break dashboard connections and SSO; only use it when the
 	 * callers are known (server-to-server traffic, a proxy, or office IPs).
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @return true|\WP_Error
 	 */
@@ -376,7 +415,7 @@ class Token {
 		/**
 		 * Filters the list of client IPs allowed to trigger remote token validation.
 		 *
-		 * @since 2.0.7
+		 * @since 2.1.0
 		 *
 		 * @param string[] $allowed Exact IP addresses. Empty means no restriction.
 		 */
@@ -406,7 +445,7 @@ class Token {
 	 * intentionally loose about format but strict about what cannot be a
 	 * token, so arbitrary visitor payloads are not forwarded to Central.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param mixed $token Raw request value.
 	 *
@@ -423,7 +462,7 @@ class Token {
 	/**
 	 * Whether a presented environment id is plausibly a Central environment id.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param mixed $environmentId Raw request value.
 	 *
@@ -469,7 +508,7 @@ class Token {
 	 * network: the X-BGC-Auth REST header and the wp-login.php
 	 * has_access_token flow.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param string $providedToken Access token (base64 "user:token"), without a Bearer prefix.
 	 *
@@ -485,7 +524,7 @@ class Token {
 				'central_connect_too_many_attempts',
 				'Too many failed authentication attempts. Please try again later.',
 				array(
-					'status' => 429,
+					'status'      => 429,
 					'retry_after' => $limiter->retryAfter( $scope, $limits['window'] ),
 				)
 			);
@@ -524,7 +563,7 @@ class Token {
 	/**
 	 * Rate limit applied to failed access-token attempts per client.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @return array {
 	 *     @type int $limit  Failed attempts allowed per window.
@@ -540,7 +579,7 @@ class Token {
 		/**
 		 * Filters the failed access-token attempt limit per client IP.
 		 *
-		 * @since 2.0.7
+		 * @since 2.1.0
 		 *
 		 * @param array $limits Array with integer `limit` and `window` (seconds).
 		 */
@@ -565,10 +604,10 @@ class Token {
 	 * @return WP_User
 	 */
 	public function getValidUser( $providedToken ) {
-		$tokenValue = base64_decode( $providedToken );
-		$tokenValue = $tokenValue ? $tokenValue : '';
-		$split = explode( ':', $tokenValue );
-		$userId = ! empty( $split[0] ) ? $split[0] : null;
+		$tokenValue    = base64_decode( $providedToken ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- access token wire format is base64(user_id:token).
+		$tokenValue    = $tokenValue ? $tokenValue : '';
+		$split         = explode( ':', $tokenValue );
+		$userId        = ! empty( $split[0] ) ? $split[0] : null;
 		$providedToken = ! empty( $split[1] ) ? $split[1] : null;
 
 		$user = false;

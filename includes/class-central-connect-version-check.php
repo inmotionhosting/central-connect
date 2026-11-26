@@ -12,6 +12,10 @@
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 
 	/**
@@ -60,13 +64,14 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		 * @param  string   $wp_version  Minimum WordPress version required.
 		 * @param  string   $php_version Minimum PHP version required.
 		 * @param  callable $callback    Callback method to call if version check passes.
+		 * @param  mixed    ...$callback_args Arguments passed to the callback.
 		 *
 		 * @return void
 		 */
-		public static function init( $plugin, $wp_version, $php_version, $callback = null ) {
-			self::$plugin = $plugin;
+		public static function init( $plugin, $wp_version, $php_version, $callback = null, ...$callback_args ) {
+			self::$plugin      = $plugin;
 			self::$php_version = $php_version;
-			self::$wp_version = $wp_version;
+			self::$wp_version  = $wp_version;
 			if ( self::is_bad() ) {
 				// Display warnings for WP-CLI.
 				if ( defined( 'WP_CLI' ) ) {
@@ -78,40 +83,46 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 					// Ensures plugin deactivation happens after the notice is displayed.
 					add_action( 'admin_init', array( __CLASS__, 'deactivate' ) );
 				}
+			} elseif ( is_callable( $callback ) ) {
+				// Call the callback with any args required.
+				call_user_func_array( $callback, $callback_args );
 			} else {
-				// Checks for cb and args passed.
-				if ( is_callable( $callback ) ) {
-					$arguments = array();
-					$args = func_num_args();
-					for ( $i = 4; $i < $args; $i++ ) {
-						$arg = func_get_arg( $i );
-						$arguments[] = $arg;
-					}
-					// Call the callback with any args required.
-					call_user_func_array( $callback, $arguments );
-				} else {
-					// Add success hook to init for plugins to initialize on.
-					add_action( 'init', array( __CLASS__, 'success_hook' ) );
-				}
+				// Add success hook to init for plugins to initialize on.
+				add_action( 'init', array( __CLASS__, 'success_hook' ) );
 			}
 		}
 
 		/**
-		 * Adds dynamic action for plugin name:init.
+		 * Fires the central_connect_init action.
 		 *
-		 * This is where plugins can hook to run their initialization code
-		 * once passing the PHP and WordPress version checks.
+		 * Only used when init() is called without a callback; the plugin
+		 * itself always passes central_connect_plugin_load.
 		 *
 		 * @since  1.0.0
+		 * @since  2.1.0 Fires `central_connect_init`; the dynamic `{$slug}:init` is deprecated.
 		 *
 		 * @access public
 		 *
 		 * @return void
 		 */
 		public static function success_hook() {
+			/**
+			 * Fires on init once the PHP and WordPress version checks pass.
+			 *
+			 * @since 2.1.0
+			 */
+			do_action( 'central_connect_init' );
+
+			/**
+			 * Fires on init once the PHP and WordPress version checks pass.
+			 *
+			 * The name is the plugin folder followed by ":init", e.g. "central-connect:init".
+			 *
+			 * @since 1.0.0
+			 * @deprecated 2.1.0 Use central_connect_init.
+			 */
 			$file = explode( '/', self::$plugin );
-			$name = sanitize_key( $file[0] );
-			do_action( "{$name}:init" );
+			do_action_deprecated( sanitize_key( $file[0] ) . ':init', array(), '2.1.0', 'central_connect_init' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound, WordPress.NamingConventions.ValidHookName.UseUnderscores -- legacy hook kept for backward compatibility.
 		}
 
 		/**
@@ -124,9 +135,9 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		 * @return void
 		 */
 		public static function admin_notice() {
-			printf( '<div class="error"><p>%s</p></div>', esc_html( self::get_message() ) );
+			printf( '<div class="error"><p>%s</p></div>', wp_kses( self::get_message(), array( 'code' => array() ) ) );
 			// Disables the activate message.
-			if ( isset( $_GET['activate'] ) ) {
+			if ( isset( $_GET['activate'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- only hides the core "activated" notice.
 				unset( $_GET['activate'] );
 			}
 		}
@@ -141,7 +152,7 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		 * @return void
 		 */
 		public static function deactivate() {
-			error_log( self::get_message() );
+			error_log( self::get_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- records why the plugin deactivated itself.
 			deactivate_plugins( self::$plugin );
 		}
 

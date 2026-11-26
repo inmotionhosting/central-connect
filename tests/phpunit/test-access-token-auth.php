@@ -30,8 +30,8 @@ class Test_Access_Token_Auth extends Central_Connect_Test_Case {
 	 * A valid access token authenticates its user.
 	 */
 	public function test_valid_access_token_authenticates_user() {
-		$admin = self::factory()->user->create( array( 'role' => 'administrator' ) );
-		$token = new Token();
+		$admin  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$token  = new Token();
 		$issued = $token->create( get_user_by( 'id', $admin ) );
 
 		$result = $this->authenticate_with( 'Bearer ' . $issued['access_token'] );

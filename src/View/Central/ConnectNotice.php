@@ -31,8 +31,8 @@ class ConnectNotice {
 	public function initialize() {
 		$page = null;
 
-		if ( isset( $_REQUEST['page'] ) ) {
-			$page = sanitize_text_field( wp_unslash( $_REQUEST['page'] ) );
+		if ( isset( $_REQUEST['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only screen routing.
+			$page = sanitize_text_field( wp_unslash( $_REQUEST['page'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
 
 		if ( 'central-connect' === $page ) {
@@ -90,7 +90,7 @@ class ConnectNotice {
 	 * @return boolean
 	 */
 	public static function isConnected() {
-		return ! ! Option\Connect::get( 'environment_id' );
+		return (bool) Option\Connect::get( 'environment_id' );
 	}
 
 	/**
@@ -101,13 +101,13 @@ class ConnectNotice {
 	public function enqueue_scripts() {
 		wp_enqueue_style( 'central-connect-styles', plugins_url( './assets/style/admin.css', CENTRAL_CONNECT_FILE ), array(), CENTRAL_CONNECT_VERSION );
 
-		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
+		$configs  = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 		$provider = get_option( 'boldgrid_connect_provider', '' );
 
 		global $_wp_admin_css_colors;
 
 		$user_admin_color = get_user_meta( get_current_user_id(), 'admin_color', true );
-		$color = $_wp_admin_css_colors[ $user_admin_color ]->colors[2];
+		$color            = $_wp_admin_css_colors[ $user_admin_color ]->colors[2];
 
 		if ( ! empty( $provider ) && ! empty( $configs['branding'][ $provider ]['primaryColor'] ) ) {
 			$color = $configs['branding'][ $provider ]['primaryColor'];
@@ -134,14 +134,14 @@ class ConnectNotice {
 			'activate_plugins',
 			'central-connect',
 			function () {
-				$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
+				$configs    = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 				$centralUrl = $configs['central_url'] . '/projects?environment_id=' . Option\Connect::get( 'environment_id' );
 
 				?>
 				<div class="central-container"> 
 				<?php
 				if ( self::isConnected() ) {
-					
+
 					?>
 						<div class="central-connect-active">
 							<h2 class="central-connect-active__heading"><?php print esc_html__( 'Site Connected', 'central-connect' ); ?></h2>
@@ -172,8 +172,13 @@ class ConnectNotice {
 	 */
 	public function handleConnectRedirect() {
 		$isRedirect = false;
-		$page = false;
+		$page       = false;
 
+		/**
+		 * Read-only screen routing; the redirect below only mints a token for
+		 * the current user and sends them to Central.
+		 */
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['token_redirect'] ) ) {
 			$isRedirect = sanitize_text_field( wp_unslash( $_GET['token_redirect'] ) );
 		}
@@ -181,13 +186,14 @@ class ConnectNotice {
 		if ( isset( $_GET['page'] ) ) {
 			$page = sanitize_text_field( wp_unslash( $_GET['page'] ) );
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		if ( 'central-connect' === $page && $isRedirect ) {
 			$authentication = new \Central\Connect\Authentication\Token();
-			$token = $authentication->create( wp_get_current_user(), '+5 minutes' );
+			$token          = $authentication->create( wp_get_current_user(), '+5 minutes' );
 
 			$url = self::getConnectUrl( $token['access_token'] );
-			wp_redirect( $url );
+			wp_redirect( $url ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- intentional redirect to the Central portal.
 			exit;
 		}
 	}
@@ -200,7 +206,7 @@ class ConnectNotice {
 	 * @echo string
 	 */
 	public static function termsOfService() {
-		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
+		$configs  = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 		$provider = get_option( 'boldgrid_connect_provider', 'BoldGrid' );
 
 		printf(
@@ -208,7 +214,7 @@ class ConnectNotice {
 				/* Translators: placeholders are links. */
 				__( 'By clicking the <strong>Connect to %3$s</strong> button, you agree to our <a href="%1$s" target="_blank">Terms of Service</a> and our <a href="%2$s" target="_blank">privacy policy</a>.', 'central-connect' ),
 				array(
-					'a' => array(
+					'a'      => array(
 						'href'   => array(),
 						'target' => array(),
 						'rel'    => array(),
@@ -232,13 +238,13 @@ class ConnectNotice {
 	 * @return string
 	 */
 	public static function getConnectUrl( $token ) {
-		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
+		$configs  = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
 		$provider = get_option( 'boldgrid_connect_provider', 'BoldGrid' );
 
 		$query = http_build_query(
 			array(
-				'url' => get_site_url(),
-				'token' => $token,
+				'url'        => get_site_url(),
+				'token'      => $token,
 				'site_title' => get_bloginfo( 'name' ),
 			)
 		);
@@ -254,9 +260,9 @@ class ConnectNotice {
 	 * @return string $url The URL for the brand's logo.
 	 */
 	public static function getBrandLogo() {
-		$configs = \Central_Connect_Service::get( 'configs' );
+		$configs  = \Central_Connect_Service::get( 'configs' );
 		$provider = get_option( 'boldgrid_connect_provider', 'BoldGrid' );
-		$url = $configs['branding'][ $provider ]['logo'];
+		$url      = $configs['branding'][ $provider ]['logo'];
 
 		// Allows brands to provide external URL via config or load from local file.
 		if ( substr( $configs['branding'][ $provider ]['logo'], 0, 4 ) !== 'http' ) {
@@ -274,8 +280,8 @@ class ConnectNotice {
 	 * @return void
 	 */
 	public static function getNoticeBody() {
-		$configs = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
-		$provider = get_option( 'boldgrid_connect_provider', '' );
+		$configs     = get_option( 'bg_connect_configs', \Central_Connect_Service::get( 'configs' ) );
+		$provider    = get_option( 'boldgrid_connect_provider', '' );
 		$productName = '';
 
 		if ( ! empty( $provider ) ) {
@@ -305,8 +311,7 @@ class ConnectNotice {
 			<?php
 		else :
 			if ( isset( $_SERVER['REQUEST_URI'] ) ) {
-				$redirect = urlencode( remove_query_arg( 'provider', esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) );
-				$redirect = urlencode( esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
+				$redirect = rawurlencode( esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
 			}
 
 			?>
@@ -339,16 +344,18 @@ class ConnectNotice {
 	 * @return void
 	 */
 	public function admin_post() {
-		// Validate nonce. A missing nonce must be rejected as well; previously
-		// the check only fired when a nonce was present but invalid, so a
-		// request with no nonce bypassed CSRF protection entirely.
+		/**
+		 * Validate nonce. A missing nonce must be rejected as well; previously
+		 * the check only fired when a nonce was present but invalid, so a
+		 * request with no nonce bypassed CSRF protection entirely.
+		 */
 		if ( empty( $_POST['boldgrid_connect_provider_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['boldgrid_connect_provider_nonce'] ) ), 'boldgrid_connect_provider' ) ) {
-			wp_die( __( 'Invalid nonce.', 'central-connect' ) );
+			wp_die( esc_html__( 'Invalid nonce.', 'central-connect' ) );
 		}
 
 		// Only administrators may change the connect provider.
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( __( 'Unauthorized.', 'central-connect' ) );
+			wp_die( esc_html__( 'Unauthorized.', 'central-connect' ) );
 		}
 
 		// Check and set option for provider on submission.
@@ -360,7 +367,7 @@ class ConnectNotice {
 		}
 
 		if ( ! isset( $_POST['_wp_http_referer'] ) ) {
-			wp_die( __( 'Missing target.', 'central-connect' ) );
+			wp_die( esc_html__( 'Missing target.', 'central-connect' ) );
 		}
 
 		$url = add_query_arg( 'provider', $provider, urldecode( sanitize_text_field( wp_unslash( $_POST['_wp_http_referer'] ) ) ) );

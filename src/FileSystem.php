@@ -37,8 +37,6 @@ class FileSystem {
 	 */
 	public function __construct() {
 		$this->wpFilesystem = $this->init();
-
-		return $this;
 	}
 
 	/**
@@ -46,7 +44,7 @@ class FileSystem {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @return wp_filesystem Wordpress global.
+	 * @return wp_filesystem WordPress global.
 	 */
 	public function get_wp_filesystem() {
 		return $this->wpFilesystem;

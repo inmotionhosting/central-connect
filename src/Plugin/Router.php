@@ -65,9 +65,9 @@ class Router {
 			'bgc/v1',
 			'/plugins/',
 			array(
-				'methods' => 'PUT',
-				'callback' => function ( $request ) {
-					$files = $request->get_param( 'files' ) ?: array(); //phpcs:ignore WordPress.PHP.DisallowShortTernary.Found
+				'methods'             => 'PUT',
+				'callback'            => function ( $request ) {
+					$files = $request->get_param( 'files' ) ?: array(); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found -- falsy params default to empty.
 					$active = $request->get_param( 'active' );
 
 					include_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -84,19 +84,19 @@ class Router {
 					return $response;
 				},
 				'permission_callback' => array( $this, 'pluginPermissionCheck' ),
-				'args' => array(
-					'files' => array(
-						'required' => true,
-						'description' => 'List of plugin file paths e.g. plugin-name/plugin.php',
-						'type' => 'array',
-						'items' => array(
+				'args'                => array(
+					'files'  => array(
+						'required'          => true,
+						'description'       => 'List of plugin file paths e.g. plugin-name/plugin.php',
+						'type'              => 'array',
+						'items'             => array(
 							'type' => 'string',
 						),
 						'validate_callback' => array( $this, 'validateFilesExists' ),
 					),
 					'active' => array(
-						'required' => true,
-						'type' => 'boolean',
+						'required'    => true,
+						'type'        => 'boolean',
 						'description' => 'Is Active state. true to activate plugin false to deactivate.',
 					),
 				),
@@ -117,8 +117,8 @@ class Router {
 			'bgc/v1',
 			'/plugins/',
 			array(
-				'methods' => 'DELETE',
-				'callback' => function ( $request ) {
+				'methods'             => 'DELETE',
+				'callback'            => function ( $request ) {
 					$files = $request->get_param( 'files' );
 
 					$this->pluginInstaller->delete( $files );
@@ -130,13 +130,13 @@ class Router {
 					return $response;
 				},
 				'permission_callback' => array( $this, 'pluginPermissionCheck' ),
-				'args' => array(
+				'args'                => array(
 					'files' => array(
-						'required' => true,
-						'description' => 'List of plugin file paths e.g. plugin-name/plugin.php',
-						'type' => 'array',
+						'required'          => true,
+						'description'       => 'List of plugin file paths e.g. plugin-name/plugin.php',
+						'type'              => 'array',
 						'validate_callback' => array( $this, 'validateFilesExists' ),
-						'items' => array(
+						'items'             => array(
 							'type' => 'string',
 						),
 					),
@@ -157,8 +157,8 @@ class Router {
 			'bgc/v1',
 			'/plugins/',
 			array(
-				'methods' => 'GET',
-				'callback' => function () {
+				'methods'             => 'GET',
+				'callback'            => function () {
 					$response = $this->pluginInstaller->getCollection();
 
 					$response = new \WP_REST_Response( $response );
@@ -182,8 +182,8 @@ class Router {
 			'bgc/v1',
 			'/plugins/',
 			array(
-				'methods' => 'POST',
-				'callback' => function ( $request ) {
+				'methods'             => 'POST',
+				'callback'            => function ( $request ) {
 					$plugins = $request->get_param( 'plugins' );
 					$activate = $request->get_param( 'activate' );
 
@@ -203,16 +203,16 @@ class Router {
 					return $response;
 				},
 				'permission_callback' => array( $this, 'pluginPermissionCheck' ),
-				'args' => array(
+				'args'                => array(
 					'activate' => array(
-						'type' => 'boolean',
+						'type'        => 'boolean',
 						'description' => '1 to activate plugin 0 to deactivate.',
 					),
-					'plugins' => array(
-						'required' => true,
-						'type' => 'array',
-						'description' => 'List of plugin zips and slugs to install.',
-						'items' => array(
+					'plugins'  => array(
+						'required'          => true,
+						'type'              => 'array',
+						'description'       => 'List of plugin zips and slugs to install.',
+						'items'             => array(
 							'type' => 'string',
 						),
 						'sanitize_callback' => function ( $plugins ) {
@@ -221,7 +221,7 @@ class Router {
 								$wpOrgPlugin = 'https://downloads.wordpress.org/plugin/' . $plugin . '.latest-stable.zip';
 								if ( wp_http_validate_url( $plugin ) ) {
 									$cleanPlugins[] = $plugin;
-								} else if ( wp_http_validate_url( $wpOrgPlugin ) ) {
+								} elseif ( wp_http_validate_url( $wpOrgPlugin ) ) {
 									$cleanPlugins[] = $wpOrgPlugin;
 								}
 							}

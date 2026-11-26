@@ -4,7 +4,7 @@
  *
  * Transient-backed fixed-window rate limiter for authentication paths.
  *
- * @since      2.0.7
+ * @since      2.1.0
  * @package    Central\Connect\Authentication
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  * @link       https://boldgrid.com
@@ -22,14 +22,14 @@ namespace Central\Connect\Authentication;
  * Transients are used so the limiter works without a persistent object
  * cache; the counters are best-effort and reset when the window expires.
  *
- * @since 2.0.7
+ * @since 2.1.0
  */
 class RateLimiter {
 
 	/**
 	 * Transient name prefix.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @var string
 	 */
@@ -38,7 +38,7 @@ class RateLimiter {
 	/**
 	 * Consume one attempt from a bucket.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param string $scope  Bucket identifier (e.g. "remote_validate:ip:203.0.113.1").
 	 * @param int    $limit  Maximum attempts allowed per window.
@@ -57,7 +57,7 @@ class RateLimiter {
 			return false;
 		}
 
-		$bucket['count']++;
+		++$bucket['count'];
 		set_transient( $key, $bucket, max( 1, $bucket['reset'] - $now ) );
 
 		return true;
@@ -69,7 +69,7 @@ class RateLimiter {
 	 * Used when an attempt turned out to be legitimate and should not count
 	 * against the bucket. The window end is left unchanged.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param string $scope  Bucket identifier.
 	 * @param int    $window Window length in seconds.
@@ -86,14 +86,14 @@ class RateLimiter {
 			return;
 		}
 
-		$bucket['count']--;
+		--$bucket['count'];
 		set_transient( $key, $bucket, max( 1, $bucket['reset'] - $now ) );
 	}
 
 	/**
 	 * Check whether a bucket is exhausted without consuming an attempt.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param string $scope  Bucket identifier.
 	 * @param int    $limit  Maximum attempts allowed per window.
@@ -110,7 +110,7 @@ class RateLimiter {
 	/**
 	 * Seconds until the bucket resets.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param string $scope  Bucket identifier.
 	 * @param int    $window Window length in seconds.
@@ -131,7 +131,7 @@ class RateLimiter {
 	/**
 	 * Clear a bucket.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param string $scope Bucket identifier.
 	 *
@@ -149,7 +149,7 @@ class RateLimiter {
 	 * filter. Forwarded headers are deliberately not read here because a
 	 * caller could spoof them to escape the per-client limit.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @return string IP address, or "unknown" when none is available.
 	 */
@@ -165,7 +165,7 @@ class RateLimiter {
 		/**
 		 * Filters the client IP used for authentication rate limiting.
 		 *
-		 * @since 2.0.7
+		 * @since 2.1.0
 		 *
 		 * @param string $ip Client IP from REMOTE_ADDR (empty when unavailable).
 		 */
@@ -180,7 +180,7 @@ class RateLimiter {
 	/**
 	 * Build the transient key for a scope.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param string $scope Bucket identifier.
 	 *
@@ -193,7 +193,7 @@ class RateLimiter {
 	/**
 	 * Load the current bucket, starting a fresh window when expired.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param string $key    Transient key.
 	 * @param int    $now    Current timestamp.

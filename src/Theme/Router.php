@@ -63,11 +63,11 @@ class Router {
 			'bgc/v1',
 			'/themes/',
 			array(
-				'methods' => 'PATCH',
-				'callback' => function ( $request ) {
+				'methods'             => 'PATCH',
+				'callback'            => function ( $request ) {
 					$response = array( 'error' => 'Unable to switch theme' );
 					$status = 400;
-					$stylesheet = $request->get_param( 'stylesheet' ) ?: ''; //phpcs:ignore WordPress.PHP.DisallowShortTernary.Found
+					$stylesheet = $request->get_param( 'stylesheet' ) ?: ''; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found -- falsy params default to empty.
 					switch_theme( $stylesheet );
 
 					$currentTheme = wp_get_theme();
@@ -83,11 +83,11 @@ class Router {
 					return $response;
 				},
 				'permission_callback' => array( $this, 'permissionCheck' ),
-				'args' => array(
+				'args'                => array(
 					'stylesheet' => array(
-						'required' => true,
-						'description' => 'Theme stylesheet name',
-						'type' => 'string',
+						'required'          => true,
+						'description'       => 'Theme stylesheet name',
+						'type'              => 'string',
 						'validate_callback' => array( $this, 'validateThemeExists' ),
 						'sanitize_callback' => 'sanitize_title',
 					),
@@ -108,8 +108,8 @@ class Router {
 			'bgc/v1',
 			'/themes/',
 			array(
-				'methods' => 'POST',
-				'callback' => function ( $request ) {
+				'methods'             => 'POST',
+				'callback'            => function ( $request ) {
 					$themes = $request->get_param( 'themes' );
 					$activeStylesheet = $request->get_param( 'active_stylesheet' );
 
@@ -128,17 +128,17 @@ class Router {
 					return $response;
 				},
 				'permission_callback' => array( $this, 'permissionCheck' ),
-				'args' => array(
+				'args'                => array(
 					'active_stylesheet' => array(
-						'type' => 'string',
-						'description' => 'Name of a stylesheet to activate after install.',
+						'type'              => 'string',
+						'description'       => 'Name of a stylesheet to activate after install.',
 						'sanitize_callback' => 'sanitize_title',
 					),
-					'themes' => array(
-						'required' => true,
-						'type' => 'array',
-						'description' => 'List of theeme zips and stylesheets to install.',
-						'items' => array(
+					'themes'            => array(
+						'required'          => true,
+						'type'              => 'array',
+						'description'       => 'List of theeme zips and stylesheets to install.',
+						'items'             => array(
 							'type' => 'string',
 						),
 						'sanitize_callback' => function ( $assets ) {
@@ -147,7 +147,7 @@ class Router {
 								$wpOrgUrl = 'https://downloads.wordpress.org/theme/' . $asset . '.latest-stable.zip';
 								if ( wp_http_validate_url( $asset ) ) {
 									$cleanAssets[] = $asset;
-								} else if ( wp_http_validate_url( $wpOrgUrl ) ) {
+								} elseif ( wp_http_validate_url( $wpOrgUrl ) ) {
 									$cleanAssets[] = $wpOrgUrl;
 								}
 							}
@@ -172,8 +172,8 @@ class Router {
 			'bgc/v1',
 			'/themes/',
 			array(
-				'methods' => 'DELETE',
-				'callback' => function ( $request ) {
+				'methods'             => 'DELETE',
+				'callback'            => function ( $request ) {
 					$stylesheets = $request->get_param( 'stylesheets' );
 
 					$this->themeInstaller->delete( $stylesheets );
@@ -187,11 +187,11 @@ class Router {
 					return $response;
 				},
 				'permission_callback' => array( $this, 'permissionCheck' ),
-				'args' => array(
+				'args'                => array(
 					'stylesheets' => array(
-						'required' => true,
-						'description' => 'A list of theme file stylesheets',
-						'type' => 'array',
+						'required'          => true,
+						'description'       => 'A list of theme file stylesheets',
+						'type'              => 'array',
 						'validate_callback' => function ( $stylesheets ) {
 							$valid = true;
 							foreach ( $stylesheets as $stylesheet ) {
@@ -210,7 +210,7 @@ class Router {
 
 							return $stylesheets;
 						},
-						'items' => array(
+						'items'             => array(
 							'type' => 'string',
 						),
 					),
@@ -231,8 +231,8 @@ class Router {
 			'bgc/v1',
 			'/themes/',
 			array(
-				'methods' => 'GET',
-				'callback' => function () {
+				'methods'             => 'GET',
+				'callback'            => function () {
 					$response = $this->themeInstaller->getCollection();
 
 					$response = new \WP_REST_Response( $response );

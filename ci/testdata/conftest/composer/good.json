@@ -1,0 +1,16 @@
+{
+  "name": "inmotionhosting/central-connect",
+  "require": {
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "^3.11",
+    "wp-coding-standards/wpcs": "^3.1",
+    "phpcompatibility/phpcompatibility-wp": "^2.1"
+  },
+  "config": {
+    "platform": {
+      "php": "7.4"
+    }
+  }
+}

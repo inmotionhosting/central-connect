@@ -47,8 +47,8 @@ abstract class Group {
 	 * @param mixed  $value Value to store.
 	 */
 	public static function update( $key, $value ) {
-		$option = get_option( static::OPTION_NAMESPACE, array() );
-		$option = is_array( $option ) ? $option : array();
+		$option         = get_option( static::OPTION_NAMESPACE, array() );
+		$option         = is_array( $option ) ? $option : array();
 		$option[ $key ] = $value;
 		update_option( static::OPTION_NAMESPACE, $option );
 	}

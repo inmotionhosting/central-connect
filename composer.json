@@ -1,0 +1,38 @@
+{
+	"name": "inmotionhosting/central-connect",
+	"description": "Connects users and sites with InMotion Central.",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"homepage": "https://central.inmotionhosting.com",
+	"require": {
+		"php": ">=7.4"
+	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"phpcompatibility/phpcompatibility-wp": "^2.1",
+		"phpunit/phpunit": "^9.6",
+		"squizlabs/php_codesniffer": "^3.11",
+		"wp-coding-standards/wpcs": "^3.1",
+		"yoast/phpunit-polyfills": "^3.0"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		},
+		"optimize-autoloader": true,
+		"platform": {
+			"php": "7.4"
+		},
+		"sort-packages": true
+	},
+	"scripts": {
+		"lint": "bash bin/php-lint.sh",
+		"phpcs": "phpcs",
+		"phpcbf": "phpcbf",
+		"phpcompat": "phpcs --standard=phpcompat.xml.dist",
+		"test": "phpunit",
+		"security-checks": "bash bin/run-security-checks.sh",
+		"semgrep": "bash bin/run-security-checks.sh semgrep",
+		"conftest": "bash bin/run-security-checks.sh conftest"
+	}
+}

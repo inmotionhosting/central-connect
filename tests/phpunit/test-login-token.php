@@ -74,7 +74,12 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 		delete_option( 'boldgrid_api_key' );
 		$this->central_accepts();
 
-		$location = $this->authenticate( array( 'token' => 'abc123', 'environment_id' => 'env-1' ) );
+		$location = $this->authenticate(
+			array(
+				'token'          => 'abc123',
+				'environment_id' => 'env-1',
+			)
+		);
 
 		$this->assertSame( 'wp-login.php', $location );
 		$this->assertCount( 0, $this->http_requests );
@@ -124,7 +129,12 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 	public function test_malformed_login_request_is_not_forwarded( $request ) {
 		self::factory()->user->create( array( 'role' => 'administrator' ) );
 		$this->connect_site( 'site-key', 'env-1' );
-		$this->http_response = $this->central_response( array( 'is_valid' => true, 'validated' => true ) );
+		$this->http_response = $this->central_response(
+			array(
+				'is_valid'  => true,
+				'validated' => true,
+			)
+		);
 
 		$location = $this->authenticate( $request );
 
@@ -142,12 +152,32 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 		$long = str_repeat( 'a', \Central\Connect\Authentication\Token::MAX_TOKEN_LENGTH + 1 );
 
 		return array(
-			'env token with space'   => array( array( 'token' => 'abc def', 'environment_id' => 'env-1' ) ),
-			'env token too long'     => array( array( 'token' => $long, 'environment_id' => 'env-1' ) ),
-			'env id is a url'        => array( array( 'token' => 'good-token', 'environment_id' => 'https://example.com/x' ) ),
-			'env id with spaces'     => array( array( 'token' => 'good-token', 'environment_id' => '1 2' ) ),
-			'site token with space'  => array( array( 'token' => 'abc def' ) ),
-			'site token too long'    => array( array( 'token' => $long ) ),
+			'env token with space'  => array(
+				array(
+					'token'          => 'abc def',
+					'environment_id' => 'env-1',
+				),
+			),
+			'env token too long'    => array(
+				array(
+					'token'          => $long,
+					'environment_id' => 'env-1',
+				),
+			),
+			'env id is a url'       => array(
+				array(
+					'token'          => 'good-token',
+					'environment_id' => 'https://example.com/x',
+				),
+			),
+			'env id with spaces'    => array(
+				array(
+					'token'          => 'good-token',
+					'environment_id' => '1 2',
+				),
+			),
+			'site token with space' => array( array( 'token' => 'abc def' ) ),
+			'site token too long'   => array( array( 'token' => $long ) ),
 		);
 	}
 
@@ -160,10 +190,34 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 		$this->connect_site( 'site-key', 'env-1' );
 		get_user_by( 'id', $admin )->set_role( 'subscriber' );
 
-		$location = $this->authenticate( array( 'token' => $issued['access_token'], 'environment_id' => 'env-1', 'has_access_token' => '1' ) );
+		$location = $this->authenticate(
+			array(
+				'token'            => $issued['access_token'],
+				'environment_id'   => 'env-1',
+				'has_access_token' => '1',
+			)
+		);
 
 		$this->assertSame( 'wp-login.php', $location );
 		$this->assertSame( 0, get_current_user_id() );
+	}
+
+	/**
+	 * The site-token relay fires central_connect_remote_validate only when it
+	 * actually contacts Central.
+	 */
+	public function test_site_token_relay_fires_remote_validate_action() {
+		self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$this->connect_site();
+		$this->http_response = $this->central_response( array( 'validated' => true ) );
+		$before              = did_action( 'central_connect_remote_validate' );
+
+		$this->authenticate( array( 'token' => str_repeat( 'x', 5000 ) ) );
+		$this->assertSame( $before, did_action( 'central_connect_remote_validate' ), 'A locally rejected token must not fire the action.' );
+
+		$this->authenticate( array( 'token' => 'site-token' ) );
+		$this->assertCount( 1, $this->http_requests );
+		$this->assertSame( $before + 1, did_action( 'central_connect_remote_validate' ) );
 	}
 
 	/**
@@ -207,7 +261,12 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 			}
 		);
 
-		$location = $this->authenticate( array( 'token' => 'good-token', 'environment_id' => 'env-1' ) );
+		$location = $this->authenticate(
+			array(
+				'token'          => 'good-token',
+				'environment_id' => 'env-1',
+			)
+		);
 
 		$this->assertSame( 'wp-login.php', $location );
 		$this->assertCount( 0, $this->http_requests );
@@ -223,7 +282,13 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 		$this->connect_site( 'site-key', 'env-1' );
 		$this->central_accepts();
 
-		$location = $this->authenticate( array( 'token' => 'good-token', 'environment_id' => 'env-1', 'redirect_url' => admin_url( 'plugins.php' ) ) );
+		$location = $this->authenticate(
+			array(
+				'token'          => 'good-token',
+				'environment_id' => 'env-1',
+				'redirect_url'   => admin_url( 'plugins.php' ),
+			)
+		);
 
 		$this->assertSame( admin_url( 'plugins.php' ), $location );
 		$this->assertSame( $admin, get_current_user_id() );
@@ -241,7 +306,12 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 		$this->connect_site( 'site-key', 'old-env' );
 		$this->central_accepts();
 
-		$this->authenticate( array( 'token' => 'good-token', 'environment_id' => 'new-env' ) );
+		$this->authenticate(
+			array(
+				'token'          => 'good-token',
+				'environment_id' => 'new-env',
+			)
+		);
 		$this->assertSame( 'new-env', \Central\Connect\Option\Connect::get( 'environment_id' ) );
 
 		// Follow-up logins with the new id now use the normal bucket, not re-pair.
@@ -250,7 +320,12 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 		$rebind_limit = \Central\Connect\Authentication\Token::rateLimits()['rebind_ip']['limit'];
 		for ( $i = 0; $i <= $rebind_limit; $i++ ) {
 			wp_set_current_user( 0 );
-			$this->authenticate( array( 'token' => 'stale-' . $i, 'environment_id' => 'new-env' ) );
+			$this->authenticate(
+				array(
+					'token'          => 'stale-' . $i,
+					'environment_id' => 'new-env',
+				)
+			);
 		}
 		$this->assertCount( $rebind_limit + 2, $this->http_requests );
 	}
@@ -263,7 +338,12 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 		$this->connect_site( 'site-key', 'old-env' );
 		$this->central_rejects();
 
-		$location = $this->authenticate( array( 'token' => 'bad-token', 'environment_id' => 'new-env' ) );
+		$location = $this->authenticate(
+			array(
+				'token'          => 'bad-token',
+				'environment_id' => 'new-env',
+			)
+		);
 
 		$this->assertSame( 'wp-login.php', $location );
 		$this->assertSame( 'old-env', \Central\Connect\Option\Connect::get( 'environment_id' ) );
@@ -277,7 +357,13 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 		$issued = ( new \Central\Connect\Authentication\Token() )->create( get_user_by( 'id', $admin ) );
 		$this->connect_site( 'site-key', 'env-1' );
 
-		$location = $this->authenticate( array( 'token' => $issued['access_token'], 'environment_id' => 'env-1', 'has_access_token' => '1' ) );
+		$location = $this->authenticate(
+			array(
+				'token'            => $issued['access_token'],
+				'environment_id'   => 'env-1',
+				'has_access_token' => '1',
+			)
+		);
 
 		$this->assertSame( user_admin_url(), $location );
 		$this->assertSame( $admin, get_current_user_id() );
@@ -296,16 +382,34 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 		$limit = \Central\Connect\Authentication\Token::accessTokenFailureLimits()['limit'];
 
 		for ( $i = 0; $i < $limit; $i++ ) {
-			$location = $this->authenticate( array( 'token' => base64_encode( $admin . ':guess-' . $i ), 'environment_id' => 'env-1', 'has_access_token' => '1' ) );
+			$location = $this->authenticate(
+				array(
+					'token'            => base64_encode( $admin . ':guess-' . $i ),
+					'environment_id'   => 'env-1',
+					'has_access_token' => '1',
+				)
+			);
 			$this->assertSame( 'wp-login.php', $location );
 		}
 
-		$location = $this->authenticate( array( 'token' => $issued['access_token'], 'environment_id' => 'env-1', 'has_access_token' => '1' ) );
+		$location = $this->authenticate(
+			array(
+				'token'            => $issued['access_token'],
+				'environment_id'   => 'env-1',
+				'has_access_token' => '1',
+			)
+		);
 		$this->assertSame( 'wp-login.php', $location, 'Exhausted client must be refused even with a valid token.' );
 		$this->assertSame( 0, get_current_user_id() );
 
 		$_SERVER['REMOTE_ADDR'] = '203.0.113.78';
-		$location               = $this->authenticate( array( 'token' => $issued['access_token'], 'environment_id' => 'env-1', 'has_access_token' => '1' ) );
+		$location               = $this->authenticate(
+			array(
+				'token'            => $issued['access_token'],
+				'environment_id'   => 'env-1',
+				'has_access_token' => '1',
+			)
+		);
 		$this->assertSame( user_admin_url(), $location );
 		$this->assertSame( $admin, get_current_user_id() );
 	}
@@ -318,7 +422,13 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 		$this->connect_site( 'site-key', 'env-1' );
 		$this->central_accepts();
 
-		$location = $this->authenticate( array( 'token' => 'good-token', 'environment_id' => 'env-1', 'redirect_url' => 'https://evil.example/phish' ) );
+		$location = $this->authenticate(
+			array(
+				'token'          => 'good-token',
+				'environment_id' => 'env-1',
+				'redirect_url'   => 'https://evil.example/phish',
+			)
+		);
 
 		$this->assertSame( admin_url(), $location );
 	}

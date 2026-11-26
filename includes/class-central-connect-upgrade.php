@@ -82,7 +82,7 @@ class Central_Connect_Upgrade {
 
 				// Gives precedence to minor version specific upgrades over subminors.
 				$verHigh = str_replace( 'x', '9999', $ver );
-				$verLow = str_replace( 'x', '0', $ver );
+				$verLow  = str_replace( 'x', '0', $ver );
 
 				// If upgrade method version is greater than stored DB version.
 				if ( version_compare( $verHigh, $this->get_option(), 'gt' ) &&
@@ -116,7 +116,7 @@ class Central_Connect_Upgrade {
 		$methods = get_class_methods( $this );
 		$methods = array_filter(
 			$methods,
-			function( $key ) {
+			function ( $key ) {
 				return strpos( $key, 'upgrade_to_' ) !== false;
 			}
 		);

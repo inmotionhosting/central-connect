@@ -39,7 +39,7 @@ class Installer {
 
 		$plugins = array();
 		foreach ( \get_plugins() as $filePath => $plugin ) {
-			$plugin['File'] = $filePath;
+			$plugin['File']     = $filePath;
 			$plugin['IsActive'] = is_plugin_active( $filePath );
 
 			if ( isset( $updates->response[ $filePath ] ) ) {
@@ -82,7 +82,7 @@ class Installer {
 			'upgrader_package_options',
 			function ( $options ) {
 				$options['clear_destination'] = true;
-				$options['clear_working'] = true;
+				$options['clear_working']     = true;
 
 				return $options;
 			}

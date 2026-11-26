@@ -118,7 +118,14 @@ class Test_Plugin_Route extends Central_Connect_Test_Case {
 	 * A real installed plugin basename passes validation.
 	 */
 	public function test_installed_plugin_is_accepted() {
-		$response = $this->rest( 'PUT', self::ROUTE, array( 'files' => array( 'cc-test-plugin/cc-test-plugin.php' ), 'active' => false ) );
+		$response = $this->rest(
+			'PUT',
+			self::ROUTE,
+			array(
+				'files'  => array( 'cc-test-plugin/cc-test-plugin.php' ),
+				'active' => false,
+			)
+		);
 
 		$this->assertSame( 200, $response->get_status() );
 	}

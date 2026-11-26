@@ -87,9 +87,15 @@ class Central_Connect_Login {
 	 * @see wp_redirect()
 	 */
 	public function authenticate() {
+		/**
+		 * This wp-login.php flow is authenticated by the Central token
+		 * (validated below), not by a WordPress nonce.
+		 */
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+
 		// Authentication parameters.
-		$token        = ! empty( $_REQUEST['token'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['token'] ) ) : null; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-		$redirect_url = ! empty( $_REQUEST['redirect_url'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_url'] ) ) : user_admin_url(); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		$token        = ! empty( $_REQUEST['token'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['token'] ) ) : null;
+		$redirect_url = ! empty( $_REQUEST['redirect_url'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_url'] ) ) : user_admin_url();
 
 		if ( is_user_logged_in() && $token ) {
 			wp_safe_redirect( $redirect_url );
@@ -133,8 +139,10 @@ class Central_Connect_Login {
 			}
 		}
 
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
 		if ( ! $valid && $token ) {
-			wp_redirect( 'wp-login.php' );
+			wp_redirect( 'wp-login.php' ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- fixed same-site path.
 			exit;
 		}
 	}
@@ -181,7 +189,7 @@ class Central_Connect_Login {
 		 * `central_connect_auth_allowed_ips` allowlist, or past the rate limit.
 		 */
 		$siteKey = get_option( 'boldgrid_api_key' );
-		if ( ! is_string( $siteKey ) || '' === trim( $siteKey ) ) {
+		if ( ! is_string( $siteKey ) || '' === trim( $siteKey, " \n\r\t\v\0" ) ) {
 			return false;
 		}
 
@@ -198,11 +206,11 @@ class Central_Connect_Login {
 			return false;
 		}
 
-		do_action( 'bgc_remote_validate' );
+		\Central\Connect\Authentication\Token::doRemoteValidateAction();
 
-		$configs   = \Central_Connect_Service::get( 'configs' );
-		$url       = $configs['asset_server'] . $configs['ajax_calls']['verify_site_token'];
-		$args      = array(
+		$configs = \Central_Connect_Service::get( 'configs' );
+		$url     = $configs['asset_server'] . $configs['ajax_calls']['verify_site_token'];
+		$args    = array(
 			'method'  => 'POST',
 			'body'    => array(
 				'key'   => $siteKey,
