@@ -30,7 +30,7 @@ Using our single sign in feature, you can log into central and access any of you
 
 = 2.1.0 =
 
-Release Date: TBD
+Release Date: November 26th, 2026
 
 * Security: The Central environment-token validation used by `/bgc/v1/auth/` and `wp-login.php` no longer contacts Central for sites that have no API key, for malformed tokens or environment ids, or once a per-client / per-site rate limit is reached. The stored environment id is preferred over the caller-supplied value.
 * Security: Removed the 3 second delay on failed token validation; failures are rate limited instead.
