@@ -2,7 +2,7 @@
 Contributors: inmotionhosting, imh_brad, joemoto, rramo012, timph, jamesros161
 Tags: inmotion, connect, manage
 Requires at least: 5.0
-Tested up to: 7.0
+Tested up to: 7.2
 Requires PHP: 7.4
 Stable tag: 2.0.6
 License: GPLv2 or later
