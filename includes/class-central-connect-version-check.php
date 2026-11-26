@@ -12,6 +12,10 @@
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 
 	/**
@@ -89,21 +93,25 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		}
 
 		/**
-		 * Adds dynamic action for plugin name:init.
+		 * Fires the central_connect_init action.
 		 *
-		 * This is where plugins can hook to run their initialization code
-		 * once passing the PHP and WordPress version checks.
+		 * Only used when init() is called without a callback; the plugin
+		 * itself always passes central_connect_plugin_load.
 		 *
 		 * @since  1.0.0
+		 * @since  2.1.0 Fires `central_connect_init` instead of the dynamic `{$slug}:init`.
 		 *
 		 * @access public
 		 *
 		 * @return void
 		 */
 		public static function success_hook() {
-			$file = explode( '/', self::$plugin );
-			$name = sanitize_key( $file[0] );
-			do_action( "{$name}:init" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores -- public hook name.
+			/**
+			 * Fires on init once the PHP and WordPress version checks pass.
+			 *
+			 * @since 2.1.0
+			 */
+			do_action( 'central_connect_init' );
 		}
 
 		/**

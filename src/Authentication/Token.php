@@ -112,6 +112,30 @@ class Token {
 	}
 
 	/**
+	 * Fire the actions that run right before a token is sent to Central.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return void
+	 */
+	public static function doRemoteValidateAction() {
+		/**
+		 * Fires right before the site asks Central to validate a token.
+		 *
+		 * @since 2.1.0
+		 */
+		do_action( 'central_connect_remote_validate' );
+
+		/**
+		 * Fires right before the site asks Central to validate a token.
+		 *
+		 * @since 2.0.0
+		 * @deprecated 2.1.0 Use central_connect_remote_validate.
+		 */
+		do_action_deprecated( 'bgc_remote_validate', array(), '2.1.0', 'central_connect_remote_validate' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- legacy public hook kept for backward compatibility.
+	}
+
+	/**
 	 * Validate a Central environment token, guarding the outbound call.
 	 *
 	 * This path is reachable by unauthenticated visitors (REST /bgc/v1/auth/
@@ -182,7 +206,7 @@ class Token {
 
 		$environmentToSend = $rebind || '' === $storedEnvironmentId ? (string) $environmentId : $storedEnvironmentId;
 
-		do_action( 'bgc_remote_validate' );
+		self::doRemoteValidateAction();
 
 		$configs = \Central_Connect_Service::get( 'configs' );
 		$url     = $configs['asset_server'] . $configs['ajax_calls']['verify_env_token'];

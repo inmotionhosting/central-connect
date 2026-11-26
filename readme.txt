@@ -41,6 +41,8 @@ Release Date: November 26th, 2026
 * Update: Tested up to WordPress 7.2.
 * Bug Fix: PHP 8.6 compatibility: the filesystem helper constructor no longer returns a value, and API key checks pass explicit `trim()` characters.
 * Bug Fix: The minimum requirements notice displayed raw `<code>` markup.
+* Update: Addressed WordPress Plugin Check findings: direct file access guards, removed the `Domain Path` header for a folder that does not exist, and prefixed hook names.
+* Update: The `bgc_remote_validate` action is deprecated in favor of `central_connect_remote_validate`; existing listeners still run and receive a deprecation notice. The version check's fallback init action is now `central_connect_init`.
 * Update: Added a PHPUnit (WordPress test library) suite.
 * Update: Added PHPCS (WordPress Coding Standards and PHPCompatibility), Semgrep and Conftest checks, GitHub Actions CI for PHP 7.4 through 8.6, and a WordPress.org deploy script.
 * Update: Backfilled the missing 2.0.2 changelog entry. Version 2.0.7 was never released; its changes ship in 2.1.0.

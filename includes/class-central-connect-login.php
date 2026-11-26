@@ -206,7 +206,7 @@ class Central_Connect_Login {
 			return false;
 		}
 
-		do_action( 'bgc_remote_validate' );
+		\Central\Connect\Authentication\Token::doRemoteValidateAction();
 
 		$configs = \Central_Connect_Service::get( 'configs' );
 		$url     = $configs['asset_server'] . $configs['ajax_calls']['verify_site_token'];

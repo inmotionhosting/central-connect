@@ -11,6 +11,10 @@
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Responsible for class autoloading in plugin.
  *

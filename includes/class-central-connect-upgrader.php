@@ -14,6 +14,10 @@
  * @author     InMotion Hosting <central-dev@inmotionhosting.com>
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Include core WordPress upgrader file.
  */
