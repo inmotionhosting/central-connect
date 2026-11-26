@@ -75,22 +75,18 @@ class Central {
 				return $response;
 			}
 
-			// Validate the access token for a user and set them as the current user.
-			$user = $tokenHelper->getAuthenticatedUser( $authValue );
-			if ( $user ) {
-				wp_set_current_user( $user->ID );
-				$response = true;
-
-				// If not valid respond with error.
-			} else {
-				sleep( 3 );
-
-				$response = new \WP_Error(
-					'restx_logged_out',
-					'Sorry, your access token is invalid.',
-					array( 'status' => 401 )
-				);
+			/**
+			 * Validate the access token (rate limited per client on failure)
+			 * and set the matching user as the current user. Invalid tokens
+			 * yield 401, exhausted clients 429; neither path sleeps.
+			 */
+			$user = $tokenHelper->authenticateAccessToken( preg_replace( '/Bearer\s+/', '', $authValue ) );
+			if ( is_wp_error( $user ) ) {
+				return $user;
 			}
+
+			wp_set_current_user( $user->ID );
+			$response = true;
 		}
 
 		return $response;

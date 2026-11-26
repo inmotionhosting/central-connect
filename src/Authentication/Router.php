@@ -61,74 +61,57 @@ class Router {
 			'/auth/',
 			array(
 				'methods' => 'POST',
-				// Authorization is enforced inside the callback by validating the
-				// caller's Central environment token via Token::remoteValidate().
-				// Declared explicitly so WordPress never falls back to its
-				// permissive default for routes without a permission_callback.
+				/**
+				 * This route is reachable without a WordPress session on purpose:
+				 * Central presents an environment token here to obtain a local
+				 * access token. Authorization is enforced inside the callback by
+				 * Token::validateEnvironmentToken(), which decides everything it
+				 * can locally (connected site, well-formed input, rate limits)
+				 * before relaying the token to Central for confirmation.
+				 */
 				'permission_callback' => '__return_true',
 				'callback' => function ( $request ) {
-
-					// Reach out to our API servers to validate their token.
 					$environmentId = $request->get_param( 'environment_id' );
-					$tokenVal = $request->get_param( 'token' );
-					$token = new Token();
-					if ( ! $token->remoteValidate( $tokenVal, $environmentId ) ) {
-						return new \WP_Error(
-							'restx_logged_out',
-							'Sorry, your remote access token is not valid.',
-							array( 'status' => 403 )
-						);
+					$tokenVal      = $request->get_param( 'token' );
+
+					$token  = new Token();
+					$result = $token->validateEnvironmentToken( $tokenVal, $environmentId );
+					if ( is_wp_error( $result ) ) {
+						return $result;
 					}
 
-					Option\Connect::update( 'environment_id', $environmentId );
-
 					// If the remote token is valid assign a local token.
-					$userId = $request->get_param( 'user_id' );
-
-					// Find the requested user, or default.
-					$user = $this->selectUser( $userId );
-
-					// Reject requests that explicitly target an administrator
-					// account through the user_id parameter. Returning here is
-					// required: previously the response was built but then
-					// overwritten by the token creation below, so the guard had
-					// no effect and any environment-token holder could mint an
-					// administrator access token (privilege escalation).
-					if ( false !== $user && user_can( $userId, 'manage_options' ) ) {
+					$user = $this->selectUser( $request->get_param( 'user_id' ) );
+					if ( is_wp_error( $user ) ) {
 						return new \WP_REST_Response(
 							array(
 								'errors' => array(
-									'name' => 'user_not_qualified',
-									'message' => 'Please try again with a WordPress administrator account.',
+									'name' => $user->get_error_code(),
+									'message' => $user->get_error_message(),
 								),
 							),
 							400
 						);
 					}
 
-					// User found, create token and return to view.
-					if ( $user ) {
-						$tokenHelper = new Token();
-						$accessToken = $tokenHelper->create( $user );
-						return new \WP_REST_Response( $accessToken );
-					}
+					$tokenHelper = new Token();
+					$accessToken = $tokenHelper->create( $user );
 
-					// User not found.
-					return new \WP_REST_Response(
-						array(
-							'errors' => array(
-								'name' => 'user_not_found',
-								'message' => 'Unable to find a user to authenticate as.',
-							),
-						),
-						400
-					);
+					// Only remember the environment once a token was actually issued for it.
+					Option\Connect::update( 'environment_id', (string) $environmentId );
+
+					return new \WP_REST_Response( $accessToken );
 				},
 				'args' => array(
 					'token' => array(
 						'required' => true,
 						'type' => 'string',
 						'description' => 'Central Authentication token',
+					),
+					'environment_id' => array(
+						'required' => true,
+						'type' => 'string',
+						'description' => 'Central Environment ID the token was issued for',
 					),
 					'user_id' => array(
 						'required' => false,
@@ -141,23 +124,42 @@ class Router {
 	}
 
 	/**
-	 * Find a user to log in as.
+	 * Find a user to issue an access token for.
+	 *
+	 * Every bgc/v1 route requires administrator-level capabilities
+	 * (activate_plugins, switch_themes, manage_options), so the token is
+	 * only useful - and only issued - for a user who can manage_options.
+	 *
+	 * When Central names a user it must exist; there is no silent fallback
+	 * to the default administrator for an unknown id. When no user is named
+	 * the site's administrator account is used, which is the trust model of
+	 * the product: a Central-confirmed environment token acts as the site
+	 * administrator.
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $userId User Id.
-	 * @return WP_User User to login as.
+	 * @param string|null $userId User Id from the request, if any.
+	 * @return \WP_User|\WP_Error User to issue a token for, or an error whose
+	 *                            code/message are returned to the caller.
 	 */
 	private function selectUser( $userId ) {
 		$user = false;
 
-		if ( $userId ) {
-			$user = get_user_by( 'id', $userId );
+		if ( null !== $userId && '' !== $userId ) {
+			if ( is_numeric( $userId ) && (int) $userId > 0 ) {
+				$user = get_user_by( 'id', (int) $userId );
+			}
+		} else {
+			$login = new \Central_Connect_Login();
+			$user  = $login->get_user();
 		}
 
-		if ( empty( $user ) ) {
-			$login = new \Central_Connect_Login();
-			$user = $login->get_user();
+		if ( ! $user instanceof \WP_User ) {
+			return new \WP_Error( 'user_not_found', 'Unable to find a user to authenticate as.' );
+		}
+
+		if ( ! user_can( $user, 'manage_options' ) ) {
+			return new \WP_Error( 'user_not_qualified', 'Please try again with a WordPress administrator account.' );
 		}
 
 		return $user;

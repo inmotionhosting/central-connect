@@ -96,7 +96,7 @@ class Router {
 					),
 					'active' => array(
 						'required' => true,
-						'type' => 'bool',
+						'type' => 'boolean',
 						'description' => 'Is Active state. true to activate plugin false to deactivate.',
 					),
 				),
@@ -205,7 +205,7 @@ class Router {
 				'permission_callback' => array( $this, 'pluginPermissionCheck' ),
 				'args' => array(
 					'activate' => array(
-						'type' => 'bool',
+						'type' => 'boolean',
 						'description' => '1 to activate plugin 0 to deactivate.',
 					),
 					'plugins' => array(
@@ -235,25 +235,47 @@ class Router {
 	}
 
 	/**
-	 * Given a list of plugin files, make sure they all exist.
+	 * Given a list of plugin files, make sure they are all installed plugins.
+	 *
+	 * Each entry must be a plugin basename known to get_plugins() and pass
+	 * validate_file(). An existence check alone is not enough because core's
+	 * delete_plugins() does not validate the path it is given.
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param array $files Array of files to test if they exist.
-	 * @return boolean     Do all the files exist.
+	 * @param array $files Array of plugin basenames (plugin-dir/plugin.php).
+	 * @return boolean     Are all entries installed plugins.
 	 */
 	public function validateFilesExists( $files ) {
-		$valid = true;
+		if ( ! is_array( $files ) || empty( $files ) ) {
+			return false;
+		}
+
+		if ( ! function_exists( 'get_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		wp_cache_delete( 'plugins', 'plugins' );
+		$installed  = get_plugins();
 		$fileSystem = new FileSystem();
+
 		foreach ( $files as $file ) {
-			$pluginFile = trailingslashit( WP_PLUGIN_DIR ) . $file;
-			if ( ! $fileSystem->wpFilesystem->is_file( $pluginFile ) ) {
-				$valid = false;
-				break;
+			if ( ! is_string( $file ) || '' === $file || 0 !== validate_file( $file ) ) {
+				return false;
+			}
+
+			if ( ! isset( $installed[ $file ] ) ) {
+				return false;
+			}
+
+			$path   = trailingslashit( WP_PLUGIN_DIR ) . $file;
+			$isFile = empty( $fileSystem->wpFilesystem ) ? is_file( $path ) : $fileSystem->wpFilesystem->is_file( $path );
+			if ( ! $isFile ) {
+				return false;
 			}
 		}
 
-		return $valid;
+		return true;
 	}
 
 	/**

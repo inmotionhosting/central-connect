@@ -104,12 +104,22 @@ class Central_Connect_Login {
 				$environment_id = sanitize_text_field( wp_unslash( $_REQUEST['environment_id'] ) );
 				$tokenValidator = new \Central\Connect\Authentication\Token();
 				if ( ! empty( $_REQUEST['has_access_token'] ) ) {
-					$user = $tokenValidator->getValidUser( $token );
-					$valid = $user && ! empty( $user->ID );
+					// Same per-client failure limit as the X-BGC-Auth REST header.
+					$user  = $tokenValidator->authenticateAccessToken( $token );
+					$valid = $user instanceof \WP_User && ! empty( $user->ID );
 
 					// Validate an environment auth code remotely.
 				} else {
 					$valid = $user && $tokenValidator->remoteValidate( $token, $environment_id );
+
+					/**
+					 * Remember the environment Central just confirmed, exactly as
+					 * the REST auth route does, so a site that only ever signs in
+					 * through the browser is not left on a stale environment id.
+					 */
+					if ( $valid ) {
+						\Central\Connect\Option\Connect::update( 'environment_id', $environment_id );
+					}
 				}
 
 				// Verify the site token.
@@ -164,6 +174,30 @@ class Central_Connect_Login {
 	 * @return bool
 	 */
 	public function remote_validate( $token ) {
+		/**
+		 * Same guard as the environment-token path: this is reachable by any
+		 * visitor through wp-login.php, so never contact Central for a site
+		 * that has no API key, for a malformed token, for a caller outside the
+		 * `central_connect_auth_allowed_ips` allowlist, or past the rate limit.
+		 */
+		$siteKey = get_option( 'boldgrid_api_key' );
+		if ( ! is_string( $siteKey ) || '' === trim( $siteKey ) ) {
+			return false;
+		}
+
+		if ( ! \Central\Connect\Authentication\Token::isWellFormedToken( $token ) ) {
+			return false;
+		}
+
+		$tokenHelper = new \Central\Connect\Authentication\Token();
+		if ( is_wp_error( $tokenHelper->checkAllowedCaller() ) ) {
+			return false;
+		}
+
+		if ( is_wp_error( $tokenHelper->throttleRemoteValidation() ) ) {
+			return false;
+		}
+
 		do_action( 'bgc_remote_validate' );
 
 		$configs   = \Central_Connect_Service::get( 'configs' );
@@ -171,7 +205,7 @@ class Central_Connect_Login {
 		$args      = array(
 			'method'  => 'POST',
 			'body'    => array(
-				'key'   => get_option( 'boldgrid_api_key' ),
+				'key'   => $siteKey,
 				'token' => $token,
 			),
 			'timeout' => 10,
@@ -181,6 +215,11 @@ class Central_Connect_Login {
 		$http_code = wp_remote_retrieve_response_code( $response );
 		$body      = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		return 200 === $http_code && ! empty( $body['validated'] );
+		$valid = 200 === $http_code && ! empty( $body['validated'] );
+		if ( $valid ) {
+			$tokenHelper->releaseRemoteValidation();
+		}
+
+		return $valid;
 	}
 }
