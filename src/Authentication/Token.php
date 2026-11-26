@@ -26,7 +26,7 @@ class Token {
 	/**
 	 * Upper bound on an environment token presented for remote validation.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @var int
 	 */
@@ -35,7 +35,7 @@ class Token {
 	/**
 	 * Upper bound on an environment id presented for remote validation.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @var int
 	 */
@@ -132,7 +132,7 @@ class Token {
 	 * Failures return immediately; the previous 3 second sleep let any
 	 * visitor pin a PHP worker for free and has been replaced by the limiter.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param string $token         Token to validate.
 	 * @param string $environmentId Central Environment ID named by the caller.
@@ -223,7 +223,7 @@ class Token {
 	 * buckets, and once a site-wide bucket is full no per-IP transient is
 	 * written. Site-wide buckets are checked ahead of per-IP ones.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param bool $rebind Whether the caller named an environment id different
 	 *                     from the one the site already stores.
@@ -274,7 +274,7 @@ class Token {
 	 * count against the tight `ip` / `site` buckets. They still count against
 	 * the larger `total` bucket, which bounds all outbound calls.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @return void
 	 */
@@ -289,7 +289,7 @@ class Token {
 	/**
 	 * Build the 429 error returned when a remote-validation bucket is full.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param RateLimiter $limiter Limiter instance.
 	 * @param string      $scope   Exhausted bucket.
@@ -315,7 +315,7 @@ class Token {
 	 * refunded); `total` counts every outbound call; the `rebind_*` buckets
 	 * count calls naming an environment other than the stored one.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @return array Buckets keyed by name, each with `limit` and `window` (seconds).
 	 */
@@ -346,7 +346,7 @@ class Token {
 		/**
 		 * Filters the rate limits applied to outbound Central validation calls.
 		 *
-		 * @since 2.0.7
+		 * @since 2.1.0
 		 *
 		 * @param array $limits Buckets keyed by `ip`, `site`, `total`, `rebind_ip`, `rebind_site`,
 		 *                      each an array with integer `limit` and `window` (seconds).
@@ -383,7 +383,7 @@ class Token {
 	 * alone will break dashboard connections and SSO; only use it when the
 	 * callers are known (server-to-server traffic, a proxy, or office IPs).
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @return true|\WP_Error
 	 */
@@ -391,7 +391,7 @@ class Token {
 		/**
 		 * Filters the list of client IPs allowed to trigger remote token validation.
 		 *
-		 * @since 2.0.7
+		 * @since 2.1.0
 		 *
 		 * @param string[] $allowed Exact IP addresses. Empty means no restriction.
 		 */
@@ -421,7 +421,7 @@ class Token {
 	 * intentionally loose about format but strict about what cannot be a
 	 * token, so arbitrary visitor payloads are not forwarded to Central.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param mixed $token Raw request value.
 	 *
@@ -438,7 +438,7 @@ class Token {
 	/**
 	 * Whether a presented environment id is plausibly a Central environment id.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param mixed $environmentId Raw request value.
 	 *
@@ -484,7 +484,7 @@ class Token {
 	 * network: the X-BGC-Auth REST header and the wp-login.php
 	 * has_access_token flow.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @param string $providedToken Access token (base64 "user:token"), without a Bearer prefix.
 	 *
@@ -539,7 +539,7 @@ class Token {
 	/**
 	 * Rate limit applied to failed access-token attempts per client.
 	 *
-	 * @since 2.0.7
+	 * @since 2.1.0
 	 *
 	 * @return array {
 	 *     @type int $limit  Failed attempts allowed per window.
@@ -555,7 +555,7 @@ class Token {
 		/**
 		 * Filters the failed access-token attempt limit per client IP.
 		 *
-		 * @since 2.0.7
+		 * @since 2.1.0
 		 *
 		 * @param array $limits Array with integer `limit` and `window` (seconds).
 		 */

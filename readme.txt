@@ -4,7 +4,7 @@ Tags: inmotion, connect, manage
 Requires at least: 5.0
 Tested up to: 7.2
 Requires PHP: 7.4
-Stable tag: 2.0.6
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,7 +28,7 @@ Using our single sign in feature, you can log into central and access any of you
 
 == Changelog ==
 
-= 2.0.7 =
+= 2.1.0 =
 
 Release Date: TBD
 
@@ -37,7 +37,13 @@ Release Date: TBD
 * Security: `/bgc/v1/auth/` only issues access tokens for administrator accounts and no longer falls back to the default administrator when an unknown `user_id` is supplied.
 * Security: `/bgc/v1/plugins/` only accepts `files` entries that are installed plugin basenames.
 * Security: Access tokens presented through the `X-BGC-Auth` header or the `wp-login.php` `has_access_token` flow are only accepted for users who can manage options.
+* Update: Requires PHP 7.4 or higher. The plugin header, readme and the activation check now agree (previously PHP 5.4 in the readme and 5.6 at runtime).
+* Update: Tested up to WordPress 7.2.
+* Bug Fix: PHP 8.6 compatibility: the filesystem helper constructor no longer returns a value, and API key checks pass explicit `trim()` characters.
+* Bug Fix: The minimum requirements notice displayed raw `<code>` markup.
 * Update: Added a PHPUnit (WordPress test library) suite.
+* Update: Added PHPCS (WordPress Coding Standards and PHPCompatibility), Semgrep and Conftest checks, GitHub Actions CI for PHP 7.4 through 8.6, and a WordPress.org deploy script.
+* Update: Backfilled the missing 2.0.2 changelog entry. Version 2.0.7 was never released; its changes ship in 2.1.0.
 
 = 2.0.6 =
 
