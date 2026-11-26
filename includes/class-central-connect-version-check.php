@@ -79,15 +79,12 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 					// Ensures plugin deactivation happens after the notice is displayed.
 					add_action( 'admin_init', array( __CLASS__, 'deactivate' ) );
 				}
+			} elseif ( is_callable( $callback ) ) {
+				// Call the callback with any args required.
+				call_user_func_array( $callback, $callback_args );
 			} else {
-				// Checks for cb and args passed.
-				if ( is_callable( $callback ) ) {
-					// Call the callback with any args required.
-					call_user_func_array( $callback, $callback_args );
-				} else {
-					// Add success hook to init for plugins to initialize on.
-					add_action( 'init', array( __CLASS__, 'success_hook' ) );
-				}
+				// Add success hook to init for plugins to initialize on.
+				add_action( 'init', array( __CLASS__, 'success_hook' ) );
 			}
 		}
 
@@ -106,7 +103,7 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		public static function success_hook() {
 			$file = explode( '/', self::$plugin );
 			$name = sanitize_key( $file[0] );
-			do_action( "{$name}:init" );
+			do_action( "{$name}:init" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores -- public hook name.
 		}
 
 		/**
@@ -119,9 +116,9 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		 * @return void
 		 */
 		public static function admin_notice() {
-			printf( '<div class="error"><p>%s</p></div>', esc_html( self::get_message() ) );
+			printf( '<div class="error"><p>%s</p></div>', wp_kses( self::get_message(), array( 'code' => array() ) ) );
 			// Disables the activate message.
-			if ( isset( $_GET['activate'] ) ) {
+			if ( isset( $_GET['activate'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- only hides the core "activated" notice.
 				unset( $_GET['activate'] );
 			}
 		}
@@ -136,7 +133,7 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		 * @return void
 		 */
 		public static function deactivate() {
-			error_log( self::get_message() );
+			error_log( self::get_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- records why the plugin deactivated itself.
 			deactivate_plugins( self::$plugin );
 		}
 

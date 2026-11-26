@@ -72,7 +72,7 @@ class Token {
 		update_user_option( $user->ID, 'bgc_access_tokens', $accessTokens );
 
 		unset( $newAccessToken['access_token_hash'] );
-		$newAccessToken['access_token'] = base64_encode( $user->ID . ':' . $rawToken );
+		$newAccessToken['access_token'] = base64_encode( $user->ID . ':' . $rawToken ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- access token wire format is base64(user_id:token).
 
 		return $newAccessToken;
 	}
@@ -86,7 +86,7 @@ class Token {
 	 */
 	public function isBGToken( $providedToken ) {
 		$providedToken = preg_replace( '/Bearer\s+/', '', $providedToken );
-		$tokenValue    = base64_decode( $providedToken );
+		$tokenValue    = base64_decode( $providedToken ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- access token wire format is base64(user_id:token).
 		$tokenValue    = $tokenValue ? $tokenValue : '';
 		$split         = explode( ':', $tokenValue );
 		$userId        = ! empty( $split[0] ) ? $split[0] : null;
@@ -580,7 +580,7 @@ class Token {
 	 * @return WP_User
 	 */
 	public function getValidUser( $providedToken ) {
-		$tokenValue    = base64_decode( $providedToken );
+		$tokenValue    = base64_decode( $providedToken ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- access token wire format is base64(user_id:token).
 		$tokenValue    = $tokenValue ? $tokenValue : '';
 		$split         = explode( ':', $tokenValue );
 		$userId        = ! empty( $split[0] ) ? $split[0] : null;

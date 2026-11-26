@@ -31,8 +31,8 @@ class ConnectNotice {
 	public function initialize() {
 		$page = null;
 
-		if ( isset( $_REQUEST['page'] ) ) {
-			$page = sanitize_text_field( wp_unslash( $_REQUEST['page'] ) );
+		if ( isset( $_REQUEST['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only screen routing.
+			$page = sanitize_text_field( wp_unslash( $_REQUEST['page'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
 
 		if ( 'central-connect' === $page ) {
@@ -174,6 +174,11 @@ class ConnectNotice {
 		$isRedirect = false;
 		$page       = false;
 
+		/**
+		 * Read-only screen routing; the redirect below only mints a token for
+		 * the current user and sends them to Central.
+		 */
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['token_redirect'] ) ) {
 			$isRedirect = sanitize_text_field( wp_unslash( $_GET['token_redirect'] ) );
 		}
@@ -181,13 +186,14 @@ class ConnectNotice {
 		if ( isset( $_GET['page'] ) ) {
 			$page = sanitize_text_field( wp_unslash( $_GET['page'] ) );
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		if ( 'central-connect' === $page && $isRedirect ) {
 			$authentication = new \Central\Connect\Authentication\Token();
 			$token          = $authentication->create( wp_get_current_user(), '+5 minutes' );
 
 			$url = self::getConnectUrl( $token['access_token'] );
-			wp_redirect( $url );
+			wp_redirect( $url ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- intentional redirect to the Central portal.
 			exit;
 		}
 	}
@@ -305,8 +311,7 @@ class ConnectNotice {
 			<?php
 		else :
 			if ( isset( $_SERVER['REQUEST_URI'] ) ) {
-				$redirect = urlencode( remove_query_arg( 'provider', esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) );
-				$redirect = urlencode( esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
+				$redirect = rawurlencode( esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
 			}
 
 			?>
@@ -339,16 +344,18 @@ class ConnectNotice {
 	 * @return void
 	 */
 	public function admin_post() {
-		// Validate nonce. A missing nonce must be rejected as well; previously
-		// the check only fired when a nonce was present but invalid, so a
-		// request with no nonce bypassed CSRF protection entirely.
+		/**
+		 * Validate nonce. A missing nonce must be rejected as well; previously
+		 * the check only fired when a nonce was present but invalid, so a
+		 * request with no nonce bypassed CSRF protection entirely.
+		 */
 		if ( empty( $_POST['boldgrid_connect_provider_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['boldgrid_connect_provider_nonce'] ) ), 'boldgrid_connect_provider' ) ) {
-			wp_die( __( 'Invalid nonce.', 'central-connect' ) );
+			wp_die( esc_html__( 'Invalid nonce.', 'central-connect' ) );
 		}
 
 		// Only administrators may change the connect provider.
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( __( 'Unauthorized.', 'central-connect' ) );
+			wp_die( esc_html__( 'Unauthorized.', 'central-connect' ) );
 		}
 
 		// Check and set option for provider on submission.
@@ -360,7 +367,7 @@ class ConnectNotice {
 		}
 
 		if ( ! isset( $_POST['_wp_http_referer'] ) ) {
-			wp_die( __( 'Missing target.', 'central-connect' ) );
+			wp_die( esc_html__( 'Missing target.', 'central-connect' ) );
 		}
 
 		$url = add_query_arg( 'provider', $provider, urldecode( sanitize_text_field( wp_unslash( $_POST['_wp_http_referer'] ) ) ) );

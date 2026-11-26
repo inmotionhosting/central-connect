@@ -43,8 +43,32 @@
 		<severity>0</severity>
 	</rule>
 
-	<!-- PHPUnit tests: WP_UnitTestCase naming and fixtures. -->
+	<!-- Legacy file names loaded by path from other files and older installs. -->
+	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+		<exclude-pattern>*/includes/config/config.*.php</exclude-pattern>
+	</rule>
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<exclude-pattern>*/includes/class-central-connect-upgrader.php</exclude-pattern>
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+
+	<!--
+		PHPUnit tests build fixtures on disk, encode test tokens and declare
+		small helper classes next to the test case that uses them.
+	-->
+	<rule ref="WordPress.WP.AlternativeFunctions">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Generic.Files.OneObjectStructurePerFile">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.Security.EscapeOutput.ExceptionNotEscaped">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Generic.Commenting.DocComment.ShortNotCapital">
 		<exclude-pattern>*/tests/*</exclude-pattern>
 	</rule>
 

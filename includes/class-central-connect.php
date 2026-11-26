@@ -147,13 +147,11 @@ class Central_Connect {
 		$login = new Central_Connect_Login();
 		$login->setup();
 
-		// Disabling the connect notice and menu for now.
-		// $connectNotice = new Connect\View\Central\ConnectNotice();
-		// $connectNotice->initialize();
-
-		// Remove "My Connection" page from plugins list.
-		// $installedPlugins = new Connect\Plugin\Installed();
-		// $installedPlugins->initialize();
+		/**
+		 * The connect notice / settings menu (Connect\View\Central\ConnectNotice)
+		 * and the "My Connection" plugins-list filter (Connect\Plugin\Installed)
+		 * have been disabled since 2.0.4 and are intentionally not initialized.
+		 */
 
 		$inspirations = new Connect\Integrations\Inspirations();
 		$inspirations->initialize();
@@ -213,13 +211,12 @@ class Central_Connect {
 		/**
 		 * Filters the bg_connect_configs option to merge option with static configs provided.
 		 *
-		 * @param mixed       $value   Value of the option.
-		 * @param string      $option  Option name.
+		 * @param mixed $value Value of the option.
 		 * @return false|mixed (Maybe) filtered option value.
 		 */
 		add_filter(
 			'option_bg_connect_configs',
-			function ( $value, $option ) {
+			function ( $value ) {
 				/**
 				 * The BoldGrid Library applies this filter before the
 				 * 'configs' service gets registered above. In order for this
@@ -248,9 +245,7 @@ class Central_Connect {
 				}
 
 				return $confs;
-			},
-			10,
-			2
+			}
 		);
 	}
 

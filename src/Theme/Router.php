@@ -67,7 +67,7 @@ class Router {
 				'callback'            => function ( $request ) {
 					$response = array( 'error' => 'Unable to switch theme' );
 					$status = 400;
-					$stylesheet = $request->get_param( 'stylesheet' ) ?: ''; //phpcs:ignore WordPress.PHP.DisallowShortTernary.Found
+					$stylesheet = $request->get_param( 'stylesheet' ) ?: ''; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found -- falsy params default to empty.
 					switch_theme( $stylesheet );
 
 					$currentTheme = wp_get_theme();

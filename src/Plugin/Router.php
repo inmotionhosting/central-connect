@@ -67,7 +67,7 @@ class Router {
 			array(
 				'methods'             => 'PUT',
 				'callback'            => function ( $request ) {
-					$files = $request->get_param( 'files' ) ?: array(); //phpcs:ignore WordPress.PHP.DisallowShortTernary.Found
+					$files = $request->get_param( 'files' ) ?: array(); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found -- falsy params default to empty.
 					$active = $request->get_param( 'active' );
 
 					include_once ABSPATH . 'wp-admin/includes/plugin.php';

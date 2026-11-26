@@ -66,6 +66,33 @@ class Test_Version_Check extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The requirements notice keeps its <code> markup and escapes everything else.
+	 */
+	public function test_admin_notice_markup() {
+		Central_Connect_Version_Check::init( 'central-connect/central-connect.php', '5.0', '7.4', '__return_null' );
+
+		ob_start();
+		Central_Connect_Version_Check::admin_notice();
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString( '<code>central-connect</code>', $html );
+		$this->assertStringNotContainsString( '&lt;code&gt;', $html );
+	}
+
+	/**
+	 * The bg_connect_configs option filter merges the static configs into the stored value.
+	 */
+	public function test_connect_configs_option_is_merged() {
+		update_option( 'bg_connect_configs', array( 'central_url' => 'https://example.test' ) );
+
+		$configs = get_option( 'bg_connect_configs' );
+
+		$this->assertIsArray( $configs );
+		$this->assertSame( 'https://example.test', $configs['central_url'] );
+		$this->assertArrayHasKey( 'asset_server', $configs );
+	}
+
+	/**
 	 * The plugin header and readme advertise the same PHP minimum the gate enforces.
 	 */
 	public function test_declared_php_minimum_matches_gate() {
