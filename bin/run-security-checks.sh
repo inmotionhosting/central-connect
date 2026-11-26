@@ -43,6 +43,7 @@ run_semgrep() {
 	for fixture in "${FIXTURES}"/semgrep/bad/*.php; do
 		local rule
 		rule="$(basename "${fixture}" .php)"
+		# shellcheck disable=SC2016 # PHP source, not shell expansions.
 		if php -r '
 			$report = json_decode( $argv[1], true );
 			foreach ( $report["results"] ?? array() as $result ) {
