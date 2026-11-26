@@ -1,0 +1,44 @@
+# Paths excluded from the WordPress.org package built by bin/deploy.sh.
+# rsync --exclude-from syntax; a leading slash anchors to the plugin root.
+# The package is built from `git archive`, so untracked files never ship.
+
+# VCS, CI and editor configuration
+/.git
+/.github
+/.gitattributes
+/.gitignore
+/.distignore
+/.editorconfig
+/.vscode
+/.cursor
+/.claude
+/includes/config/.gitignore
+
+# Development tooling and its configuration
+/bin
+/build
+/ci
+/docs
+/node_modules
+/policies
+/rules
+/tests
+/vendor
+/composer.json
+/composer.lock
+/conftest.toml
+/package.json
+/package-lock.json
+/yarn.lock
+/yarn-error.log
+/phpcs.xml
+/phpcs.xml.dist
+/phpcompat.xml.dist
+/phpunit.xml
+/phpunit.xml.dist
+/.phpunit.result.cache
+
+# Repository-only documents and artifacts
+/README.md
+/CHANGELOG.md
+/central-connect.zip

@@ -13,6 +13,8 @@
 		"semgrep": "bash bin/run-security-checks.sh semgrep",
 		"conftest": "bash bin/run-security-checks.sh conftest",
 		"security-checks": "bash bin/run-security-checks.sh",
-		"test": "./vendor/bin/phpunit"
+		"test": "./vendor/bin/phpunit",
+		"build": "bash bin/deploy.sh --build-only",
+		"deploy": "bash bin/deploy.sh"
 	}
 }
