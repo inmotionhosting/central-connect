@@ -16,6 +16,8 @@
  * Plugin URI:        https://central.inmotionhosting.com
  * Description:       Safe and easy management for all of your WordPress websites. SEO, Backups, 1-click login, site transfers, and more on one dashboard.
  * Version:           2.0.6
+ * Requires at least: 5.0
+ * Requires PHP:      7.4
  * Author:            InMotion Hosting
  * Author URI:        https://inmotionhosting.com
  * License:           GPL-2.0+
@@ -45,10 +47,11 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 	require CENTRAL_CONNECT_PATH . 'includes/class-central-connect-version-check.php';
 }
 
-// Initalize the version checking.  This checks that the user has at least WordPress v5.0 and PHP v5.6.
-// WordPress REST API was added in version 4.7.
-// BoldGrid Backup has a minimum PHP version of 5.4 supported.
-Central_Connect_Version_Check::init( plugin_basename( __FILE__ ), '5.0', '5.6', 'central_connect_plugin_load' );
+/**
+ * Initialize the version checking. This checks that the site runs at least
+ * WordPress 5.0 and PHP 7.4 before any plugin code is loaded.
+ */
+Central_Connect_Version_Check::init( plugin_basename( __FILE__ ), '5.0', '7.4', 'central_connect_plugin_load' );
 
 /**
  * Kicks off our core plugin code.

@@ -181,7 +181,7 @@ class Central_Connect_Login {
 		 * `central_connect_auth_allowed_ips` allowlist, or past the rate limit.
 		 */
 		$siteKey = get_option( 'boldgrid_api_key' );
-		if ( ! is_string( $siteKey ) || '' === trim( $siteKey ) ) {
+		if ( ! is_string( $siteKey ) || '' === trim( $siteKey, " \n\r\t\v\0" ) ) {
 			return false;
 		}
 

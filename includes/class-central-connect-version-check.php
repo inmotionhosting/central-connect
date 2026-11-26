@@ -60,10 +60,11 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		 * @param  string   $wp_version  Minimum WordPress version required.
 		 * @param  string   $php_version Minimum PHP version required.
 		 * @param  callable $callback    Callback method to call if version check passes.
+		 * @param  mixed    ...$callback_args Arguments passed to the callback.
 		 *
 		 * @return void
 		 */
-		public static function init( $plugin, $wp_version, $php_version, $callback = null ) {
+		public static function init( $plugin, $wp_version, $php_version, $callback = null, ...$callback_args ) {
 			self::$plugin = $plugin;
 			self::$php_version = $php_version;
 			self::$wp_version = $wp_version;
@@ -81,14 +82,8 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 			} else {
 				// Checks for cb and args passed.
 				if ( is_callable( $callback ) ) {
-					$arguments = array();
-					$args = func_num_args();
-					for ( $i = 4; $i < $args; $i++ ) {
-						$arg = func_get_arg( $i );
-						$arguments[] = $arg;
-					}
 					// Call the callback with any args required.
-					call_user_func_array( $callback, $arguments );
+					call_user_func_array( $callback, $callback_args );
 				} else {
 					// Add success hook to init for plugins to initialize on.
 					add_action( 'init', array( __CLASS__, 'success_hook' ) );

@@ -3,7 +3,7 @@ Contributors: inmotionhosting, imh_brad, joemoto, rramo012, timph, jamesros161
 Tags: inmotion, connect, manage
 Requires at least: 5.0
 Tested up to: 7.0
-Requires PHP: 5.4
+Requires PHP: 7.4
 Stable tag: 2.0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,8 @@ Using our single sign in feature, you can log into central and access any of you
 == Installation ==
 
 = Minimum Requirements =
-* PHP 5.4 or higher
+* PHP 7.4 or higher
+* WordPress 5.0 or higher
 
 = Manually =
 1. Upload the entire central-connect folder to the /wp-content/plugins/ directory.

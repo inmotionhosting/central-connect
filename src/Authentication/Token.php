@@ -142,7 +142,7 @@ class Token {
 	 */
 	public function validateEnvironmentToken( $token, $environmentId ) {
 		$siteKey = get_option( 'boldgrid_api_key' );
-		if ( ! is_string( $siteKey ) || '' === trim( $siteKey ) ) {
+		if ( ! is_string( $siteKey ) || '' === trim( $siteKey, " \n\r\t\v\0" ) ) {
 			return new \WP_Error(
 				'central_connect_not_connected',
 				'This site is not connected to Central.',

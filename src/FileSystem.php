@@ -37,8 +37,6 @@ class FileSystem {
 	 */
 	public function __construct() {
 		$this->wpFilesystem = $this->init();
-
-		return $this;
 	}
 
 	/**
