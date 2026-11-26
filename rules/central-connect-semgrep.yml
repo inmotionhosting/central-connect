@@ -1,0 +1,106 @@
+rules:
+  - id: cc-rest-route-requires-permission-callback
+    message: register_rest_route() must declare an explicit permission_callback.
+    languages: [php]
+    severity: ERROR
+    patterns:
+      - pattern: register_rest_route($NS, $ROUTE, array(...))
+      - pattern-not: register_rest_route($NS, $ROUTE, array(..., 'permission_callback' => $CB, ...))
+
+  - id: cc-rest-public-route-allowlist
+    message: >-
+      '__return_true' permission callbacks are only allowed on the token-authenticated
+      /bgc/v1/auth route (src/Authentication/Router.php). Use a capability check.
+    languages: [php]
+    severity: ERROR
+    pattern-either:
+      - pattern: "array(..., 'permission_callback' => '__return_true', ...)"
+      - pattern: "array(..., 'permission_callback' => function (...) { return true; }, ...)"
+    paths:
+      exclude:
+        - /src/Authentication/Router.php
+
+  - id: cc-option-write-requires-allowlist
+    message: >-
+      update_option()/delete_option() with a name taken from the REST request must be
+      gated by isAllowedOption() first.
+    languages: [php]
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $NAME = $REQ->get_param(...);
+              ...
+              update_option($NAME, ...);
+          - pattern: |
+              $NAME = $REQ->get_param(...);
+              ...
+              delete_option($NAME);
+          - pattern: |
+              $NAME = $REQ[$KEY];
+              ...
+              update_option($NAME, ...);
+          - pattern: |
+              $NAME = $REQ[$KEY];
+              ...
+              delete_option($NAME);
+      # Regex-scoped to the matched span so the guard is found in any condition shape.
+      - pattern-not-regex: isAllowedOption\(
+
+  - id: cc-nonce-check-must-fail-closed
+    message: >-
+      Nonce checks must reject a missing nonce. Do not guard wp_verify_nonce() with
+      isset()/!empty() on the same request field, and do not die when it succeeds.
+    languages: [php]
+    severity: ERROR
+    pattern-either:
+      - pattern: if (isset($SRC[$K]) && !wp_verify_nonce(...)) { ... }
+      - pattern: if (!empty($SRC[$K]) && !wp_verify_nonce(...)) { ... }
+      - pattern: if (isset($SRC[$K]) && false === wp_verify_nonce(...)) { ... }
+      - pattern: if (wp_verify_nonce(...)) { ... wp_die(...); ... }
+      - pattern: if (wp_verify_nonce(...)) { ... die(...); ... }
+
+  - id: cc-use-wp-die
+    message: Use wp_die() (or WP_Error) instead of die()/exit() with a message.
+    languages: [php]
+    severity: ERROR
+    # Regex rather than an AST pattern: die/exit are language constructs. Integer
+    # exit statuses in CLI scripts are allowed; string or variable messages are not.
+    pattern-regex: '(?<![\w>$:])(die|exit)\s*\(\s*[''"$]'
+
+  - id: cc-auth-cookie-only-from-login
+    message: >-
+      wp_set_auth_cookie()/wp_set_current_user() for remote sign-in belongs in
+      Central_Connect_Login only, after token validation.
+    languages: [php]
+    severity: ERROR
+    pattern-either:
+      - pattern: wp_set_auth_cookie(...)
+    paths:
+      exclude:
+        - /includes/class-central-connect-login.php
+        - /tests/**
+
+  - id: cc-remote-request-keeps-tls-verification
+    message: Do not disable TLS verification on outbound requests to Central.
+    languages: [php]
+    severity: ERROR
+    pattern-either:
+      - pattern: "array(..., 'sslverify' => false, ...)"
+      - pattern: "array(..., 'sslverify' => 0, ...)"
+
+  - id: cc-no-unsafe-deserialize-or-eval
+    message: Never unserialize(), eval() or extract() request-controlled data.
+    languages: [php]
+    severity: ERROR
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: unserialize($_GET[...])
+      - pattern: unserialize($_POST[...])
+      - pattern: unserialize($_REQUEST[...])
+      - pattern: unserialize($_COOKIE[...])
+      - pattern: unserialize($REQ->get_param(...))
+      - pattern: extract($_GET)
+      - pattern: extract($_POST)
+      - pattern: extract($_REQUEST)
+      - pattern: extract($REQ->get_params())

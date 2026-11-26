@@ -1,0 +1,2 @@
+# conftest defaults for `conftest test`; pass --namespace release|composer|workflows.
+policy = "policies/central-connect"

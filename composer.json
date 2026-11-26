@@ -30,6 +30,9 @@
 		"phpcs": "phpcs",
 		"phpcbf": "phpcbf",
 		"phpcompat": "phpcs --standard=phpcompat.xml.dist",
-		"test": "phpunit"
+		"test": "phpunit",
+		"security-checks": "bash bin/run-security-checks.sh",
+		"semgrep": "bash bin/run-security-checks.sh semgrep",
+		"conftest": "bash bin/run-security-checks.sh conftest"
 	}
 }

@@ -1,0 +1,18 @@
+{
+	"name": "central-connect",
+	"private": true,
+	"description": "Development scripts for the Central Connect WordPress plugin.",
+	"license": "GPL-2.0-or-later",
+	"scripts": {
+		"install:deps": "composer install --no-interaction --prefer-dist",
+		"php-lint": "bash bin/php-lint.sh",
+		"php-lint:all": "bash bin/php-lint.sh php7.4 php8.0 php8.1 php8.2 php8.3 php8.4 php8.5 php8.6",
+		"phpcs": "./vendor/bin/phpcs",
+		"phpcs-fix": "./vendor/bin/phpcbf",
+		"phpcompat": "./vendor/bin/phpcs --standard=phpcompat.xml.dist",
+		"semgrep": "bash bin/run-security-checks.sh semgrep",
+		"conftest": "bash bin/run-security-checks.sh conftest",
+		"security-checks": "bash bin/run-security-checks.sh",
+		"test": "./vendor/bin/phpunit"
+	}
+}
