@@ -13,12 +13,12 @@ rules:
       /bgc/v1/auth route (src/Authentication/Router.php). Use a capability check.
     languages: [php]
     severity: ERROR
-    pattern-either:
-      - pattern: "array(..., 'permission_callback' => '__return_true', ...)"
-      - pattern: "array(..., 'permission_callback' => function (...) { return true; }, ...)"
-    paths:
-      exclude:
-        - /src/Authentication/Router.php
+    patterns:
+      - pattern-either:
+          - pattern: "array(..., 'permission_callback' => '__return_true', ...)"
+          - pattern: "array(..., 'permission_callback' => function (...) { return true; }, ...)"
+      # Only the token-authenticated /bgc/v1/auth/ route is exempt; other routes in Router.php are not.
+      - pattern-not-inside: "register_rest_route('bgc/v1', '/auth/', array(..., 'permission_callback' => '__return_true', ...))"
 
   - id: cc-option-write-requires-allowlist
     message: >-

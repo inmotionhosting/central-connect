@@ -175,8 +175,16 @@ build_package() {
 	mkdir -p "${BUILD_ROOT}/export" "${PACKAGE_DIR}"
 
 	git -C "${PLUGIN_ROOT}" archive --format=tar "${GIT_REF}" | tar -x -C "${BUILD_ROOT}/export"
-	rsync -a --delete --exclude-from="${PLUGIN_ROOT}/.distignore" "${BUILD_ROOT}/export/" "${PACKAGE_DIR}/"
-	rm -rf "${BUILD_ROOT}/export"
+	# Filter with the .distignore committed at --ref; the working tree copy is only a fallback.
+	local distignore="${BUILD_ROOT}/export/.distignore"
+	if [[ ! -f "${distignore}" ]]; then
+		distignore="${BUILD_ROOT}/distignore.fallback"
+		[[ -f "${PLUGIN_ROOT}/.distignore" ]] || die "no .distignore at ${GIT_REF} or in the working tree."
+		echo "Warning: ${GIT_REF} has no .distignore; using the working tree copy." >&2
+		cp "${PLUGIN_ROOT}/.distignore" "${distignore}"
+	fi
+	rsync -a --delete --exclude-from="${distignore}" "${BUILD_ROOT}/export/" "${PACKAGE_DIR}/"
+	rm -rf "${BUILD_ROOT}/export" "${BUILD_ROOT}/distignore.fallback"
 
 	echo "== Checking release metadata"
 	local meta
@@ -185,11 +193,19 @@ build_package() {
 		$m = json_decode( $argv[1], true );
 		$v = $argv[2];
 		$errors = array();
-		if ( $m["plugin"]["version"] !== $v ) { $errors[] = "plugin header Version is " . $m["plugin"]["version"]; }
-		if ( $m["readme"]["stable_tag"] !== $v ) { $errors[] = "readme Stable tag is " . $m["readme"]["stable_tag"]; }
-		if ( ( $m["readme"]["changelog"][0] ?? "" ) !== $v ) { $errors[] = "newest changelog entry is " . ( $m["readme"]["changelog"][0] ?? "missing" ); }
-		if ( $m["plugin"]["requires_php"] !== $m["readme"]["requires_php"] ) { $errors[] = "Requires PHP differs between plugin header and readme"; }
-		foreach ( $errors as $e ) { fwrite( STDERR, "Error: " . $e . ", expected " . $v . PHP_EOL ); }
+		$expect = function ( $label, $actual, $expected ) use ( &$errors ) {
+			if ( null === $actual || $actual !== $expected ) {
+				$errors[] = $label . " is " . var_export( $actual, true ) . ", expected " . var_export( $expected, true );
+			}
+		};
+		$expect( "plugin header Version", $m["plugin"]["version"], $v );
+		$expect( "readme Stable tag", $m["readme"]["stable_tag"], $v );
+		$expect( "newest changelog entry", $m["readme"]["changelog"][0] ?? null, $v );
+		$expect( "readme Requires PHP", $m["readme"]["requires_php"], $m["plugin"]["requires_php"] );
+		$expect( "readme Requires at least", $m["readme"]["requires_at_least"], $m["plugin"]["requires_at_least"] );
+		$expect( "runtime version check PHP", $m["plugin"]["runtime_min_php"], $m["plugin"]["requires_php"] );
+		$expect( "runtime version check WordPress", $m["plugin"]["runtime_min_wp"], $m["plugin"]["requires_at_least"] );
+		foreach ( $errors as $e ) { fwrite( STDERR, "Error: " . $e . PHP_EOL ); }
 		exit( $errors ? 1 : 0 );
 	' "${meta}" "${VERSION}" || die "release metadata does not match ${VERSION}."
 

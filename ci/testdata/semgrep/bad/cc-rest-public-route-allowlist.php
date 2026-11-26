@@ -19,3 +19,23 @@ register_rest_route(
 		},
 	)
 );
+register_rest_route(
+	'bgc/v1',
+	'/auth/',
+	array(
+		'methods'             => 'POST',
+		'callback'            => 'example_callback',
+		'permission_callback' => function () {
+			return true;
+		},
+	)
+);
+register_rest_route(
+	'other/v1',
+	'/auth/',
+	array(
+		'methods'             => 'POST',
+		'callback'            => 'example_callback',
+		'permission_callback' => '__return_true',
+	)
+);
