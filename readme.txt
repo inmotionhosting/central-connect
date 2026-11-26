@@ -43,7 +43,7 @@ Release Date: TBD
 
 Release Date: June 17th, 2026
 
-* Bug Fix: Fixed sanitization of nonce to use `sanitize_key()` instead of s`antize_text_field()`.
+* Bug Fix: Fixed sanitization of nonce to use `sanitize_key()` instead of `sanitize_text_field()`.
 * Bug Fix: Set an allowlist for options that can be changed
 * Bug Fix: Fixed the inverted nonce check.
 * Bug Fix: Added explicit `permission_callback` for auth route.
@@ -67,6 +67,13 @@ Release Date: April 4th, 2023
 
 * Bug Fix: Resolve correct class names for repo changes. 
 
+= 2.0.2 =
+
+Release Date: January 9th, 2023
+
+* Update: Updated plugin for wp.org submission.
+* Update: First WordPress.org release as Central Connect (formerly BoldGrid Connect).
+
 = 2.0.1 =
 
 Release Date: June 28th, 2022
@@ -75,7 +82,7 @@ Release Date: June 28th, 2022
 
 = 2.0.0 =
 
-Release Date: TBD
+Release Date: Not published on WordPress.org
 
 * Feature:  Single signin through Central.
 * Feature:  New rest endpoints.
