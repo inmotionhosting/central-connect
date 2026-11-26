@@ -1,0 +1,24 @@
+{
+	"phpsab.executablePathCS": "./vendor/bin/phpcs",
+	"phpsab.executablePathCBF": "./vendor/bin/phpcbf",
+	"phpsab.standard": "phpcs.xml",
+	"phpsab.autoRulesetSearch": false,
+	"phpsab.snifferShowSources": true,
+	"phpcs.executablePath": "./vendor/bin/phpcs",
+	"phpcs.standard": "phpcs.xml",
+	"phpcbf.executablePath": "./vendor/bin/phpcbf",
+	"phpcbf.standard": "phpcs.xml",
+	"files.watcherExclude": {
+		"**/.cursor/working/**": true,
+		"**/build/**": true
+	},
+	"search.exclude": {
+		"**/.cursor/working": true,
+		"**/build": true
+	},
+	"intelephense.files.exclude": [
+		"**/.cursor/working/**",
+		"**/build/**",
+		"**/node_modules/**"
+	]
+}

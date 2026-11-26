@@ -12,3 +12,6 @@ package-lock.json
 yarn-error.log
 .phpunit.result.cache
 phpunit.xml
+.cursor/working/
+/build/
+/central-connect.zip
