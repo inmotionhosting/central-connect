@@ -203,6 +203,24 @@ class Test_Login_Token extends Central_Connect_Test_Case {
 	}
 
 	/**
+	 * The site-token relay fires central_connect_remote_validate only when it
+	 * actually contacts Central.
+	 */
+	public function test_site_token_relay_fires_remote_validate_action() {
+		self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$this->connect_site();
+		$this->http_response = $this->central_response( array( 'validated' => true ) );
+		$before              = did_action( 'central_connect_remote_validate' );
+
+		$this->authenticate( array( 'token' => str_repeat( 'x', 5000 ) ) );
+		$this->assertSame( $before, did_action( 'central_connect_remote_validate' ), 'A locally rejected token must not fire the action.' );
+
+		$this->authenticate( array( 'token' => 'site-token' ) );
+		$this->assertCount( 1, $this->http_requests );
+		$this->assertSame( $before + 1, did_action( 'central_connect_remote_validate' ) );
+	}
+
+	/**
 	 * The caller allowlist gates the site-token relay as well as the
 	 * environment-token relay.
 	 */

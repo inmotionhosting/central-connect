@@ -100,6 +100,27 @@ class Test_Plugin_Check extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The legacy "{slug}:init" action still fires for existing listeners and is reported as deprecated.
+	 */
+	public function test_legacy_version_check_init_action_still_fires_and_is_deprecated() {
+		$legacy = 'central-connect:init';
+		$this->setExpectedDeprecated( $legacy );
+
+		$calls    = 0;
+		$listener = function () use ( &$calls ) {
+			++$calls;
+		};
+		add_action( $legacy, $listener );
+
+		Central_Connect_Version_Check::init( 'central-connect/central-connect.php', '5.0', '7.4', '__return_null' );
+		Central_Connect_Version_Check::success_hook();
+		Central_Connect_Version_Check::init( plugin_basename( CENTRAL_CONNECT_FILE ), '5.0', '7.4', '__return_null' );
+
+		remove_action( $legacy, $listener );
+		$this->assertSame( 1, $calls );
+	}
+
+	/**
 	 * Shipped PHP files: the plugin root plus includes/ and src/.
 	 *
 	 * @return string[] Absolute paths keyed by path relative to the plugin root.

@@ -153,6 +153,31 @@ class Test_Auth_Route extends Central_Connect_Test_Case {
 	}
 
 	/**
+	 * The environment-token relay fires central_connect_remote_validate only
+	 * when it actually contacts Central.
+	 */
+	public function test_environment_token_relay_fires_remote_validate_action() {
+		self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$this->connect_site( 'site-key-123' );
+		$this->central_accepts();
+		$before = did_action( 'central_connect_remote_validate' );
+
+		$this->rest( 'POST', self::ROUTE, array( 'environment_id' => self::ENV ) );
+		$this->assertSame( $before, did_action( 'central_connect_remote_validate' ), 'A locally rejected request must not fire the action.' );
+
+		$this->rest(
+			'POST',
+			self::ROUTE,
+			array(
+				'token'          => self::TOKEN,
+				'environment_id' => self::ENV,
+			)
+		);
+		$this->assertCount( 1, $this->http_requests );
+		$this->assertSame( $before + 1, did_action( 'central_connect_remote_validate' ) );
+	}
+
+	/**
 	 * Legitimate flow: Central confirms the token and the site issues an
 	 * access token, storing the environment id for later requests.
 	 */

@@ -99,7 +99,7 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 		 * itself always passes central_connect_plugin_load.
 		 *
 		 * @since  1.0.0
-		 * @since  2.1.0 Fires `central_connect_init` instead of the dynamic `{$slug}:init`.
+		 * @since  2.1.0 Fires `central_connect_init`; the dynamic `{$slug}:init` is deprecated.
 		 *
 		 * @access public
 		 *
@@ -112,6 +112,17 @@ if ( ! class_exists( 'Central_Connect_Version_Check' ) ) {
 			 * @since 2.1.0
 			 */
 			do_action( 'central_connect_init' );
+
+			/**
+			 * Fires on init once the PHP and WordPress version checks pass.
+			 *
+			 * The name is the plugin folder followed by ":init", e.g. "central-connect:init".
+			 *
+			 * @since 1.0.0
+			 * @deprecated 2.1.0 Use central_connect_init.
+			 */
+			$file = explode( '/', self::$plugin );
+			do_action_deprecated( sanitize_key( $file[0] ) . ':init', array(), '2.1.0', 'central_connect_init' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound, WordPress.NamingConventions.ValidHookName.UseUnderscores -- legacy hook kept for backward compatibility.
 		}
 
 		/**
